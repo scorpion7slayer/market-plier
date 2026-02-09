@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once 'database/db.php';
 
 // Génération token CSRF si absent
 if (!isset($_SESSION['csrf_token'])) {
@@ -32,6 +32,7 @@ if ($user) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Market Plier</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" />
 </head>
 
 <body>
