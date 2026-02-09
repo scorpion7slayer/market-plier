@@ -13,3 +13,6 @@ https://ipapi.co/
 # DB
 
 https://ghwbk.serverscorpion1601.site/phpmyadmin
+
+user: root
+password: HoriMySQL2026!
