@@ -1,7 +1,5 @@
 # market
 
-
 # Frameworks
-
 
 # Notes
