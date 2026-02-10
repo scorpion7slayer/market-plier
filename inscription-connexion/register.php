@@ -77,7 +77,7 @@ include '../header.php';
         </div>
 
         <button type="button" class="google-btn">
-          Se connecter avec google
+          S'inscrire avec google
         </button>
       </form>
     </main>
