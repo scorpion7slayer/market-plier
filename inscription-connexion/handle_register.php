@@ -1,6 +1,6 @@
 <?php
 session_start();
-require './database/db.php';
+require '../database/db.php';
 
 // Vérification CSRF
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {

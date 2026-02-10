@@ -1,19 +1,17 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Plier - S'inscrire</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<style>* {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
+@font-face {
+    font-family: "Archivo";
+    font-style: italic;
+    font-weight: 100 900;
+    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
+        format("truetype");
+}
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: "Archivo", Arial, sans-serif;
     background-color: #ffffff;
     min-height: 100vh;
     display: flex;
@@ -35,7 +33,7 @@ body {
 }
 
 .logo img {
-    width: 500px;
+    width: 5%;
     height: auto;
 }
 
@@ -99,7 +97,7 @@ body {
 
 .divider::before,
 .divider::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background-color: #ccc;
@@ -163,64 +161,23 @@ body {
         top: 15px;
         left: 20px;
     }
-    
+
     .logo img {
-        width: 150px;
+        width: 50px;
     }
-    
+
     .brand-name {
         font-size: 1.5rem;
     }
-    
+
     .title {
         font-size: 2rem;
     }
-    
+
     .email-input,
     .google-btn,
     .submit-btn {
         font-size: 1rem;
         padding: 15px 20px;
     }
-}</style>
-<body>
-     <div class="logo">
-          <img src="Capture d'écran 2026-02-09 155057.png" alt="">
-        </div>
-
-    <div class="container">
-       
-        <main class="form-container">
-            <h2 class="title">S'inscrire</h2>
-            
-            <form class="signup-form">
-                <input 
-                    type="email" 
-                    class="email-input" 
-                    placeholder="adresse email"
-                    required
-                >
-                
-                <input 
-                    type="password" 
-                    class="email-input" 
-                    placeholder="mot de passe"
-                    required
-                >
-                
-                <button type="submit" class="submit-btn">
-                    S'inscrire
-                </button>
-                
-                <div class="divider">
-                    <span class="divider-text">ou</span>
-                </div>
-                
-                <button type="button" class="google-btn">
-                    Se connecter avec google
-                </button>
-            </form>
-        </main>
-    </div>
-</body>
-</html>
+}
