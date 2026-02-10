@@ -52,21 +52,23 @@ include '../header.php';
           placeholder="adresse email"
           required>
 
-        <input
-          type="password"
-          class="email-input"
-          name="password"
-          id="password"
-          placeholder="mot de passe"
-          required>
+        <div class="password-row">
+          <input
+            type="password"
+            class="email-input"
+            name="password"
+            id="password"
+            placeholder="mot de passe"
+            required>
 
-        <input
-          type="password"
-          class="email-input"
-          name="confirm_password"
-          id="confirm_password"
-          placeholder="confirmer le mot de passe"
-          required>
+          <input
+            type="password"
+            class="email-input"
+            name="confirm_password"
+            id="confirm_password"
+            placeholder="confirmer le mot de passe"
+            required>
+        </div>
 
         <button type="submit" class="submit-btn">
           S'inscrire

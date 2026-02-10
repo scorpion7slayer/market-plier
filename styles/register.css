@@ -64,6 +64,16 @@ body {
     gap: 30px;
 }
 
+.password-row {
+    display: flex;
+    gap: 15px;
+}
+
+.password-row .email-input {
+    flex: 1;
+    min-width: 0;
+}
+
 .email-input {
     width: 100%;
     padding: 20px 30px;
@@ -179,5 +189,10 @@ body {
     .submit-btn {
         font-size: 1rem;
         padding: 15px 20px;
+    }
+
+    .password-row {
+        flex-direction: column;
+        gap: 30px;
     }
 }
