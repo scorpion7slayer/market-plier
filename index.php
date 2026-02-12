@@ -71,16 +71,16 @@ if ($user) {
     .header-bottom {
       display: flex;
       align-items: center;
-      padding-left: 300px; /* align under searchbar */
+      padding-left: 110px; /* align under searchbar */
       margin-top: 6px;
     }
 
-    /* Logo zone - increased width */
+    /* Logo zone - adjusted for image only */
     .logo-area {
       display: flex;
       align-items: center;
       gap: 6px;
-      width: 270px;
+      width: 80px;
       flex-shrink: 0;
     }
 
@@ -297,7 +297,6 @@ if ($user) {
             <circle cx="44" cy="46" r="4" fill="#111"/>
           </svg> -->
         </div>
-        <span class="logo-text">Market Plier</span>
       </div>
       <div class="header-divider"></div>
       <input class="search-bar" type="text" placeholder="Rechercher" />
