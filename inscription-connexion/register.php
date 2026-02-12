@@ -83,9 +83,9 @@ if (empty($_SESSION['csrf_token'])) {
           <span class="divider-text">ou</span>
         </div>
 
-        <button type="button" class="google-btn">
+        <a href="google_login.php" class="google-btn">
           S'inscrire avec google
-        </button>
+        </a>
       </form>
 
       <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
