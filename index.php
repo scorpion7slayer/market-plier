@@ -71,28 +71,29 @@ if ($user) {
     .header-bottom {
       display: flex;
       align-items: center;
-      padding-left: 240px; /* align under searchbar */
+      padding-left: 320px; /* align under searchbar - adjusted */
       margin-top: 6px;
     }
 
-    /* Logo zone */
+    /* Logo zone - ÉLARGI */
     .logo-area {
       display: flex;
       align-items: center;
       gap: 6px;
-      width: 210px;
+      width: 290px; /* augmenté de 210px à 290px */
       flex-shrink: 0;
     }
 
     .logo-icon {
-      width: 56px;
+      width: 100%; /* prend toute la largeur disponible */
       height: 48px;
       flex-shrink: 0;
     }
 
-    .logo-icon svg {
+    .logo-icon img {
       width: 100%;
       height: 100%;
+      object-fit: contain; /* garde les proportions de l'image */
     }
 
     .logo-text {
@@ -104,6 +105,7 @@ if ($user) {
       line-height: 1;
       white-space: nowrap;
       letter-spacing: -0.5px;
+      display: none; /* caché car on utilise une image */
     }
 
     /* Divider */
@@ -118,9 +120,10 @@ if ($user) {
     .search-bar {
       background: #ddecd4;
       border: 1.5px solid #b5d4a0;
-      border-radius: 6px;
+      border-radius: 30px;
       height: 34px;
       flex: 1;
+      max-width: 400px; /* limite la largeur pour compenser le logo plus large */
       padding: 0 14px;
       font-size: 15px;
       font-style: italic;
@@ -148,13 +151,20 @@ if ($user) {
       letter-spacing: 0.3px;
     }
 
-    /* Avatar */
+    /* Avatar - AGRANDI */
     .avatar {
-      width: 64px;
-      height: 64px;
+      width: 80px; /* augmenté de 64px à 80px */
+      height: 80px; /* augmenté de 64px à 80px */
       border-radius: 50%;
       background: #c8c8c8;
       flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* ─── MAIN ────────────────────────────────────────────────── */
@@ -277,19 +287,17 @@ if ($user) {
     <div class="header-top">
       <div class="logo-area">
         <div class="logo-icon">
-          <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 6 C12 6, 16 8, 18 14 L26 36 C27 40, 31 42, 35 40 L52 34" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
-            <path d="M2 3 C6 2, 10 3, 12 7" stroke="#111" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <circle cx="28" cy="46" r="4" fill="#111"/>
-            <circle cx="44" cy="46" r="4" fill="#111"/>
-          </svg>
+          <!-- Remplace cette URL par ton image de logo -->
+          <img src="https://via.placeholder.com/290x48/8faf72/ffffff?text=Market+Plier" alt="Market Plier Logo">
         </div>
-        <span class="logo-text">Market Plier</span>
       </div>
       <div class="header-divider"></div>
       <input class="search-bar" type="text" placeholder="Rechercher" />
       <div class="header-divider"></div>
-      <div class="avatar"></div>
+      <div class="avatar">
+        <!-- Remplace cette URL par ta photo de profil -->
+        <img src="https://picsum.photos/seed/profile/80/80" alt="Photo de profil">
+      </div>
     </div>
 
     <!-- Bottom row: nav links -->
