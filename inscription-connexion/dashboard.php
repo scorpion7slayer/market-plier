@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['auth_token'])) {
   header('Location: login.php');
   exit();
 }
@@ -26,8 +26,8 @@ $errorMessage = '';
 // Récupérer les informations utilisateur
 if (isset($pdo)) {
   try {
-    $stmt = $pdo->prepare("SELECT username, email, is_admin, profile_photo FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt = $pdo->prepare("SELECT username, email, is_admin, profile_photo FROM users WHERE auth_token = ?");
+    $stmt->execute([$_SESSION['auth_token']]);
     $userData = $stmt->fetch();
 
     if ($userData) {
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['changer_photo'])) {
 
         // Générer un nom de fichier unique
         $extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $newFileName = 'user_' . $_SESSION['user_id'] . '_' . time() . '.' . $extension;
+        $newFileName = 'user_' . $_SESSION['auth_token'] . '_' . time() . '.' . $extension;
         $uploadPath = $uploadDir . $newFileName;
 
         // Supprimer l'ancienne photo si elle existe
@@ -78,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['changer_photo'])) {
         // Déplacer le fichier uploadé
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath)) {
           try {
-            $updateStmt = $pdo->prepare("UPDATE users SET profile_photo = ? WHERE id = ?");
-            $updateStmt->execute([$newFileName, $_SESSION['user_id']]);
+            $updateStmt = $pdo->prepare("UPDATE users SET profile_photo = ? WHERE auth_token = ?");
+            $updateStmt->execute([$newFileName, $_SESSION['auth_token']]);
             $profilePhoto = $newFileName;
             $successMessage = "Photo de profil mise à jour avec succès !";
           } catch (PDOException $ex) {
@@ -118,14 +118,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     } else {
       try {
         // Vérifier si le username ou email existe déjà (sauf pour l'utilisateur actuel)
-        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?");
-        $checkStmt->execute([$newUsername, $newEmail, $_SESSION['user_id']]);
+        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND auth_token != ?");
+        $checkStmt->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
 
         if ($checkStmt->fetch()) {
           $errorMessage = "Ce nom d'utilisateur ou email est déjà utilisé.";
         } else {
-          $updateStmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-          $updateStmt->execute([$newUsername, $newEmail, $_SESSION['user_id']]);
+          $updateStmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE auth_token = ?");
+          $updateStmt->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
 
           $username = $newUsername;
           $email = $newEmail;
