@@ -73,7 +73,7 @@ if ($user) {
       align-items: center;
       padding-left: 210px; /* align under searchbar */
       margin-top: 6px;
-      margin-left: 180px;
+      margin-left: 205px;
     }
 
     /* Logo zone - adjusted for image only */
@@ -107,16 +107,7 @@ if ($user) {
       height: 100%;
     }
 
-    .logo-text {
-      font-family: 'Ubuntu', sans-serif;
-      font-style: italic;
-      font-weight: 700;
-      font-size: 28px;
-      color: #fff;
-      line-height: 1;
-      white-space: nowrap;
-      letter-spacing: -0.5px;
-    }
+   
 
     /* Divider */
     .header-divider {
