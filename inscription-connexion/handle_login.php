@@ -24,7 +24,7 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
 }
 
 try {
-  $stmt = $pdo->prepare("SELECT id, username, email, password_hash, auth_provider FROM users WHERE email = ?");
+  $stmt = $pdo->prepare("SELECT auth_token, username, email, password_hash, auth_provider FROM users WHERE email = ?");
   $stmt->execute([$_POST['email']]);
   $user = $stmt->fetch();
 
@@ -37,7 +37,7 @@ try {
   if ($user && password_verify($_POST['password'], $user['password_hash'])) {
     // Régénérer l'ID de session pour éviter la fixation de session
     session_regenerate_id(true);
-    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['auth_token'] = $user['auth_token'];
     $_SESSION['username'] = $user['username'];
     header("Location: dashboard.php");
     exit;

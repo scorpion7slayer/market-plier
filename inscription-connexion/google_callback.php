@@ -109,21 +109,21 @@ $googleName  = $googleUser['name'] ?? '';
 // --- Recherche de l'utilisateur en BDD ---
 try {
   // Cas A : Recherche par google_id
-  $stmt = $pdo->prepare("SELECT id, username, email, google_id, auth_provider FROM users WHERE google_id = ?");
+  $stmt = $pdo->prepare("SELECT auth_token, username, email, google_id, auth_provider FROM users WHERE google_id = ?");
   $stmt->execute([$googleId]);
   $user = $stmt->fetch();
 
   if ($user) {
     // Compte Google déjà lié -> connexion directe
     session_regenerate_id(true);
-    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['auth_token'] = $user['auth_token'];
     $_SESSION['username'] = $user['username'];
     header("Location: dashboard.php");
     exit;
   }
 
   // Cas B : Recherche par email (compte local existant)
-  $stmt = $pdo->prepare("SELECT id, username, email, google_id, auth_provider FROM users WHERE email = ?");
+  $stmt = $pdo->prepare("SELECT auth_token, id, username, email, google_id, auth_provider FROM users WHERE email = ?");
   $stmt->execute([$googleEmail]);
   $user = $stmt->fetch();
 
@@ -133,7 +133,7 @@ try {
     $stmt->execute([$googleId, $user['id']]);
 
     session_regenerate_id(true);
-    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['auth_token'] = $user['auth_token'];
     $_SESSION['username'] = $user['username'];
     header("Location: dashboard.php");
     exit;
@@ -168,12 +168,14 @@ try {
     $suffix++;
   }
 
-  $stmt = $pdo->prepare("INSERT INTO users (username, email, google_id, auth_provider, password_hash) VALUES (?, ?, ?, 'google', NULL)");
-  $stmt->execute([$username, $googleEmail, $googleId]);
-  $newUserId = $pdo->lastInsertId();
+  // Générer un token d'authentification sécurisé
+  $auth_token = bin2hex(random_bytes(32));
+
+  $stmt = $pdo->prepare("INSERT INTO users (username, email, google_id, auth_provider, auth_token, password_hash) VALUES (?, ?, ?, 'google', ?, NULL)");
+  $stmt->execute([$username, $googleEmail, $googleId, $auth_token]);
 
   session_regenerate_id(true);
-  $_SESSION['user_id'] = $newUserId;
+  $_SESSION['auth_token'] = $auth_token;
   $_SESSION['username'] = $username;
   header("Location: dashboard.php");
   exit;
