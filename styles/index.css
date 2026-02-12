@@ -144,13 +144,35 @@ nav a {
     letter-spacing: 0.3px;
 }
 
-/* Avatar */
-.avatar {
-    width: 80px;
-    height: 80px;
+/* Photo de profil */
+.profile-photo-container {
+    position: sticky;
+    display: inline-block;
+}
+
+.profile-photo {
+    width: 140%;
+    height: auto;
+    object-fit: cover;
     border-radius: 50%;
-    background: #c8c8c8;
-    flex-shrink: 0;
+    flex: auto;
+}
+
+.profile-photo-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7fb885 0%, #6aa070 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(127, 184, 133, 0.3);
+}
+
+.profile-photo-placeholder i {
+    font-size: 80px;
+    color: white;
 }
 
 /* ─── MAIN ────────────────────────────────────────────────── */
