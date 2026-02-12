@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
 <body>
   <div class="logo">
-    <img src="../assets/images/logo.svg" alt="Market Plier Logo" style="width: 100%; height: auto;">
+    <img src="../assets/images/logo.svg" alt="Market Plier Logo" style="width: 80%; height: auto;">
   </div>
 
   <!-- Modal pour changer la photo -->

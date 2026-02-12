@@ -120,6 +120,7 @@ body {
 }
 
 .google-btn {
+    display: block;
     width: 100%;
     padding: 20px 30px;
     font-size: 1.1rem;
@@ -130,6 +131,10 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    font-family: inherit;
 }
 
 .google-btn:hover {

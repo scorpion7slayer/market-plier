@@ -24,9 +24,15 @@ if (empty($_POST['email']) || empty($_POST['password'])) {
 }
 
 try {
-  $stmt = $pdo->prepare("SELECT id, username, email, password_hash FROM users WHERE email = ?");
+  $stmt = $pdo->prepare("SELECT id, username, email, password_hash, auth_provider FROM users WHERE email = ?");
   $stmt->execute([$_POST['email']]);
   $user = $stmt->fetch();
+
+  if ($user && $user['password_hash'] === null) {
+    // Compte Google-only : pas de mot de passe défini
+    header("Location: login.php?error=" . urlencode("Ce compte utilise la connexion Google. Veuillez utiliser le bouton « Se connecter avec google »."));
+    exit;
+  }
 
   if ($user && password_verify($_POST['password'], $user['password_hash'])) {
     // Régénérer l'ID de session pour éviter la fixation de session
