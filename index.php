@@ -90,7 +90,7 @@ if ($user) {
       padding-left: 210px;
       /* align under searchbar */
       margin-top: 6px;
-      margin-left: 180px;
+      margin-left: 208px;
     }
 
     /* Logo zone - adjusted for image only */
