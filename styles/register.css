@@ -166,6 +166,46 @@ body {
     transform: translateY(0);
 }
 
+.alert {
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.alert-error {
+    background-color: #fde8e8;
+    color: #c0392b;
+    border: 2px solid #e74c3c;
+}
+
+.alert-success {
+    background-color: #e8fde8;
+    color: #27ae60;
+    border: 2px solid #7fb885;
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1.1rem;
+    color: #666;
+    font-style: italic;
+}
+
+.auth-link a {
+    color: #7fb885;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link a:hover {
+    color: #6aa070;
+    text-decoration: underline;
+}
+
 @media (max-width: 768px) {
     .logo {
         top: 15px;
