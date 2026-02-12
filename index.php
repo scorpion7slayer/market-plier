@@ -71,23 +71,32 @@ if ($user) {
     .header-bottom {
       display: flex;
       align-items: center;
-      padding-left: 240px; /* align under searchbar */
+      padding-left: 300px; /* align under searchbar */
       margin-top: 6px;
     }
 
-    /* Logo zone */
+    /* Logo zone - increased width */
     .logo-area {
       display: flex;
       align-items: center;
       gap: 6px;
-      width: 210px;
+      width: 270px;
       flex-shrink: 0;
     }
 
     .logo-icon {
-      width: 56px;
-      height: 48px;
+      width: 60px;
+      height: 60px;
       flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .logo-icon svg {
@@ -277,12 +286,16 @@ if ($user) {
     <div class="header-top">
       <div class="logo-area">
         <div class="logo-icon">
-          <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Remplacez le src par le chemin de votre image -->
+          <img src="votre-logo.png" alt="Market Plier Logo">
+          
+          <!-- OU gardez le SVG si vous préférez -->
+          <!-- <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 6 C12 6, 16 8, 18 14 L26 36 C27 40, 31 42, 35 40 L52 34" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
             <path d="M2 3 C6 2, 10 3, 12 7" stroke="#111" stroke-width="3" stroke-linecap="round" fill="none"/>
             <circle cx="28" cy="46" r="4" fill="#111"/>
             <circle cx="44" cy="46" r="4" fill="#111"/>
-          </svg>
+          </svg> -->
         </div>
         <span class="logo-text">Market Plier</span>
       </div>
