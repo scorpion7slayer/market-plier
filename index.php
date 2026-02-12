@@ -27,23 +27,34 @@ if ($user) {
 ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Market Plier</title>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Ubuntu:ital,wght@1,700&display=swap" rel="stylesheet">
+
   <style>
-    *, *::before, *::after {
-      
+    *,
+    *::before,
+    *::after {
+
       margin: 0;
       padding: 0;
     }
 
-    html, body {
+    @font-face {
+      font-family: "Archivo";
+      font-style: italic;
+      font-weight: 100 900;
+      src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+    }
+
+    html,
+    body {
       width: 100%;
       height: 100%;
-     
-      font-family: 'Ubuntu', Arial, sans-serif;
+
+      font-family: 'Archivo', Arial, sans-serif;
       background: #fff;
     }
 
@@ -57,7 +68,10 @@ if ($user) {
       padding: 0 18px;
       border-bottom: 3px solid #4a90a4;
       gap: 0;
-        }
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
 
     /* Top row: logo | divider | searchbar | divider | avatar */
     .header-top {
@@ -65,15 +79,22 @@ if ($user) {
       align-items: center;
       gap: 0;
       width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     /* Bottom row: nav links */
     .header-bottom {
       display: flex;
       align-items: center;
-      padding-left: 210px; /* align under searchbar */
+      padding-left: 210px;
+      /* align under searchbar */
       margin-top: 6px;
       margin-left: 180px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     /* Logo zone - adjusted for image only */
@@ -108,7 +129,7 @@ if ($user) {
     }
 
     .logo-text {
-      font-family: 'Ubuntu', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 28px;
@@ -154,7 +175,7 @@ if ($user) {
     }
 
     nav a {
-      font-family: 'Ubuntu', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 12px;
@@ -184,7 +205,7 @@ if ($user) {
     }
 
     .greeting {
-      font-family: 'Ubuntu', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 30px;
@@ -202,12 +223,12 @@ if ($user) {
       margin-top: 50px;
     }
 
-    section + section {
+    section+section {
       margin-top: 28px;
     }
 
     .section-title {
-      font-family: 'Ubuntu', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 22px;
@@ -285,6 +306,7 @@ if ($user) {
     }
   </style>
 </head>
+
 <body>
 
   <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
@@ -295,8 +317,8 @@ if ($user) {
         <div class="logo-icon">
           <!-- Remplacez le src par le chemin de votre image -->
           <img src="assets/images/logo.svg" alt="Market Plier Logo" style="width: auto; height: 100%; margin-left: 250%;">
-          
-         
+
+
         </div>
       </div>
       <div class="header-divider"></div>
@@ -349,4 +371,5 @@ if ($user) {
   </main>
 
 </body>
+
 </html>
