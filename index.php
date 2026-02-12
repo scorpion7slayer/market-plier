@@ -66,7 +66,6 @@ if ($user) {
       justify-content: center;
       height: 140px;
       padding: 0 18px;
-      border-bottom: 3px solid #4a90a4;
       gap: 0;
       position: sticky;
       top: 0;
@@ -126,7 +125,7 @@ if ($user) {
     }
 
     .logo-text {
-      font-family: 'Ubuntu', sans-serif;
+      font-family: 'Archivo', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 28px;
