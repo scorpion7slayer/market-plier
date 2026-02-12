@@ -4,7 +4,8 @@ session_start();
 try {
   require '../database/db.php';
 } catch (PDOException $e) {
-  header("Location: register.php?error=" . urlencode("Erreur de connexion à la base de données : " . $e->getMessage()));
+  error_log("DB connection error (register): " . $e->getMessage());
+  header("Location: register.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
   exit;
 }
 
@@ -54,7 +55,8 @@ try {
   if ($e->getCode() == 23000) {
     header("Location: register.php?error=" . urlencode("Ce nom d'utilisateur ou email existe déjà"));
   } else {
-    header("Location: register.php?error=" . urlencode("Erreur lors de l'inscription : " . $e->getMessage()));
+    error_log("Register error: " . $e->getMessage());
+    header("Location: register.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
   }
   exit;
 }

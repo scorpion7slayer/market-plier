@@ -4,7 +4,8 @@ session_start();
 try {
   require '../database/db.php';
 } catch (PDOException $e) {
-  header("Location: login.php?error=" . urlencode("Erreur de connexion à la base de données : " . $e->getMessage()));
+  error_log("DB connection error (login): " . $e->getMessage());
+  header("Location: login.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
   exit;
 }
 
