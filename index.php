@@ -37,145 +37,140 @@ if ($user) {
 
     html, body {
       width: 100%;
-      height: 100%;
       font-family: 'Inter', sans-serif;
       background: #fff;
       color: #111;
-      overflow-x: hidden;
+      font-size: 13px;
     }
 
-    /* ═══════════════ NAV ═══════════════ */
+    /* ═══ NAV ═══ */
     nav {
       width: 100%;
-      height: 90px;
+      height: 60px;
       background: #8faf78;
       display: grid;
       grid-template-columns: auto 1px 1fr 1px auto;
       align-items: stretch;
     }
 
-    /* Logo col */
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 0 28px;
+      gap: 7px;
+      padding: 0 18px;
       text-decoration: none;
     }
-    .nav-logo svg { width: 42px; height: 42px; flex-shrink: 0; }
+    .nav-logo svg { width: 28px; height: 28px; }
     .nav-logo span {
       font-family: 'Syne', sans-serif;
       font-style: italic;
       font-weight: 800;
-      font-size: 1.55rem;
+      font-size: 1.15rem;
       color: #fff;
       white-space: nowrap;
     }
 
-    /* Divider cols */
     .nav-sep {
       background: rgba(255,255,255,0.4);
-      margin: 12px 0;
+      margin: 8px 0;
     }
 
-    /* Center col */
     .nav-center {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 6px;
-      padding: 14px 40px;
+      gap: 4px;
+      padding: 8px 24px;
     }
     .nav-search {
       width: 100%;
       background: rgba(180,215,160,0.55);
       border: none;
       border-radius: 999px;
-      padding: 7px 18px;
+      padding: 5px 14px;
       font-family: 'Inter', sans-serif;
       font-style: italic;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: #333;
       outline: none;
     }
     .nav-search::placeholder { color: #5a7a4a; }
+
     .nav-subnav {
       display: flex;
-      gap: 32px;
+      gap: 24px;
       list-style: none;
-      padding-left: 14px;
+      padding-left: 10px;
     }
     .nav-subnav a {
       font-style: italic;
       font-weight: 600;
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       color: #fff;
       text-decoration: none;
     }
 
-    /* Avatar col */
     .nav-avatar-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 28px;
+      padding: 0 18px;
     }
     .nav-avatar {
-      width: 54px;
-      height: 54px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       overflow: hidden;
       background: #c2d9ad;
     }
     .nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* ═══════════════ PAGE ═══════════════ */
+    /* ═══ PAGE ═══ */
     .page {
       width: 100%;
-      padding: 36px 48px 40px;
-      max-width: none;
+      padding: 20px 32px 28px;
     }
 
     .greeting {
       font-family: 'Syne', sans-serif;
       font-style: italic;
       font-weight: 800;
-      font-size: 2rem;
-      margin-bottom: 40px;
+      font-size: 1.3rem;
+      margin-bottom: 24px;
     }
 
-    /* ═══════════════ SECTION ═══════════════ */
-    .section { margin-bottom: 44px; }
+    /* ═══ SECTION ═══ */
+    .section { margin-bottom: 28px; }
 
     .section-title {
       font-family: 'Syne', sans-serif;
       font-style: italic;
       font-weight: 800;
-      font-size: 1.4rem;
-      margin-bottom: 8px;
+      font-size: 1rem;
+      margin-bottom: 6px;
     }
 
     .section-line {
       border: none;
-      border-top: 1.5px solid #ccc;
-      margin-bottom: 24px;
+      border-top: 1px solid #ddd;
+      margin-bottom: 14px;
     }
 
-    /* ═══════════════ CAROUSEL ROW ═══════════════ */
+    /* ═══ CAROUSEL ROW ═══ */
     .row {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
     }
 
     .items {
       display: flex;
-      gap: 20px;
+      gap: 12px;
       flex: 1;
     }
 
     .arrow {
-      font-size: 2rem;
+      font-size: 1.4rem;
       font-weight: 900;
       cursor: pointer;
       color: #111;
@@ -184,11 +179,8 @@ if ($user) {
       line-height: 1;
     }
 
-    /* ═══════════════ CIRCLES ═══════════════ */
-    .circle-card {
-      flex: 1;
-      min-width: 0;
-    }
+    /* ═══ CIRCLES ═══ */
+    .circle-card { flex: 1; min-width: 0; }
     .circle-img {
       width: 100%;
       aspect-ratio: 1/1;
@@ -198,15 +190,12 @@ if ($user) {
     }
     .circle-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* ═══════════════ SQUARES ═══════════════ */
-    .square-card {
-      flex: 1;
-      min-width: 0;
-    }
+    /* ═══ SQUARES ═══ */
+    .square-card { flex: 1; min-width: 0; }
     .square-img {
       width: 100%;
       aspect-ratio: 1/1;
-      border-radius: 16px;
+      border-radius: 10px;
       overflow: hidden;
       background: #d9d9d9;
     }
@@ -215,7 +204,6 @@ if ($user) {
 </head>
 <body>
 
-<!-- ── NAV ── -->
 <nav>
   <a class="nav-logo" href="#">
     <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -247,36 +235,33 @@ if ($user) {
   </div>
 </nav>
 
-<!-- ── PAGE ── -->
 <div class="page">
 
   <h1 class="greeting">Bonjour, Gaspmi</h1>
 
-  <!-- Articles tendances -->
   <div class="section">
     <h2 class="section-title">Articles tendances</h2>
     <hr class="section-line" />
     <div class="row">
       <div class="items">
-        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t1/400/400" alt="" /></div></div>
-        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t2/400/400" alt="" /></div></div>
-        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t3/400/400" alt="" /></div></div>
-        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t4/400/400" alt="" /></div></div>
+        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t1/300/300" alt="" /></div></div>
+        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t2/300/300" alt="" /></div></div>
+        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t3/300/300" alt="" /></div></div>
+        <div class="circle-card"><div class="circle-img"><img src="https://picsum.photos/seed/t4/300/300" alt="" /></div></div>
       </div>
       <span class="arrow">›</span>
     </div>
   </div>
 
-  <!-- Achats consultés -->
   <div class="section">
     <h2 class="section-title">Achats consulté dernierement</h2>
     <hr class="section-line" />
     <div class="row">
       <div class="items">
-        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p1/400/400" alt="" /></div></div>
-        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p2/400/400" alt="" /></div></div>
-        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p3/400/400" alt="" /></div></div>
-        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p4/400/400" alt="" /></div></div>
+        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p1/300/300" alt="" /></div></div>
+        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p2/300/300" alt="" /></div></div>
+        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p3/300/300" alt="" /></div></div>
+        <div class="square-card"><div class="square-img"><img src="https://picsum.photos/seed/p4/300/300" alt="" /></div></div>
       </div>
       <span class="arrow">›</span>
     </div>
