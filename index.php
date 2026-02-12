@@ -34,7 +34,7 @@ if ($user) {
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Ubuntu:ital,wght@1,700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
-      box-sizing: border-box;
+      
       margin: 0;
       padding: 0;
     }
@@ -42,7 +42,7 @@ if ($user) {
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
+     
       font-family: 'Ubuntu', Arial, sans-serif;
       background: #fff;
     }
@@ -53,11 +53,11 @@ if ($user) {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      height: 100px;
+      height: 140px;
       padding: 0 18px;
       border-bottom: 3px solid #4a90a4;
       gap: 0;
-    }
+        }
 
     /* Top row: logo | divider | searchbar | divider | avatar */
     .header-top {
@@ -71,8 +71,9 @@ if ($user) {
     .header-bottom {
       display: flex;
       align-items: center;
-      padding-left: 110px; /* align under searchbar */
+      padding-left: 210px; /* align under searchbar */
       margin-top: 6px;
+      margin-left: 180px;
     }
 
     /* Logo zone - adjusted for image only */
@@ -80,23 +81,25 @@ if ($user) {
       display: flex;
       align-items: center;
       gap: 6px;
-      width: 80px;
+      width: 180px;
       flex-shrink: 0;
     }
 
     .logo-icon {
-      width: 60px;
-      height: 60px;
+      width: 100px;
+      height: 100px;
       flex-shrink: 0;
-      border-radius: 8px;
-      overflow: hidden;
       background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .logo-icon img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      display: block;
     }
 
     .logo-icon svg {
@@ -117,24 +120,27 @@ if ($user) {
 
     /* Divider */
     .header-divider {
-      width: 2px;
-      height: 60px;
+      width: 5px;
+      height: 90px;
       background: #aec89a;
       margin: 0 14px;
       flex-shrink: 0;
+      margin-left: 180px
     }
 
     .search-bar {
       background: #ddecd4;
       border: 1.5px solid #b5d4a0;
       border-radius: 30px;
-      height: 34px;
+      height: 50px;
       flex: 1;
       padding: 0 14px;
       font-size: 15px;
       font-style: italic;
       color: #555;
       outline: none;
+      margin-right: -150px;
+      margin-left: 20px;
     }
 
     .search-bar::placeholder {
@@ -159,8 +165,8 @@ if ($user) {
 
     /* Avatar */
     .avatar {
-      width: 64px;
-      height: 64px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: #c8c8c8;
       flex-shrink: 0;
@@ -168,8 +174,8 @@ if ($user) {
 
     /* ─── MAIN ────────────────────────────────────────────────── */
     main {
-      /* Fill remaining height after header (100px) */
-      height: calc(100vh - 100px);
+      /* Fill remaining height after header (140px) */
+      height: calc(100vh - 140px);
       padding: 20px 30px 10px 30px;
       display: flex;
       flex-direction: column;
@@ -193,6 +199,7 @@ if ($user) {
       min-height: 0;
       display: flex;
       flex-direction: column;
+      margin-top: 50px;
     }
 
     section + section {
@@ -207,7 +214,7 @@ if ($user) {
       color: #111;
       padding-bottom: 8px;
       border-bottom: 1.5px solid #ccc;
-      margin-bottom: 14px;
+      margin-top: 50px;
     }
 
     /* ─── CARDS ROW ───────────────────────────────────────────── */
@@ -267,7 +274,7 @@ if ($user) {
       background: #d4d4d4;
       overflow: hidden;
       height: 150px;
-      min-height: 120px;
+      min-height: 10px;
     }
 
     .rect-card img {
@@ -287,15 +294,9 @@ if ($user) {
       <div class="logo-area">
         <div class="logo-icon">
           <!-- Remplacez le src par le chemin de votre image -->
-          <img src="votre-logo.png" alt="Market Plier Logo">
+          <img src="assets/images/logo.svg" alt="Market Plier Logo" style="width: auto; height: 100%; margin-left: 250%;">
           
-          <!-- OU gardez le SVG si vous préférez -->
-          <!-- <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 6 C12 6, 16 8, 18 14 L26 36 C27 40, 31 42, 35 40 L52 34" stroke="#111" stroke-width="4" stroke-linecap="round" fill="none"/>
-            <path d="M2 3 C6 2, 10 3, 12 7" stroke="#111" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <circle cx="28" cy="46" r="4" fill="#111"/>
-            <circle cx="44" cy="46" r="4" fill="#111"/>
-          </svg> -->
+         
         </div>
       </div>
       <div class="header-divider"></div>
@@ -308,7 +309,7 @@ if ($user) {
     <div class="header-bottom">
       <nav>
         <a href="#">vendre</a>
-        <a href="#">lange</a>
+        <a href="#">langue</a>
         <a href="#">aide</a>
       </nav>
     </div>
