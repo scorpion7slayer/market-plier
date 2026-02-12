@@ -2,8 +2,8 @@
 
 $dbHost = '213.32.20.54';
 $dbName = 'marketplier';
-$dbUser = 'root';
-$dbPass = 'HoriMySQL2026!';
+$dbUser = 'theo';
+$dbPass = 'TheoDB2026!Secure';
 
 $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
