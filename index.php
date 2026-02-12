@@ -68,7 +68,7 @@ if ($user) {
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
   <main>
-    <div class="greeting">Bonjour, Gaspmi</div>
+    <div class="greeting">Bonjour, <?php echo htmlspecialchars($user['username']); ?></div>
 
     <!-- Trending section -->
     <section>
