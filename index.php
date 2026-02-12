@@ -33,6 +33,7 @@ if ($user) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Market Plier</title>
   <link rel="stylesheet" href="styles/index.css" />
+  <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" />
 </head>
 
@@ -92,7 +93,7 @@ if ($user) {
           <div class="circle-card"><img src="https://picsum.photos/seed/t3/200/200" alt=""></div>
           <div class="circle-card"><img src="https://picsum.photos/seed/t4/200/200" alt=""></div>
         </div>
-        <span class="chevron">&#62;</span>
+        <i class="fa-solid fa-caret-right chevron"></i>
       </div>
     </section>
 
@@ -106,7 +107,7 @@ if ($user) {
           <div class="rect-card"><img src="https://picsum.photos/seed/r3/200/160" alt=""></div>
           <div class="rect-card"><img src="https://picsum.photos/seed/r4/200/160" alt=""></div>
         </div>
-        <span class="chevron">&#62;</span>
+        <i class="fa-solid fa-caret-right chevron"></i>
       </div>
     </section>
   </main>
