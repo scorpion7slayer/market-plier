@@ -146,16 +146,24 @@ nav a {
 
 /* Photo de profil */
 .profile-photo-container {
-    position: sticky;
-    display: inline-block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #c8c8c8;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .profile-photo {
-    width: 140%;
-    height: auto;
-    object-fit: cover;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    flex: auto;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(127, 184, 133, 0.3);
 }
 
 .profile-photo-placeholder {

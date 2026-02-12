@@ -56,14 +56,14 @@ if ($user) {
       $profilePhoto = isset($user['profile_photo']) ? $user['profile_photo'] : null;
       if ($profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto)):
       ?>
-        <a class="avatar" href="inscription-connexion/dashboard.php">
+        <a class="profile-photo-container" href="inscription-connexion/dashboard.php">
           <img src="uploads/profiles/<?php echo htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8'); ?>"
             alt="Photo de profil"
             class="profile-photo"
-            style="object-fit: cover;" />
+            style="object-fit: cover" />
         </a>
       <?php else: ?>
-        <a class="avatar" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
+        <a class="profile-photo-container" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
       <?php endif; ?>
 
     </div>
