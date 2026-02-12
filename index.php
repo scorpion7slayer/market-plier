@@ -92,9 +92,6 @@ if ($user) {
       /* align under searchbar */
       margin-top: 6px;
       margin-left: 180px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
     }
 
     /* Logo zone - adjusted for image only */
@@ -129,7 +126,7 @@ if ($user) {
     }
 
     .logo-text {
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Ubuntu', sans-serif;
       font-style: italic;
       font-weight: 700;
       font-size: 28px;
