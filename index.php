@@ -90,7 +90,7 @@ if ($user) {
       padding-left: 210px;
       /* align under searchbar */
       margin-top: 6px;
-      margin-left: 208px;
+      margin-left: 180px;
     }
 
     /* Logo zone - adjusted for image only */
@@ -308,7 +308,7 @@ if ($user) {
   <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
   <header>
     <!-- Top row: logo | divider | search | divider | avatar -->
-    <div class="header-top">
+    <div class=" header-top">
       <div class="logo-area">
         <div class="logo-icon">
           <!-- Remplacez le src par le chemin de votre image -->
