@@ -53,7 +53,7 @@ if ($user) {
       <div class="header-divider"></div>
       <input class="search-bar" type="text" placeholder="Rechercher" />
       <div class="header-divider"></div>
-         <a class="avatar" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
+      <a class="avatar" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
 
     </div>
 

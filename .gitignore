@@ -1,2 +1,7 @@
 CLAUDE.md
 .grepai/
+# Ignorer toutes les photos de profil uploadées
+profiles/*
+
+# Mais garder le dossier profiles
+!profiles/.gitkeep
