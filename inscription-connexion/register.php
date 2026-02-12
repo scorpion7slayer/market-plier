@@ -9,8 +9,6 @@ if (isset($_SESSION['user_id'])) {
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-
-include '../header.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -19,7 +17,7 @@ include '../header.php';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../styles/register.css">
-
+  <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - S'inscrire</title>
 </head>
 
@@ -33,7 +31,14 @@ include '../header.php';
     <main class="form-container">
       <h2 class="title">S'inscrire</h2>
 
-      <form class="signup-form space-y-4" action="handle_register.php" method="POST">
+      <?php if (!empty($_GET['error'])): ?>
+        <div class="alert alert-error"><?php echo htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?></div>
+      <?php endif; ?>
+      <?php if (!empty($_GET['success'])): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success'], ENT_QUOTES, 'UTF-8'); ?></div>
+      <?php endif; ?>
+
+      <form class="signup-form" action="handle_register.php" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
         <input
@@ -82,6 +87,8 @@ include '../header.php';
           S'inscrire avec google
         </button>
       </form>
+
+      <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
     </main>
   </div>
 </body>
