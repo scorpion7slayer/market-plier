@@ -60,7 +60,10 @@ body {
 /* Photo de profil */
 .profile-photo-container {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .profile-photo {
