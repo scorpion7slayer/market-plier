@@ -8,7 +8,7 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 if (isset($_SESSION['user_id'])) {
-  $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE id = ?");
+  $stmt = $pdo->prepare("SELECT id, username, email, profile_photo FROM users WHERE id = ?");
   $stmt->execute([$_SESSION['user_id']]);
   $user = $stmt->fetch();
 }
@@ -44,7 +44,6 @@ if ($user) {
     <div class=" header-top">
       <div class="logo-area">
         <div class="logo-icon">
-          <!-- Remplacez le src par le chemin de votre image -->
           <img src="assets/images/logo.svg" alt="Market Plier Logo" style="width: auto; height: 100%; margin-left: 250%;">
 
 
@@ -53,7 +52,19 @@ if ($user) {
       <div class="header-divider"></div>
       <input class="search-bar" type="text" placeholder="Rechercher" />
       <div class="header-divider"></div>
-      <a class="avatar" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
+      <?php
+      $profilePhoto = isset($user['profile_photo']) ? $user['profile_photo'] : null;
+      if ($profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto)):
+      ?>
+        <a class="avatar" href="inscription-connexion/dashboard.php">
+          <img src="uploads/profiles/<?php echo htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8'); ?>"
+            alt="Photo de profil"
+            class="profile-photo"
+            style="object-fit: cover;" />
+        </a>
+      <?php else: ?>
+        <a class="avatar" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
+      <?php endif; ?>
 
     </div>
 
