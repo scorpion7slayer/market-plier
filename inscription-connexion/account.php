@@ -1,11 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Plier - Profil Utilisateur</title>
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles/account.css">
 </head>
 <body>
-  
+    <!-- Header -->
+    <header>
+        <div class="header-top">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <!-- REMPLACEZ CE SVG PAR VOTRE PROPRE LOGO -->
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 20 30 Q 15 20 25 15 L 40 15" 
+                              stroke="#1a1a1a" 
+                              stroke-width="8" 
+                              fill="none" 
+                              stroke-linecap="round"/>
+                        <circle cx="25" cy="85" r="6" fill="#1a1a1a"/>
+                        <circle cx="65" cy="85" r="6" fill="#1a1a1a"/>
+                        <path d="M 40 15 L 45 15 L 50 50 L 70 50 L 75 25" 
+                              stroke="#1a1a1a" 
+                              stroke-width="8" 
+                              fill="none" 
+                              stroke-linecap="round"
+                              stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">Market Plier</div>
+            </div>
+            
+            <div class="header-divider"></div>
+            
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Rechercher...">
+            </div>
+        </div>
+        
+        <div class="header-bottom">
+            <nav>
+                <a href="#">vendre</a>
+                <a href="#">langue</a>
+                <a href="#">aide</a>
+                <a href="#">parametres</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Profile Section - en haut -->
+        <div class="row">
+            <div class="col-12">
+                <div class="profile-section">
+                    <!-- Profile à gauche -->
+                    <aside class="profile-sidebar">
+                        <div class="profile-header">
+                            <div class="avatar-container">
+                                <div class="avatar"></div>
+                                <button class="edit-avatar">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="username-section">
+                                <div class="username">Utilisateur</div>
+                                <span class="verified">✓</span>
+                                <button class="edit-username">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="description-section">
+                            <h2 class="description-title">Description</h2>
+                            <p class="description-text">jaime les pieds sales</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles Section - en dessous en pleine largeur -->
+        <div class="row">
+            <div class="col-12">
+                <div class="articles-section">
+                    <h2 class="section-title">Vos arcticles</h2>
+                    <div class="articles-grid">
+                        <div class="article-card"></div>
+                        <div class="article-card"></div>
+                        <div class="article-card"></div>
+                        <div class="article-card"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Management Link - en bas à gauche -->
+    <a href="#" class="account-link">Gérer le compte</a>
+
+    <!-- Bootstrap JS local -->
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
