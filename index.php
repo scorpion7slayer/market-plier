@@ -7,17 +7,17 @@ if (!isset($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if (isset($_SESSION['user_id'])) {
-  $stmt = $pdo->prepare("SELECT id, username, email, profile_photo FROM users WHERE id = ?");
-  $stmt->execute([$_SESSION['user_id']]);
+if (isset($_SESSION['auth_token'])) {
+  $stmt = $pdo->prepare("SELECT auth_token, username, email, profile_photo FROM users WHERE auth_token = ?");
+  $stmt->execute([$_SESSION['auth_token']]);
   $user = $stmt->fetch();
 }
 // Vérifier si l'utilisateur est admin
 $isAdmin = false;
 if ($user) {
   try {
-    $checkAdmin = $pdo->prepare("SELECT is_admin FROM users WHERE id = ?");
-    $checkAdmin->execute([$_SESSION['user_id']]);
+    $checkAdmin = $pdo->prepare("SELECT is_admin FROM users WHERE auth_token = ?");
+    $checkAdmin->execute([$_SESSION['auth_token']]);
     $userData = $checkAdmin->fetch();
     $isAdmin = ($userData && $userData['is_admin'] == 1);
   } catch (PDOException $ex) {
