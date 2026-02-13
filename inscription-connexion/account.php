@@ -1,3 +1,13 @@
+<?php
+session_start();
+require_once 'database/db.php';
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['auth_token'])) {
+    header('Location: ../index.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -6,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Plier - Profil Utilisateur</title>
     <!-- Bootstrap local -->
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../styles/account.css">
     <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
 </head>
@@ -34,7 +44,7 @@
                 <a href="#">vendre</a>
                 <a href="#">langues</a>
                 <a href="#">aide</a>
-                <a href="#">paramètres</a>
+                <a href="../settings/settings.php">paramètres</a>
             </nav>
         </div>
     </header>
