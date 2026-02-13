@@ -285,8 +285,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         <div class="card shadow-sm">
           <div class="card-body">
             <div class="d-grid gap-2">
-              <a href="../index.php" class="btn btn-outline-secondary">
-                <i class="fas fa-home"></i> Retour à l'accueil
+              <a href="../inscription-connexion/account.php" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> Retour au profile
               </a>
               <a href="logout.php" class="btn btn-danger">
                 <i class="fas fa-sign-out-alt"></i> Se déconnecter
