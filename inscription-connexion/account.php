@@ -30,7 +30,7 @@
         <div class="header-bottom">
             <nav>
                 <a href="#">vendre</a>
-                <a href="#">langue</a>
+                <a href="#">langues</a>
                 <a href="#">aide</a>
                 <a href="#">parametres</a>
             </nav>
