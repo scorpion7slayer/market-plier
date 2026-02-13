@@ -83,9 +83,26 @@ if (empty($_SESSION['csrf_token'])) {
           <span class="divider-text">ou</span>
         </div>
 
-        <a href="google_login.php" class="google-btn">
-          S'inscrire avec google
-        </a>
+        <!-- Bouton officiel Google -->
+        <div id="g_id_onload"
+          data-client_id="194449123581-g833377olkfj16lqhjlnemvt4u6106vk.apps.googleusercontent.com"
+          data-callback="gestionnaireReponse"
+          data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-theme="outline"
+          data-text="signup_with"
+          data-size="large"
+          data-shape="pill"
+          data-logo_alignment="left">
+        </div>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script>
+          function gestionnaireReponse(response) {
+            window.location.href = 'google_login.php?id_token=' + encodeURIComponent(response.credential);
+          }
+        </script>
       </form>
 
       <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
