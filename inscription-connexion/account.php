@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Market Plier</title>
-  <link rel="stylesheet" href="styles/index.css" />
+  <link rel="stylesheet" href="styles/account.css" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" />
 </head>
