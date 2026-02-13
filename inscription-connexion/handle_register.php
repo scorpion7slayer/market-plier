@@ -46,9 +46,12 @@ if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $_POST['username'])) {
 
 $password_hash = password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]);
 
+// Générer un token d'authentification sécurisé
+$auth_token = bin2hex(random_bytes(32));
+
 try {
-  $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
-  $stmt->execute([$_POST['username'], $_POST['email'], $password_hash]);
+  $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, auth_token) VALUES (?, ?, ?, ?)");
+  $stmt->execute([$_POST['username'], $_POST['email'], $password_hash, $auth_token]);
   header("Location: login.php?success=" . urlencode("Compte créé avec succès"));
   exit;
 } catch (PDOException $e) {
