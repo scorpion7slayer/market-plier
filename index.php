@@ -13,6 +13,7 @@ if (isset($_SESSION['auth_token'])) {
   $user = $stmt->fetch();
 }
 // Vérifier si l'utilisateur est admin
+$user = $user ?? null;
 $isAdmin = false;
 if ($user) {
   try {
@@ -55,18 +56,16 @@ if ($user) {
       <div class="header-divider"></div>
       <?php
       $profilePhoto = isset($user['profile_photo']) ? $user['profile_photo'] : null;
-      if ($profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto)):
+      $isLoggedIn = isset($_SESSION['auth_token']) && $user;
+      $profileLink = $isLoggedIn ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php';
+      echo '<a class="profile-photo-container" href="' . $profileLink . '">';
+      if ($profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto)) {
+        echo '<img src="uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') . '" alt="Photo de profil" class="profile-photo" style="object-fit: cover" />';
+      } else {
+        echo '<img src="assets/images/default-account.svg" alt="Photo de profil par défaut" class="profile-photo" style="object-fit: cover" />';
+      }
+      echo '</a>';
       ?>
-        <a class="profile-photo-container" href="inscription-connexion/dashboard.php">
-          <img src="uploads/profiles/<?php echo htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8'); ?>"
-            alt="Photo de profil"
-            class="profile-photo"
-            style="object-fit: cover" />
-        </a>
-      <?php else: ?>
-        <a class="profile-photo-container" href="<?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>"></a>
-      <?php endif; ?>
-
     </div>
 
     <!-- Bottom row: nav links -->
@@ -81,7 +80,7 @@ if ($user) {
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
   <main>
-    <div class="greeting">Bonjour, <?php echo htmlspecialchars($user['username']); ?></div>
+    <div class="greeting">Bonjour, <?php echo htmlspecialchars($user['username'] ?? ''); ?></div>
 
     <!-- Trending section -->
     <section>
