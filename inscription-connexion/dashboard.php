@@ -1,3 +1,4 @@
+<!-- TODO ajout d'un bouton supprimer le compte et d'un modal de confirmation de suppression de compte et fonction a faire avec php -->
 <?php
 session_start();
 if (!isset($_SESSION['auth_token'])) {
