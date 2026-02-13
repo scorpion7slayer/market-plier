@@ -17,10 +17,10 @@
         <div class="header-top">
             <div class="logo-area">
                 <div class="logo-icon">
-                    <img src="../assets/images/logo.svg" alt="Logo Market Plier" style="width: 180%; height: 150%;">
+                    <a href="../index.php"><img src="../assets/images/logo.svg" alt="Logo Market Plier" style="width: 180%; height: 150%;"></a>
 
                 </div>
-            </div>&
+            </div>
 
             <div class="header-divider"></div>
 
