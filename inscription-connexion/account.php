@@ -94,7 +94,7 @@
     </div>
 
     <!-- Account Management Link - en bas à gauche -->
-    <a href="#" class="account-link">Gérer le compte</a>
+    <a href="../inscription-connexion/dashboard.php" class="account-link">Gérer le compte</a>
 
     <!-- Bootstrap JS local -->
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
