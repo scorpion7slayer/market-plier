@@ -1,13 +1,13 @@
 # market
 
-# Frameworks
+## Frameworks
 
-https://getbootstrap.com/docs/5.3/getting-started/introduction/
+[Bootstrap 5.3 Introduction](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
 
-# Notes
+## Notes
 
-pour moyen de paiement on va passer par stripe https://stripe.com/
+Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
 
-# API
+## API
 
-https://ipapi.co/
+[ipapi](https://ipapi.co/)
