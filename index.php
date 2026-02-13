@@ -64,7 +64,7 @@ if ($user) {
             style="object-fit: cover" />
         </a>
       <?php else: ?>
-        <a class="profile-photo-container" href="<?= isset($_SESSION['user_id']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
+        <a class="profile-photo-container" href="<?= isset($_SESSION['auth_token']) ? 'inscription-connexion/dashboard.php' : 'inscription-connexion/register.php' ?>"></a>
       <?php endif; ?>
 
     </div>

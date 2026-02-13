@@ -2,7 +2,7 @@
 session_start();
 
 // Rediriger si déjà connecté
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['auth_token'])) {
   header('Location: dashboard.php');
   exit();
 }
