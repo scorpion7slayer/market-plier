@@ -194,17 +194,39 @@ body {
     font-size: 1.1rem;
     color: #666;
     font-style: italic;
+    text-decoration: none;
 }
 
 .auth-link a {
     color: #7fb885;
-    text-decoration: none;
     font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+    text-decoration: none;
+}
+
+.auth-link a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: #7fb885;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .auth-link a:hover {
     color: #6aa070;
-    text-decoration: underline;
+}
+
+.auth-link a:hover::after {
+    background: #6aa070;
+    transform: scaleX(1);
+    transform-origin: left;
 }
 
 @media (max-width: 768px) {
