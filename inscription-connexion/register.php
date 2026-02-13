@@ -1,3 +1,4 @@
+<!-- TODO si adresse e-mail existe déjà dans la base de données et que l'adresse mail google correspond s'incroniser les 2 ou demander d'utiliser google pour se connecter car adresse e-mail inscrite via google -->
 <?php
 session_start();
 if (isset($_SESSION['auth_token'])) {
