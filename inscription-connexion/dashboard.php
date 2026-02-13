@@ -219,9 +219,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                   alt="Photo de profil"
                   class="profile-photo">
               <?php else: ?>
-                <div class="profile-photo-placeholder">
-                  <i class="fas fa-user-circle"></i>
-                </div>
+                <img src="../assets/images/default-account.svg"
+                  alt="Photo de profil par défaut"
+                  class="profile-photo">
               <?php endif; ?>
               <button type="button" class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#photoModal">
                 <i class="fas fa-camera"></i> Changer la photo
