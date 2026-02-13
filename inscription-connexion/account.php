@@ -17,8 +17,7 @@
         <div class="header-top">
             <div class="logo-area">
                 <div class="logo-icon">
-                    <!-- REMPLACEZ CE SVG PAR VOTRE PROPRE LOGO -->
-                    <img src="../assets/images/logo.svg" alt="" style="width: 180%; height: 150%;">
+                    <img src="../assets/images/logo.svg" alt="Logo Market Plier" style="width: 180%; height: 150%;">
 
                 </div>
             </div>
@@ -35,7 +34,7 @@
                 <a href="#">vendre</a>
                 <a href="#">langues</a>
                 <a href="#">aide</a>
-                <a href="#">parametres</a>
+                <a href="#">paramètres</a>
             </nav>
         </div>
     </header>
@@ -84,7 +83,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="articles-section">
-                    <h2 class="section-title">Vos arcticles</h2>
+                    <h2 class="section-title">Vos articles</h2>
                     <div class="articles-grid">
                         <div class="article-card"></div>
                         <div class="article-card"></div>
