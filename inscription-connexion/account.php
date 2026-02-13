@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'database/db.php';
+require_once '../database/db.php';
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../index.php');
@@ -51,6 +51,7 @@ if (!isset($_SESSION['auth_token'])) {
 
     <!-- Main Content -->
     <div class="container-fluid">
+        <!-- TODO changer bouton edit username et changement de pdp sur la page pour les regrouper en un seul et au lieu de icon w3.org utiliser fontawesome installé avec <i class="fa-solid fa-pen-to-square"></i> ne pas regrouper la fonction qu'il y a dans dashboard car fonction appart de chagement de photo-->
         <!-- Profile Section - en haut -->
         <div class="row">
             <div class="col-12">
@@ -67,7 +68,6 @@ if (!isset($_SESSION['auth_token'])) {
                                     </svg>
                                 </button>
                             </div>
-
                             <div class="username-section">
                                 <div class="username">Utilisateur</div>
                                 <span class="verified">✓</span>
@@ -79,7 +79,7 @@ if (!isset($_SESSION['auth_token'])) {
                                 </button>
                             </div>
                         </div>
-
+                        <!-- TODO ajouter changement de description gérée avec db via la table profile de la db marketplier -->
                         <div class="description-section">
                             <h2 class="description-title">Description</h2>
                             <p class="description-text">jaime les pieds sales</p>
@@ -104,7 +104,7 @@ if (!isset($_SESSION['auth_token'])) {
             </div>
         </div>
     </div>
-
+    <!-- TODO faire design bouton Gérer le compte -->
     <!-- Account Management Link - en bas à gauche -->
     <a href="../inscription-connexion/dashboard.php" class="account-link">Gérer le compte</a>
 
