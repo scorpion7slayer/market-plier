@@ -15,23 +15,9 @@
             <div class="logo-area">
                 <div class="logo-icon">
                     <!-- REMPLACEZ CE SVG PAR VOTRE PROPRE LOGO -->
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 20 30 Q 15 20 25 15 L 40 15" 
-                              stroke="#1a1a1a" 
-                              stroke-width="8" 
-                              fill="none" 
-                              stroke-linecap="round"/>
-                        <circle cx="25" cy="85" r="6" fill="#1a1a1a"/>
-                        <circle cx="65" cy="85" r="6" fill="#1a1a1a"/>
-                        <path d="M 40 15 L 45 15 L 50 50 L 70 50 L 75 25" 
-                              stroke="#1a1a1a" 
-                              stroke-width="8" 
-                              fill="none" 
-                              stroke-linecap="round"
-                              stroke-linejoin="round"/>
-                    </svg>
+                    <img src="../assets/images/logo.svg" alt="" style="width: 180%; height: 150%;">
+                    
                 </div>
-                <div class="logo-text">Market Plier</div>
             </div>
             
             <div class="header-divider"></div>
