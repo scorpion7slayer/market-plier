@@ -34,9 +34,9 @@ if ($user) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Market Plier</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ENjdO4Dr2bkBIFxQpeoYz1FQ5jJZTVq1VrB5zR0xzZ5Jz5B5u5t5U5U5U5U5U5U5" crossorigin="anonymous">
-  <!-- Font Awesome -->
+  <!-- Bootstrap CSS (local) -->
+  <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome (local) -->
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
   <!-- Custom CSS -->
   <link rel="stylesheet" href="styles/index.css" />
@@ -154,8 +154,8 @@ if ($user) {
     </section>
   </main>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoYz1FQ5jJZTVq1VrB5zR0xzZ5Jz5B5u5t5U5U5U5U5U5U5" crossorigin="anonymous"></script>
+  <!-- Bootstrap JS (local) -->
+  <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
