@@ -16,3 +16,6 @@ CLAUDE.md
 
 # OAuth credentials (secrets)
 config/google_oauth.php
+# Node modules
+node_modules/
+
