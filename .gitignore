@@ -1,5 +1,6 @@
 CLAUDE.md
 .grepai/
+.claude/
 # # Ignorer toutes les photos de profil uploadées
 # profiles/*
 
