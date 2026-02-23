@@ -11,5 +11,3 @@ Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
 ## API
 
 [ipapi](https://ipapi.co/)
-
-jsp test
