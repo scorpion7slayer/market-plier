@@ -145,14 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="../styles/dashboard.css">
+  <link rel="stylesheet" href="../styles/settings.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - Mon Profil</title>
 </head>
@@ -162,120 +162,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     <img src="../assets/images/logo.svg" alt="Market Plier Logo" style="width: 80%; height: auto;">
   </div>
 
-  <!-- Modal pour changer la photo -->
-  <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="photoModalLabel">Changer ma photo de profil</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form method="POST" enctype="multipart/form-data">
-          <div class="modal-body">
-            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
-            <div class="mb-3">
-              <label for="photo" class="form-label">Sélectionnez une photo (JPG, PNG, WEBP - max 5MB)</label>
-              <input type="file" class="form-control" id="photo" name="photo" accept=".jpg,.jpeg,.png,.webp" required>
-            </div>
-            <div class="alert alert-info">
-              <i class="fas fa-info-circle"></i> La photo sera redimensionnée automatiquement.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="submit" name="changer_photo" class="btn btn-primary">
-              <i class="fas fa-upload"></i> Enregistrer
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+ 
 
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-8">
 
-        <!-- Messages de succès/erreur -->
-        <?php if ($successMessage): ?>
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8'); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <?php endif; ?>
+      
 
-        <?php if ($errorMessage): ?>
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <?php endif; ?>
-
-        <!-- Carte de profil -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-body text-center py-5">
-            <div class="profile-photo-container mb-4">
-              <?php if ($profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto)): ?>
-                <img src="../uploads/profiles/<?php echo htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8'); ?>"
-                  alt="Photo de profil"
-                  class="profile-photo">
-              <?php else: ?>
-                <img src="../assets/images/default-account.svg"
-                  alt="Photo de profil par défaut"
-                  class="profile-photo">
-              <?php endif; ?>
-              <button type="button" class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#photoModal">
-                <i class="fas fa-camera"></i> Changer la photo
-              </button>
-            </div>
-
-            <h2 class="mb-2"><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?></h2>
-            <p class="text-muted mb-3">
-              <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>
-            </p>
-
-            <?php if ($isAdmin): ?>
-              <span class="badge bg-success">
-                <i class="fas fa-shield-alt"></i> Administrateur
-              </span>
-            <?php endif; ?>
-          </div>
-        </div>
+        
 
         <!-- Formulaire de modification du profil -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="fas fa-user-cog"></i> Modifier mon profil</h5>
+            <h5 class="mb-0"><i class="fa-solid fa-gear"></i>Paramètres du site</h5>
           </div>
           <div class="card-body">
             <form method="POST">
               <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
-              <div class="mb-3">
-                <label for="username" class="form-label">Nom d'utilisateur</label>
-                <input type="text"
-                  class="form-control"
-                  id="username"
-                  name="username"
-                  value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"
-                  pattern="[a-zA-Z0-9_]{3,30}"
-                  required>
-                <div class="form-text">3-30 caractères alphanumériques et underscore uniquement.</div>
-              </div>
+              
 
               <div class="mb-3">
-                <label for="email" class="form-label">Adresse email</label>
-                <input type="email"
-                  class="form-control"
-                  id="email"
-                  name="email"
-                  value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
-                  required>
+                <label for="email" class="form-label">thème du site</label>
               </div>
 
               <div class="d-grid gap-2">
-                <button type="submit" name="update_profile" class="btn btn-primary">
-                  <i class="fas fa-save"></i> Enregistrer les modifications
+                <button id="theme-button" type="submit" name="update_profile" class="btn btn-primary">
+                  <i class="fas fa-save"></i> 
                 </button>
               </div>
             </form>
@@ -301,6 +215,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
   </div>
 
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+        const html = document.documentElement;
+        const toggleBtn = document.getElementById('theme-button');
+        const storedTheme = localStorage.getItem('theme');
+
+        // Appliquer thème initial
+        if (storedTheme === 'dark') {
+            html.setAttribute('data-bs-theme', 'dark');
+            toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>'; // Icône lune
+        }
+
+        // Toggle au clic
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Changer icône (optionnel)
+            if (newTheme === 'dark') {
+                toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>';
+            } else {
+                toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#sun-icon"></use></svg>';
+            }
+        });
+    </script>
 </body>
 
 </html>

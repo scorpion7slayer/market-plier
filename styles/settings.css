@@ -23,7 +23,6 @@
 
 body {
     font-family: "Archivo", Arial, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
     min-height: 100vh;
     padding-top: 80px;
 }
@@ -225,7 +224,6 @@ body {
 
 .modal-header {
     border-bottom: 2px solid #7fb885;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
 }
 
 .modal-title {
