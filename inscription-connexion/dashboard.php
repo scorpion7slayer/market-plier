@@ -1,4 +1,3 @@
-<!-- TODO ajout d'un bouton supprimer le compte et d'un modal de confirmation de suppression de compte et fonction a faire avec php -->
 <?php
 session_start();
 if (!isset($_SESSION['auth_token'])) {
@@ -23,6 +22,46 @@ $email = '';
 $profilePhoto = null;
 $successMessage = '';
 $errorMessage = '';
+
+// Traitement de la suppression de compte
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    $errorMessage = "Token de sécurité invalide.";
+  } else {
+    try {
+      // Récupérer la photo de profil pour la supprimer du serveur
+      $photoStmt = $pdo->prepare("SELECT profile_photo FROM users WHERE auth_token = ?");
+      $photoStmt->execute([$_SESSION['auth_token']]);
+      $photoData = $photoStmt->fetch();
+
+      if ($photoData && $photoData['profile_photo'] && file_exists('../uploads/profiles/' . $photoData['profile_photo'])) {
+        unlink('../uploads/profiles/' . $photoData['profile_photo']);
+      }
+
+      // Supprimer l'utilisateur (le profil dans profiles sera supprimé automatiquement via ON DELETE CASCADE)
+      $deleteStmt = $pdo->prepare("DELETE FROM users WHERE auth_token = ?");
+      $deleteStmt->execute([$_SESSION['auth_token']]);
+
+      // Détruire la session
+      $_SESSION = [];
+      if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+          $params["path"], $params["domain"],
+          $params["secure"], $params["httponly"]
+        );
+      }
+      session_destroy();
+
+      header("Location: login.php?success=" . urlencode("Votre compte a été supprimé avec succès."));
+      exit;
+    } catch (PDOException $ex) {
+      $errorMessage = "Erreur lors de la suppression du compte.";
+      error_log("Error deleting account: " . $ex->getMessage());
+    }
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  }
+}
 
 // Récupérer les informations utilisateur
 if (isset($pdo)) {
@@ -287,15 +326,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
           <div class="card-body">
             <div class="d-grid gap-2">
               <a href="../inscription-connexion/account.php" class="btn btn-outline-secondary">
-                <i class="fas fa-home"></i> Retour au profile
+                <i class="fas fa-home"></i> Retour au profil
               </a>
               <a href="logout.php" class="btn btn-danger">
                 <i class="fas fa-sign-out-alt"></i> Se déconnecter
               </a>
+              <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                <i class="fas fa-trash-alt"></i> Supprimer mon compte
+              </button>
             </div>
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de suppression -->
+  <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #fde8e8 0%, #fff5f5 100%); border-bottom: 2px solid #e74c3c;">
+          <h5 class="modal-title" id="deleteAccountModalLabel" style="color: #c0392b;">
+            <i class="fas fa-exclamation-triangle"></i> Supprimer mon compte
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger">
+            <strong><i class="fas fa-exclamation-circle"></i> Attention !</strong> Cette action est irréversible.
+          </div>
+          <p>En supprimant votre compte, vous perdrez :</p>
+          <ul>
+            <li>Votre profil et vos informations personnelles</li>
+            <li>Votre photo de profil</li>
+            <li>Votre description</li>
+            <li>Tous vos articles publiés</li>
+          </ul>
+          <p class="fw-bold text-danger">Cette action ne peut pas être annulée.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <form method="POST" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+            <button type="submit" name="delete_account" class="btn btn-danger">
+              <i class="fas fa-trash-alt"></i> Confirmer la suppression
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>

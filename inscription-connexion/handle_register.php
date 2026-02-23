@@ -46,11 +46,46 @@ if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $_POST['username'])) {
 
 $password_hash = password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]);
 
+// Vérifier si l'email est déjà utilisé via Google
+try {
+  $checkGoogle = $pdo->prepare("SELECT auth_provider FROM users WHERE email = ?");
+  $checkGoogle->execute([$_POST['email']]);
+  $existing = $checkGoogle->fetch();
+
+  if ($existing) {
+    if ($existing['auth_provider'] === 'google') {
+      header("Location: register.php?error=" . urlencode("Cette adresse email est déjà associée à un compte Google. Veuillez utiliser le bouton Google pour vous connecter."));
+      exit;
+    }
+    // Vérifier plus précisément si c'est le username ou l'email qui est en doublon
+    $checkUsername = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+    $checkUsername->execute([$_POST['username']]);
+    if ($checkUsername->fetch()) {
+      header("Location: register.php?error=" . urlencode("Ce nom d'utilisateur est déjà utilisé."));
+    } else {
+      header("Location: register.php?error=" . urlencode("Cette adresse email est déjà utilisée."));
+    }
+    exit;
+  }
+
+  // Vérifier si le username existe déjà
+  $checkUsername = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+  $checkUsername->execute([$_POST['username']]);
+  if ($checkUsername->fetch()) {
+    header("Location: register.php?error=" . urlencode("Ce nom d'utilisateur est déjà utilisé."));
+    exit;
+  }
+} catch (PDOException $e) {
+  error_log("Register check error: " . $e->getMessage());
+  header("Location: register.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
+  exit;
+}
+
 // Générer un token d'authentification sécurisé
 $auth_token = bin2hex(random_bytes(32));
 
 try {
-  $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, auth_token) VALUES (?, ?, ?, ?)");
+  $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, auth_token, auth_provider) VALUES (?, ?, ?, ?, 'local')");
   $stmt->execute([$_POST['username'], $_POST['email'], $password_hash, $auth_token]);
   header("Location: login.php?success=" . urlencode("Compte créé avec succès"));
   exit;

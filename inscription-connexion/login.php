@@ -16,6 +16,7 @@ if (empty($_SESSION['csrf_token'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../styles/register.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - Connexion</title>
@@ -26,7 +27,7 @@ if (empty($_SESSION['csrf_token'])) {
     <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
   </div>
 
-  <div class="container">
+  <div class="register-container">
 
     <main class="form-container">
       <h2 class="title">Se connecter</h2>
