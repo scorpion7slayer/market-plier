@@ -1,10 +1,23 @@
-/* TODO convertir tout avec bootsrap css et utiliser police archivo*/
-@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+@font-face {
+    font-family: "Archivo";
+    font-style: normal;
+    font-weight: 100 900;
+    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf")
+        format("truetype");
+}
+
+@font-face {
+    font-family: "Archivo";
+    font-style: italic;
+    font-weight: 100 900;
+    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
+        format("truetype");
 }
 
 body {
@@ -13,7 +26,7 @@ body {
     min-height: 100vh;
 }
 
-/* Header - copié du CSS fourni */
+/* ─── HEADER (identique à index.css pour le header partagé) ─── */
 header {
     background-color: #8faf72;
     display: flex;
@@ -39,6 +52,7 @@ header {
     align-items: center;
     padding-left: 210px;
     margin-top: 6px;
+    margin-left: 200px;
 }
 
 .logo-area {
@@ -49,33 +63,45 @@ header {
     flex-shrink: 0;
 }
 
+.logo-icon {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
 .header-divider {
     width: 5px;
     height: 90px;
     background: #aec89a;
     margin: 0 14px;
     flex-shrink: 0;
-    margin-left: auto;
-    margin-right: 40px;
-}
-
-.search-container {
-    max-width: 500px;
-    flex: 0 1 500px;
-    margin-right: 700px;
+    margin-left: 180px;
 }
 
 .search-bar {
     background: #ddecd4;
-    border: 1.5px solid #bce3a1;
+    border: 1.5px solid #b5d4a0;
     border-radius: 30px;
     height: 50px;
-    width: 150%;
+    flex: 1;
     padding: 0 14px;
     font-size: 15px;
     font-style: italic;
     color: #555;
     outline: none;
+    margin-right: -150px;
+    margin-left: 20px;
 }
 
 .search-bar::placeholder {
@@ -94,7 +120,7 @@ nav {
 }
 
 nav a {
-    font-family: "Poppins", sans-serif;
+    font-family: "Archivo", sans-serif;
     font-style: italic;
     font-weight: 700;
     font-size: 12px;
@@ -108,7 +134,28 @@ nav a:hover {
     opacity: 0.8;
 }
 
-/* Main Content */
+/* Photo de profil dans le header */
+.header-top .profile-photo-container {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #c8c8c8;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.header-top .profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(127, 184, 133, 0.3);
+}
+
+/* ─── CONTENU PRINCIPAL ─── */
 .container-fluid {
     padding: 40px 40px;
 }
@@ -146,27 +193,6 @@ nav a:hover {
     border: 4px solid #f0f0f0;
 }
 
-.edit-avatar {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.edit-avatar:hover {
-    transform: scale(1.1);
-}
-
 .username-section {
     display: flex;
     align-items: center;
@@ -194,21 +220,6 @@ nav a:hover {
     justify-content: center;
     font-size: 18px;
     flex-shrink: 0;
-}
-
-.edit-username {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.edit-username:hover {
-    transform: scale(1.1);
 }
 
 .description-section {
@@ -258,30 +269,67 @@ nav a:hover {
     border-radius: 20px;
 }
 
-/* Account Management - en bas à gauche */
-.account-link {
-    position: fixed;
-    bottom: 20px;
-    left: 30px;
-    font-size: 11px;
-    font-weight: 400;
+/* ─── BOUTONS ACTIONS PROFIL ─── */
+.profile-actions {
+    margin-top: 40px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-brand {
+    background-color: #7fb885;
+    border-color: #7fb885;
+    color: white;
+    font-weight: 600;
     font-style: italic;
-    color: #666;
+    border-radius: 50px;
+    padding: 10px 25px;
+    transition: all 0.3s ease;
     text-decoration: none;
+    display: inline-block;
+    border: 2px solid #7fb885;
+}
+
+.btn-brand:hover {
+    background-color: #6aa070;
+    border-color: #6aa070;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(127, 184, 133, 0.4);
+}
+
+/* Description éditable */
+.description-edit-form textarea {
+    border: 2px solid #7fb885;
+    border-radius: 12px;
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.description-edit-form textarea:focus {
+    border-color: #6aa070;
+    box-shadow: 0 0 0 0.2rem rgba(127, 184, 133, 0.25);
+    outline: none;
+}
+
+.edit-description-btn {
+    background: none;
+    border: none;
+    color: #7fb885;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
     transition: color 0.3s ease;
 }
 
-.account-link:hover {
-    color: #8faf72;
-    text-decoration: underline;
+.edit-description-btn:hover {
+    color: #6aa070;
 }
 
-/* Icons */
-.icon {
-    width: 20px;
-    height: 20px;
-}
-
+/* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
     .articles-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -303,6 +351,7 @@ nav a:hover {
 
     .header-bottom {
         padding-left: 20px;
+        margin-left: 0;
     }
 
     nav {

@@ -1,4 +1,3 @@
-<!-- TODO si adresse e-mail existe déjà dans la base de données et que l'adresse mail google correspond s'incroniser les 2 ou demander d'utiliser google pour se connecter car adresse e-mail inscrite via google -->
 <?php
 session_start();
 if (isset($_SESSION['auth_token'])) {
@@ -17,6 +16,7 @@ if (empty($_SESSION['csrf_token'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../styles/register.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - S'inscrire</title>
@@ -27,7 +27,7 @@ if (empty($_SESSION['csrf_token'])) {
     <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
   </div>
 
-  <div class="container">
+  <div class="register-container">
 
     <main class="form-container">
       <h2 class="title">S'inscrire</h2>
