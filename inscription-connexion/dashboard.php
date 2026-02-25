@@ -152,8 +152,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
   // Vérification CSRF
   if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     $errorMessage = "Token de sécurité invalide.";
-  } elseif ($authProvider === 'google' && !$hasPassword) {
-    $errorMessage = "Vous utilisez un compte Google. Définissez d'abord un mot de passe pour votre compte.";
   } else {
     $currentPassword = $_POST['current_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';
@@ -183,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 
         if (empty($errorMessage)) {
           $newPasswordHash = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12]);
-          $updateStmt = $pdo->prepare("UPDATE users SET password_hash = ?, auth_provider = 'local' WHERE auth_token = ?");
+          $updateStmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE auth_token = ?");
           $updateStmt->execute([$newPasswordHash, $_SESSION['auth_token']]);
           $hasPassword = true;
           $successMessage = "Mot de passe modifié avec succès !";
@@ -230,8 +228,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
 
         if (empty($errorMessage)) {
           // Supprimer la photo de profil si elle existe
-          if ($profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto)) {
-            unlink('../uploads/profiles/' . $profilePhoto);
+          if ($profilePhoto && file_exists('../uploads/profiles/' . basename($profilePhoto))) {
+            unlink('../uploads/profiles/' . basename($profilePhoto));
           }
 
           // Supprimer l'utilisateur de la base de données
