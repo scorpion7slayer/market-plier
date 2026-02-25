@@ -40,6 +40,13 @@ if ($user) {
 
 <body>
 
+  <!-- Message de confirmation suppression compte -->
+  <?php if (isset($_GET['account_deleted']) && $_GET['account_deleted'] === '1'): ?>
+    <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c3e6cb;">
+      <i class="fas fa-check-circle"></i> Votre compte a été supprimé avec succès. Merci d'avoir utilisé Market Plier.
+    </div>
+  <?php endif; ?>
+
   <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
   <header>
     <!-- Top row: logo | divider | search | divider | avatar -->

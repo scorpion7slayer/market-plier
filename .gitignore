@@ -9,3 +9,14 @@ CLAUDE.md
 
 # # Credentials Google OAuth
 # config/google_oauth.php
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.production
+
+# OAuth credentials (secrets)
+config/google_oauth.php
+# Node modules
+node_modules/
+
