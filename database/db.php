@@ -1,9 +1,22 @@
 <?php
 
-$dbHost = '213.32.20.54';
-$dbName = 'marketplier';
-$dbUser = 'theo';
-$dbPass = 'TheoDB2026!Secure';
+// Load environment variables from .env file
+$envFile = __DIR__ . '/../.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Skip comments
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $_ENV[trim($key)] = trim($value);
+        }
+    }
+}
+
+$dbHost = $_ENV['DB_HOST'] ?? 'localhost';
+$dbName = $_ENV['DB_NAME'] ?? 'marketplier';
+$dbUser = $_ENV['DB_USER'] ?? 'theo';
+$dbPass = $_ENV['DB_PASS'] ?? '';
 
 $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
