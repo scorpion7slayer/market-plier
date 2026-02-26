@@ -4,6 +4,8 @@
 
 [Bootstrap 5.3 Introduction](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
 
+[fontawesome](https://fontawesome.com/search?ic=free-collection)
+
 ## Notes
 
 Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
