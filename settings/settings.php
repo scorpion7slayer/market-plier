@@ -237,6 +237,40 @@ document.addEventListener("DOMContentLoaded",function(){var t=document.getElemen
         });
     });
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("Theme script loading...");
+        
+        var toggle = document.getElementById("themeToggle");
+        var html = document.documentElement;
+        
+        console.log("Toggle element:", toggle);
+        
+        if (!toggle) {
+            console.error("Toggle not found!");
+            return;
+        }
+        
+        var theme = localStorage.getItem("theme");
+        console.log("Stored theme:", theme);
+        
+        if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            console.log("System theme:", theme);
+        }
+        
+        html.setAttribute("data-bs-theme", theme);
+        toggle.checked = (theme === "dark");
+        console.log("Applied theme:", theme);
+        
+        toggle.addEventListener("change", function() {
+            var newTheme = this.checked ? "dark" : "light";
+            html.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            console.log("Theme changed to:", newTheme);
+        });
+    });
+    </script>
 </body>
 
 </html>
