@@ -210,58 +210,28 @@ $errorMessage = '';
 
     <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script>console.log("inline script");// Theme Toggle
-document.addEventListener("DOMContentLoaded",function(){var t=document.getElementById("themeToggle"),e=document.documentElement;if(!t)return void console.error("Toggle not found");var n=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");e.setAttribute("data-bs-theme",n),t.checked="dark"===n,t.addEventListener("change",function(){var t=this.checked?"dark":"light";e.setAttribute("data-bs-theme",t),localStorage.setItem("theme",t)})});</script>
+    <script src="theme-toggle.js"></script>
     <script>
+    // Theme Toggle
     document.addEventListener("DOMContentLoaded", function() {
+        console.log("Theme toggle init...");
+        
         var toggle = document.getElementById("themeToggle");
         var html = document.documentElement;
         
         if (!toggle) {
-            console.error("Toggle not found!");
+            console.error("Toggle element NOT FOUND");
             return;
         }
         
-        var theme = localStorage.getItem("theme");
-        if (!theme) {
-            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        }
+        console.log("Toggle found, setting up...");
         
+        var theme = localStorage.getItem("theme") || 
+                   (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        
+        console.log("Theme:", theme);
         html.setAttribute("data-bs-theme", theme);
         toggle.checked = (theme === "dark");
-        
-        toggle.addEventListener("change", function() {
-            var newTheme = this.checked ? "dark" : "light";
-            html.setAttribute("data-bs-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-        });
-    });
-    </script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log("Theme script loading...");
-        
-        var toggle = document.getElementById("themeToggle");
-        var html = document.documentElement;
-        
-        console.log("Toggle element:", toggle);
-        
-        if (!toggle) {
-            console.error("Toggle not found!");
-            return;
-        }
-        
-        var theme = localStorage.getItem("theme");
-        console.log("Stored theme:", theme);
-        
-        if (!theme) {
-            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-            console.log("System theme:", theme);
-        }
-        
-        html.setAttribute("data-bs-theme", theme);
-        toggle.checked = (theme === "dark");
-        console.log("Applied theme:", theme);
         
         toggle.addEventListener("change", function() {
             var newTheme = this.checked ? "dark" : "light";
@@ -269,6 +239,8 @@ document.addEventListener("DOMContentLoaded",function(){var t=document.getElemen
             localStorage.setItem("theme", newTheme);
             console.log("Theme changed to:", newTheme);
         });
+        
+        console.log("Theme toggle ready!");
     });
     </script>
 </body>
