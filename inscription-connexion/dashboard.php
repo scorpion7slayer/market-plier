@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
       if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
         setcookie(
-          session_name(),
+          session_name(), // session_name() sans argument retourne le nom de la session
           '',
           time() - 42000,
           $params["path"],

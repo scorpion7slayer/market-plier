@@ -18,7 +18,6 @@ Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
   -leur donner des catégorie
   2-page de recherche pour produits
   -chercher par catégorie (pays,prix etc)
-  3-pouvoir modifier son mdp
-  4-fonction panier et acheter
-  5-systeme commentaire vendeur
+  3-fonction panier et acheter
+  4-systeme commentaire vendeur
   6-systeme de vérification avec carte id
