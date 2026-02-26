@@ -36,4 +36,13 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       <a href="#">aide</a>
     </nav>
   </div>
+
+    <script>
+    // Global Theme Toggle - apply theme on all pages
+    (function() {
+        var theme = localStorage.getItem("theme") || 
+                   (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-bs-theme", theme);
+    })();
+    </script>
 </header>
