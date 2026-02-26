@@ -77,9 +77,13 @@ body {
     gap: 15px;
 }
 
-.password-row .email-input {
+.password-field {
     flex: 1;
     min-width: 0;
+}
+
+.password-field .email-input {
+    width: 100%;
 }
 
 .email-input {
@@ -290,4 +294,47 @@ body {
         flex-direction: column;
         gap: 30px;
     }
+}
+
+/* Validation personnalisée */
+@keyframes errorSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c0392b;
+    font-size: 0.82rem;
+    font-style: italic;
+    margin-top: 8px;
+    padding: 7px 16px 7px 8px;
+    background-color: #fde8e8;
+    border: 1.5px solid #e74c3c;
+    border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
+    animation: errorSlideIn 0.2s ease;
+}
+
+.field-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-style: normal;
+    flex-shrink: 0;
+}
+
+.email-input.field-error-active {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
 }

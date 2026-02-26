@@ -320,3 +320,44 @@ h5 {
 .fa {
     vertical-align: middle;
 }
+
+/* Validation personnalisée */
+@keyframes errorSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c0392b;
+    font-size: 0.82rem;
+    margin-top: 6px;
+    padding: 7px 16px 7px 8px;
+    background-color: #fde8e8;
+    border: 1.5px solid #e74c3c;
+    border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
+    animation: errorSlideIn 0.2s ease;
+}
+
+.field-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.form-control.field-error-active {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.12) !important;
+}
