@@ -27,6 +27,7 @@ if (empty($_SESSION['csrf_token'])) {
 <body>
   <div class="logo">
     <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
+    <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">← Retour à l'accueil</a></p>
   </div>
 
   <div class="register-container">
