@@ -210,46 +210,7 @@ $errorMessage = '';
 
     <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        (function() {
-            const html = document.documentElement;
-            const toggle = document.getElementById('themeToggle');
-            const storedTheme = localStorage.getItem('theme');
-            
-            // Apply stored theme or system preference
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    html.setAttribute('data-bs-theme', 'dark');
-                    toggle.checked = true;
-                } else if (theme === 'light') {
-                    html.setAttribute('data-bs-theme', 'light');
-                    toggle.checked = false;
-                } else {
-                    // No stored theme, check system preference
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    html.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
-                    toggle.checked = prefersDark;
-                }
-            }
-            
-            // Initialize theme
-            applyTheme(storedTheme);
-            
-            // Listen for toggle changes
-            toggle.addEventListener('change', function() {
-                const newTheme = this.checked ? 'dark' : 'light';
-                html.setAttribute('data-bs-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-            });
-            
-            // Listen for system theme changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (!localStorage.getItem('theme')) {
-                    applyTheme(e.matches ? 'dark' : 'light');
-                }
-            });
-        })();
-    </script>
+    <script src="theme-toggle.js"></script>
 </body>
 
 </html>
