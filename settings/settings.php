@@ -1,4 +1,3 @@
-<!-- TODO ajout d'un bouton supprimer le compte et d'un modal de confirmation de suppression de compte et fonction a faire avec php -->
 <?php
 session_start();
 if (!isset($_SESSION['auth_token'])) {
@@ -162,15 +161,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     <img src="../assets/images/logo.svg" alt="Market Plier Logo" style="width: 80%; height: auto;">
   </div>
 
- 
+
 
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-8">
 
-      
 
-        
+
+
 
         <!-- Formulaire de modification du profil -->
         <div class="card shadow-sm mb-4">
@@ -181,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             <form method="POST">
               <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
-              
+
 
               <div class="mb-3">
                 <label for="email" class="form-label">thème du site</label>
@@ -189,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
               <div class="d-grid gap-2">
                 <button id="theme-button" type="submit" name="update_profile" class="btn btn-primary">
-                  <i class="fas fa-save"></i> 
+                  <i class="fas fa-save"></i>
                 </button>
               </div>
             </form>
@@ -216,32 +215,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-        const html = document.documentElement;
-        const toggleBtn = document.getElementById('theme-button');
-        const storedTheme = localStorage.getItem('theme');
+    const html = document.documentElement;
+    const toggleBtn = document.getElementById('theme-button');
+    const storedTheme = localStorage.getItem('theme');
 
-        // Appliquer thème initial
-        if (storedTheme === 'dark') {
-            html.setAttribute('data-bs-theme', 'dark');
-            toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>'; // Icône lune
-        }
+    // Appliquer thème initial
+    if (storedTheme === 'dark') {
+      html.setAttribute('data-bs-theme', 'dark');
+      toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>'; // Icône lune
+    }
 
-        // Toggle au clic
-        toggleBtn.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    // Toggle au clic
+    toggleBtn.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-bs-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-            html.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+      html.setAttribute('data-bs-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
 
-            // Changer icône (optionnel)
-            if (newTheme === 'dark') {
-                toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>';
-            } else {
-                toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#sun-icon"></use></svg>';
-            }
-        });
-    </script>
+      // Changer icône (optionnel)
+      if (newTheme === 'dark') {
+        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>';
+      } else {
+        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#sun-icon"></use></svg>';
+      }
+    });
+  </script>
 </body>
 
 </html>
