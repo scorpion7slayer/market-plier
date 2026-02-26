@@ -168,8 +168,11 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
 
                         <!-- Boutons d'actions -->
                         <div class="profile-actions">
+                            <a href="settings/settings.php" class="btn btn-brand">
+                                <i class="fa-solid fa-gear"></i> Paramètres
+                            </a>
                             <a href="dashboard.php" class="btn btn-brand">
-                                <i class="fa-solid fa-gear"></i> Gérer le compte
+                                <i class="fa-solid fa-pen-to-square"></i> Modifier le profil
                             </a>
                             <a href="logout.php" class="btn btn-outline-danger" style="border-radius: 50px; font-weight: 600; font-style: italic;">
                                 <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter

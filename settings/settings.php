@@ -1,246 +1,255 @@
 <?php
 session_start();
+
+// Check if user is logged in
 if (!isset($_SESSION['auth_token'])) {
-  header('Location: login.php');
-  exit();
+    header('Location: ../index.php');
+    exit();
 }
 
-try {
-  require_once '../database/db.php';
-} catch (PDOException $e) {
-  error_log("DB connection error (dashboard): " . $e->getMessage());
-}
-
-// Générer un token CSRF si nécessaire
+// Generate CSRF token if needed
 if (!isset($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$isAdmin = false;
+// Database connection
+try {
+    require_once '../database/db.php';
+} catch (PDOException $e) {
+    error_log("DB connection error (settings): " . $e->getMessage());
+}
+
+$user = null;
 $username = $_SESSION['username'] ?? '';
-$email = '';
-$profilePhoto = null;
+
+// Fetch user info
+if (isset($pdo)) {
+    try {
+        $stmt = $pdo->prepare("SELECT username, email, profile_photo, is_admin FROM users WHERE auth_token = ?");
+        $stmt->execute([$_SESSION['auth_token']]);
+        $user = $stmt->fetch();
+        
+        if ($user) {
+            $username = $user['username'];
+        }
+    } catch (PDOException $ex) {
+        error_log("Error fetching user data: " . $ex->getMessage());
+    }
+}
+
+if (!$user) {
+    header('Location: ../index.php');
+    exit();
+}
+
 $successMessage = '';
 $errorMessage = '';
-
-// Récupérer les informations utilisateur
-if (isset($pdo)) {
-  try {
-    $stmt = $pdo->prepare("SELECT username, email, is_admin, profile_photo FROM users WHERE auth_token = ?");
-    $stmt->execute([$_SESSION['auth_token']]);
-    $userData = $stmt->fetch();
-
-    if ($userData) {
-      $username = $userData['username'];
-      $email = $userData['email'];
-      $isAdmin = ($userData['is_admin'] == 1);
-      $profilePhoto = $userData['profile_photo'];
-    }
-  } catch (PDOException $ex) {
-    error_log("Error fetching user data: " . $ex->getMessage());
-  }
-}
-
-// Traitement de l'upload de photo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['changer_photo'])) {
-  // Vérification CSRF
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-      $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      $maxSize = 5 * 1024 * 1024; // 5MB
-
-      $fileType = $_FILES['photo']['type'];
-      $fileSize = $_FILES['photo']['size'];
-
-      if (!in_array($fileType, $allowedTypes)) {
-        $errorMessage = "Format de fichier non autorisé. Utilisez JPG, PNG ou WEBP.";
-      } elseif ($fileSize > $maxSize) {
-        $errorMessage = "Le fichier est trop volumineux (max 5MB).";
-      } else {
-        // Créer le dossier uploads/profiles s'il n'existe pas
-        $uploadDir = '../uploads/profiles/';
-        if (!is_dir($uploadDir)) {
-          mkdir($uploadDir, 0755, true);
-        }
-
-        // Générer un nom de fichier unique
-        $extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $newFileName = 'user_' . $_SESSION['auth_token'] . '_' . time() . '.' . $extension;
-        $uploadPath = $uploadDir . $newFileName;
-
-        // Supprimer l'ancienne photo si elle existe
-        if ($profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto)) {
-          unlink('../uploads/profiles/' . $profilePhoto);
-        }
-
-        // Déplacer le fichier uploadé
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath)) {
-          try {
-            $updateStmt = $pdo->prepare("UPDATE users SET profile_photo = ? WHERE auth_token = ?");
-            $updateStmt->execute([$newFileName, $_SESSION['auth_token']]);
-            $profilePhoto = $newFileName;
-            $successMessage = "Photo de profil mise à jour avec succès !";
-          } catch (PDOException $ex) {
-            $errorMessage = "Erreur lors de la mise à jour de la base de données.";
-            error_log("Error updating profile photo: " . $ex->getMessage());
-          }
-        } else {
-          $errorMessage = "Erreur lors de l'upload du fichier.";
-        }
-      }
-    } else {
-      $errorMessage = "Aucun fichier sélectionné ou erreur d'upload.";
-    }
-
-    // Régénérer le token CSRF
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-  }
-}
-
-// Traitement de la mise à jour du profil
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-  // Vérification CSRF
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    $newUsername = trim($_POST['username'] ?? '');
-    $newEmail = trim($_POST['email'] ?? '');
-
-    // Validation
-    if (empty($newUsername) || empty($newEmail)) {
-      $errorMessage = "Tous les champs sont requis.";
-    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $newUsername)) {
-      $errorMessage = "Le nom d'utilisateur doit contenir entre 3 et 30 caractères alphanumériques.";
-    } elseif (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-      $errorMessage = "Adresse email invalide.";
-    } else {
-      try {
-        // Vérifier si le username ou email existe déjà (sauf pour l'utilisateur actuel)
-        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND auth_token != ?");
-        $checkStmt->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
-
-        if ($checkStmt->fetch()) {
-          $errorMessage = "Ce nom d'utilisateur ou email est déjà utilisé.";
-        } else {
-          $updateStmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE auth_token = ?");
-          $updateStmt->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
-
-          $username = $newUsername;
-          $email = $newEmail;
-          $_SESSION['username'] = $newUsername;
-          $successMessage = "Profil mis à jour avec succès !";
-        }
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la mise à jour du profil.";
-        error_log("Error updating profile: " . $ex->getMessage());
-      }
-    }
-
-    // Régénérer le token CSRF
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-  }
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr" data-bs-theme="light">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="../styles/settings.css">
-  <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
-  <title>Market Plier - Mon Profil</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Plier - Paramètres</title>
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <!-- FontAwesome local -->
+    <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../styles/settings.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
 </head>
 
 <body>
-  <div class="logo">
-    <img src="../assets/images/logo.svg" alt="Market Plier Logo" style="width: 80%; height: auto;">
-  </div>
+    <!-- Header partagé -->
+    <?php
+    $headerBasePath = '../';
+    $headerUser = $user;
+    include '../header.php';
+    ?>
 
-
-
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-
-
-
-
-
-        <!-- Formulaire de modification du profil -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="fa-solid fa-gear"></i>Paramètres du site</h5>
-          </div>
-          <div class="card-body">
-            <form method="POST">
-              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
-
-
-
-              <div class="mb-3">
-                <label for="email" class="form-label">thème du site</label>
-              </div>
-
-              <div class="d-grid gap-2">
-                <button id="theme-button" type="submit" name="update_profile" class="btn btn-primary">
-                  <i class="fas fa-save"></i>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="d-grid gap-2">
-              <a href="../inscription-connexion/account.php" class="btn btn-outline-secondary">
-                <i class="fas fa-home"></i> Retour au profile
-              </a>
-              <a href="logout.php" class="btn btn-danger">
-                <i class="fas fa-sign-out-alt"></i> Se déconnecter
-              </a>
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Messages -->
+        <?php if ($successMessage): ?>
+            <div class="alert alert-success" style="border-radius: 50px; border: 2px solid #7fb885; background-color: #e8fde8; color: #27ae60; text-align: center; max-width: 600px; margin: 15px auto;">
+                <i class="fa-solid fa-check-circle"></i> <?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?>
             </div>
-          </div>
+        <?php endif; ?>
+        
+        <?php if ($errorMessage): ?>
+            <div class="alert alert-danger" style="border-radius: 50px; border: 2px solid #e74c3c; background-color: #fde8e8; color: #c0392b; text-align: center; max-width: 600px; margin: 15px auto;">
+                <i class="fa-solid fa-exclamation-triangle"></i> <?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                
+                <!-- Appearance Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-palette"></i> Apparence
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-moon"></i> Mode sombre
+                                </h6>
+                                <p>Activer le thème sombre pour une lecture</p>
+                             confortable la nuit</div>
+                            <label class="theme-toggle">
+                                <input type="checkbox" id="themeToggle">
+                                <span class="theme-slider">
+                                    <i class="fa-solid fa-sun theme-icon sun-icon"></i>
+                                    <i class="fa-solid fa-moon theme-icon moon-icon"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-user-gear"></i> Compte
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-user"></i> Nom d'utilisateur
+                                </h6>
+                                <p><?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                            <a href="dashboard.php" class="btn btn-outline-secondary btn-sm">
+                                <i class="fa-solid fa-pen"></i> Modifier
+                            </a>
+                        </div>
+                        
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-envelope"></i> Email
+                                </h6>
+                                <p><?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                            <a href="dashboard.php" class="btn btn-outline-secondary btn-sm">
+                                <i class="fa-solid fa-pen"></i> Modifier
+                            </a>
+                        </div>
+                        
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-image"></i> Photo de profil
+                                </h6>
+                                <p>Changer votre photo de profil</p>
+                            </div>
+                            <a href="dashboard.php" class="btn btn-outline-secondary btn-sm">
+                                <i class="fa-solid fa-camera"></i> Changer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-shield-halved"></i> Sécurité
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                                </h6>
+                                <p>Se déconnecter de votre compte sur cet appareil</p>
+                            </div>
+                            <a href="logout.php" class="btn btn-outline-danger btn-sm">
+                                <i class="fa-solid fa-sign-out-alt"></i> Se déconnecter
+                            </a>
+                        </div>
+                        
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <h6>
+                                    <i class="fa-solid fa-trash"></i> Supprimer le compte
+                                </h6>
+                                <p>Supprimer définitivement votre compte et toutes vos données</p>
+                            </div>
+                            <a href="dashboard.php#delete" class="btn btn-danger btn-sm">
+                                <i class="fa-solid fa-trash-alt"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="../inscription-connexion/account.php" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-arrow-left"></i> Retour au profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-
-      </div>
     </div>
-  </div>
 
-  <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const html = document.documentElement;
-    const toggleBtn = document.getElementById('theme-button');
-    const storedTheme = localStorage.getItem('theme');
-
-    // Appliquer thème initial
-    if (storedTheme === 'dark') {
-      html.setAttribute('data-bs-theme', 'dark');
-      toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>'; // Icône lune
-    }
-
-    // Toggle au clic
-    toggleBtn.addEventListener('click', () => {
-      const currentTheme = html.getAttribute('data-bs-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-      html.setAttribute('data-bs-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-
-      // Changer icône (optionnel)
-      if (newTheme === 'dark') {
-        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>';
-      } else {
-        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#sun-icon"></use></svg>';
-      }
-    });
-  </script>
+    <!-- Bootstrap JS local -->
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const storedTheme = localStorage.getItem('theme');
+            
+            // Apply stored theme or system preference
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    html.setAttribute('data-bs-theme', 'dark');
+                    toggle.checked = true;
+                } else if (theme === 'light') {
+                    html.setAttribute('data-bs-theme', 'light');
+                    toggle.checked = false;
+                } else {
+                    // No stored theme, check system preference
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    html.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+                    toggle.checked = prefersDark;
+                }
+            }
+            
+            // Initialize theme
+            applyTheme(storedTheme);
+            
+            // Listen for toggle changes
+            toggle.addEventListener('change', function() {
+                const newTheme = this.checked ? 'dark' : 'light';
+                html.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+            
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        })();
+    </script>
 </body>
 
 </html>
