@@ -46,9 +46,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
       $_SESSION = [];
       if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-          $params["path"], $params["domain"],
-          $params["secure"], $params["httponly"]
+        setcookie(
+          session_name(),
+          '',
+          time() - 42000,
+          $params["path"],
+          $params["domain"],
+          $params["secure"],
+          $params["httponly"]
         );
       }
       session_destroy();
@@ -546,9 +551,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
               <a href="logout.php" class="btn btn-danger">
                 <i class="fas fa-sign-out-alt"></i> Se déconnecter
               </a>
-              <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                <i class="fas fa-trash-alt"></i> Supprimer mon compte
-              </button>
             </div>
           </div>
         </div>
@@ -556,7 +558,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
         <!-- Zone de danger -->
         <div class="card shadow-sm mt-4 border-danger">
           <div class="card-header bg-danger text-white">
-            <h5 class="mb-0"><i class="fas fa-skull-crossbones"></i> Zone de danger</h5>
+            <h5 class="mb-0"><i class="fa-solid fa-triangle-exclamation"></i> Zone de danger</h5>
           </div>
           <div class="card-body">
             <p class="text-muted mb-3">Une fois votre compte supprimé, toutes vos données seront effacées définitivement. Cette action est irréversible.</p>
