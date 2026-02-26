@@ -25,5 +25,4 @@ cacert.pem
 
 # Composer dependencies
 vendor/
-composer.lock
 
