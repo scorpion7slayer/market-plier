@@ -7,22 +7,18 @@ CLAUDE.md
 # Mais garder le dossier profiles
 !profiles/.gitkeep
 
-# # Credentials Google OAuth
-# config/google_oauth.php
-
 # Environment variables (contains secrets)
 .env
 .env.local
 .env.production
 
-# OAuth credentials (secrets)
-config/google_oauth.php
 # Node modules
 node_modules/
-
-# CA bundle (local dev only)
-cacert.pem
 
 # Composer dependencies
 vendor/
 
+# Google OAuth - fichiers sensibles
+google/google_oauth.php
+google/cacert.pem
+google/client_secret_*.json
