@@ -210,7 +210,8 @@ $errorMessage = '';
 
     <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="theme-toggle.js"></script>
+<script>console.log("inline script");// Theme Toggle
+document.addEventListener("DOMContentLoaded",function(){var t=document.getElementById("themeToggle"),e=document.documentElement;if(!t)return void console.error("Toggle not found");var n=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");e.setAttribute("data-bs-theme",n),t.checked="dark"===n,t.addEventListener("change",function(){var t=this.checked?"dark":"light";e.setAttribute("data-bs-theme",t),localStorage.setItem("theme",t)})});</script>
 </body>
 
 </html>
