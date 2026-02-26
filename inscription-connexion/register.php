@@ -5,8 +5,6 @@ if (isset($_SESSION['auth_token'])) {
   exit();
 }
 
-require_once '../config/google_oauth.php';
-
 // Générer un token CSRF si non existant
 if (empty($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -87,7 +85,7 @@ if (empty($_SESSION['csrf_token'])) {
           <span class="divider-text">ou</span>
         </div>
 
-        <a href="google_login.php" class="btn-google">
+        <a href="../google/google_login.php" class="btn-google">
           <img src="https://www.google.com/favicon.ico" alt="" width="18" height="18">
           S'inscrire avec Google
         </a>
