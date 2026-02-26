@@ -96,7 +96,7 @@ if (!empty($errors)) {
 try {
     $stmt = $pdo->prepare(
         "INSERT INTO listings (auth_token, title, description, price, category, item_condition, image, location)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $_SESSION['auth_token'],

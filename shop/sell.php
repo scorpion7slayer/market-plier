@@ -8,9 +8,9 @@ if (!isset($_SESSION['auth_token'])) {
 
 require_once '../database/db.php';
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Toujours générer un nouveau token CSRF à chaque affichage du formulaire
+// (évite les jetons obsolètes si l'utilisateur revient en arrière / recharge la page).
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 $user = null;
 try {
@@ -104,13 +104,13 @@ try {
                         <label class="field-label" for="category">Catégorie</label>
                         <select class="sell-select" id="category" name="category" required>
                             <option value="" disabled <?php echo empty($_POST['category']) ? 'selected' : ''; ?>>Choisir...</option>
-                            <option value="vetements"    <?php echo ($_POST['category'] ?? '') === 'vetements'    ? 'selected' : ''; ?>>Vêtements</option>
+                            <option value="vetements" <?php echo ($_POST['category'] ?? '') === 'vetements'    ? 'selected' : ''; ?>>Vêtements</option>
                             <option value="electronique" <?php echo ($_POST['category'] ?? '') === 'electronique' ? 'selected' : ''; ?>>Électronique</option>
-                            <option value="livres"       <?php echo ($_POST['category'] ?? '') === 'livres'       ? 'selected' : ''; ?>>Livres &amp; Médias</option>
-                            <option value="maison"       <?php echo ($_POST['category'] ?? '') === 'maison'       ? 'selected' : ''; ?>>Maison &amp; Jardin</option>
-                            <option value="sport"        <?php echo ($_POST['category'] ?? '') === 'sport'        ? 'selected' : ''; ?>>Sport &amp; Loisirs</option>
-                            <option value="vehicules"    <?php echo ($_POST['category'] ?? '') === 'vehicules'    ? 'selected' : ''; ?>>Véhicules</option>
-                            <option value="autre"        <?php echo ($_POST['category'] ?? '') === 'autre'        ? 'selected' : ''; ?>>Autre</option>
+                            <option value="livres" <?php echo ($_POST['category'] ?? '') === 'livres'       ? 'selected' : ''; ?>>Livres &amp; Médias</option>
+                            <option value="maison" <?php echo ($_POST['category'] ?? '') === 'maison'       ? 'selected' : ''; ?>>Maison &amp; Jardin</option>
+                            <option value="sport" <?php echo ($_POST['category'] ?? '') === 'sport'        ? 'selected' : ''; ?>>Sport &amp; Loisirs</option>
+                            <option value="vehicules" <?php echo ($_POST['category'] ?? '') === 'vehicules'    ? 'selected' : ''; ?>>Véhicules</option>
+                            <option value="autre" <?php echo ($_POST['category'] ?? '') === 'autre'        ? 'selected' : ''; ?>>Autre</option>
                         </select>
                     </div>
 
@@ -118,11 +118,11 @@ try {
                         <label class="field-label" for="condition">État</label>
                         <select class="sell-select" id="condition" name="condition" required>
                             <option value="" disabled <?php echo empty($_POST['condition']) ? 'selected' : ''; ?>>Choisir...</option>
-                            <option value="neuf"          <?php echo ($_POST['condition'] ?? '') === 'neuf'          ? 'selected' : ''; ?>>Neuf</option>
+                            <option value="neuf" <?php echo ($_POST['condition'] ?? '') === 'neuf'          ? 'selected' : ''; ?>>Neuf</option>
                             <option value="tres_bon_etat" <?php echo ($_POST['condition'] ?? '') === 'tres_bon_etat' ? 'selected' : ''; ?>>Très bon état</option>
-                            <option value="bon_etat"      <?php echo ($_POST['condition'] ?? '') === 'bon_etat'      ? 'selected' : ''; ?>>Bon état</option>
-                            <option value="etat_correct"  <?php echo ($_POST['condition'] ?? '') === 'etat_correct'  ? 'selected' : ''; ?>>État correct</option>
-                            <option value="pour_pieces"   <?php echo ($_POST['condition'] ?? '') === 'pour_pieces'   ? 'selected' : ''; ?>>Pour pièces</option>
+                            <option value="bon_etat" <?php echo ($_POST['condition'] ?? '') === 'bon_etat'      ? 'selected' : ''; ?>>Bon état</option>
+                            <option value="etat_correct" <?php echo ($_POST['condition'] ?? '') === 'etat_correct'  ? 'selected' : ''; ?>>État correct</option>
+                            <option value="pour_pieces" <?php echo ($_POST['condition'] ?? '') === 'pour_pieces'   ? 'selected' : ''; ?>>Pour pièces</option>
                         </select>
                     </div>
                 </div>
@@ -184,29 +184,29 @@ try {
     </main>
 
     <script>
-        var photoInput   = document.getElementById('photo');
-        var preview      = document.getElementById('photo-preview');
-        var container    = document.getElementById('photo-preview-container');
-        var placeholder  = document.getElementById('upload-placeholder');
-        var changeBtn    = document.getElementById('change-photo-btn');
+        var photoInput = document.getElementById('photo');
+        var preview = document.getElementById('photo-preview');
+        var container = document.getElementById('photo-preview-container');
+        var placeholder = document.getElementById('upload-placeholder');
+        var changeBtn = document.getElementById('change-photo-btn');
 
-        photoInput.addEventListener('change', function () {
+        photoInput.addEventListener('change', function() {
             var file = this.files[0];
             if (!file) return;
             var reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 preview.src = e.target.result;
                 placeholder.style.display = 'none';
-                container.style.display   = 'block';
+                container.style.display = 'block';
             };
             reader.readAsDataURL(file);
         });
 
-        changeBtn.addEventListener('click', function (e) {
+        changeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            photoInput.value          = '';
-            container.style.display   = 'none';
+            photoInput.value = '';
+            container.style.display = 'none';
             placeholder.style.display = 'flex';
         });
     </script>

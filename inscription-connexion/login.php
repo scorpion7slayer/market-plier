@@ -5,10 +5,8 @@ if (isset($_SESSION['auth_token'])) {
   exit();
 }
 
-// Générer un token CSRF si non existant
-if (empty($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Générer un nouveau token CSRF à chaque affichage du formulaire
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
