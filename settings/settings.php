@@ -212,6 +212,31 @@ $errorMessage = '';
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script>console.log("inline script");// Theme Toggle
 document.addEventListener("DOMContentLoaded",function(){var t=document.getElementById("themeToggle"),e=document.documentElement;if(!t)return void console.error("Toggle not found");var n=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");e.setAttribute("data-bs-theme",n),t.checked="dark"===n,t.addEventListener("change",function(){var t=this.checked?"dark":"light";e.setAttribute("data-bs-theme",t),localStorage.setItem("theme",t)})});</script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var toggle = document.getElementById("themeToggle");
+        var html = document.documentElement;
+        
+        if (!toggle) {
+            console.error("Toggle not found!");
+            return;
+        }
+        
+        var theme = localStorage.getItem("theme");
+        if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        
+        html.setAttribute("data-bs-theme", theme);
+        toggle.checked = (theme === "dark");
+        
+        toggle.addEventListener("change", function() {
+            var newTheme = this.checked ? "dark" : "light";
+            html.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+        });
+    });
+    </script>
 </body>
 
 </html>
