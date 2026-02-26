@@ -20,3 +20,10 @@ config/google_oauth.php
 # Node modules
 node_modules/
 
+# CA bundle (local dev only)
+cacert.pem
+
+# Composer dependencies
+vendor/
+composer.lock
+
