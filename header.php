@@ -1,11 +1,5 @@
 <?php
-/**
- * Header partagé Market Plier
- *
- * Variables à définir avant include :
- *   $headerBasePath  - chemin relatif vers la racine ('' ou '../')
- *   $headerUser      - tableau user (username, profile_photo...) ou null
- */
+
 $headerBasePath = $headerBasePath ?? '';
 $headerUser = $headerUser ?? null;
 
