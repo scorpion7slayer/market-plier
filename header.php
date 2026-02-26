@@ -38,6 +38,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     <nav>
       <a href="#">vendre</a>
       <a href="#">langue</a>
+      <a href="#">thème</a>
       <a href="#">aide</a>
     </nav>
   </div>

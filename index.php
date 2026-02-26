@@ -39,7 +39,12 @@ if ($user) {
 </head>
 
 <body>
-
+  <!-- Header partagé -->
+    <?php
+    $headerBasePath = './';
+    $headerUser = $user;
+    include 'header.php';
+    ?>
   <!-- Message de confirmation suppression compte -->
   <?php if (isset($_GET['account_deleted']) && $_GET['account_deleted'] === '1'): ?>
     <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c3e6cb;">
@@ -47,45 +52,7 @@ if ($user) {
     </div>
   <?php endif; ?>
 
-  <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
-  <header>
-    <!-- Top row: logo | divider | search | divider | avatar -->
-    <div class=" header-top">
-      <div class="logo-area">
-        <div class="logo-icon">
-          <img src="assets/images/logo.svg" alt="Market Plier Logo" style="width: auto; height: 100%; margin-left: 250%;">
-
-
-        </div>
-      </div>
-      <div class="header-divider"></div>
-      <input class="search-bar" type="text" placeholder="Rechercher" />
-      <div class="header-divider"></div>
-      <?php
-      $profilePhoto = isset($user['profile_photo']) ? $user['profile_photo'] : null;
-      if ($profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto)):
-      ?>
-        <a class="profile-photo-container" href="inscription-connexion/account.php">
-          <img src="uploads/profiles/<?php echo htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8'); ?>"
-            alt="Photo de profil"
-            class="profile-photo"
-            style="object-fit: cover" />
-        </a>
-      <?php else: ?>
-        <a class="profile-photo-container" href="<?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>"></a>
-      <?php endif; ?>
-
-    </div>
-
-    <!-- Bottom row: nav links -->
-    <div class="header-bottom">
-      <nav>
-        <a href="#">vendre</a>
-        <a href="#"></a>
-        <a href="#">aide</a>
-      </nav>
-    </div>
-  </header>
+ 
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
   <main>
