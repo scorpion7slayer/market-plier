@@ -27,7 +27,7 @@ try {
 // Charger la description depuis profiles (table optionnelle)
 if ($user) {
     try {
-        $descStmt = $pdo->prepare("SELECT description FROM profiles WHERE auth_token = ?");
+        $descStmt = $pdo->prepare("SELECT description FROM profile WHERE auth_token = ?");
         $descStmt->execute([$_SESSION['auth_token']]);
         $profile = $descStmt->fetch();
         $description = $profile ? ($profile['description'] ?? '') : '';
@@ -41,7 +41,7 @@ if (!$user) {
     exit();
 }
 
-$successMessage = '';
+$successMessage = isset($_GET['success']) && $_GET['success'] === 'description' ? "Description mise à jour avec succès !" : '';
 $errorMessage = '';
 
 // Traitement POST : mise à jour de la description
@@ -54,11 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])
             $errorMessage = "La description ne peut pas dépasser 500 caractères.";
         } else {
             try {
-                $upsert = $pdo->prepare("INSERT INTO profiles (auth_token, description) VALUES (?, ?)
+                $upsert = $pdo->prepare("INSERT INTO profile (auth_token, description) VALUES (?, ?)
                     ON DUPLICATE KEY UPDATE description = VALUES(description)");
                 $upsert->execute([$_SESSION['auth_token'], $newDescription]);
-                $description = $newDescription;
-                $successMessage = "Description mise à jour avec succès !";
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                header('Location: account.php?success=description');
+                exit();
             } catch (PDOException $ex) {
                 $errorMessage = "Erreur lors de la mise à jour de la description.";
                 error_log("Error updating description: " . $ex->getMessage());
@@ -96,19 +97,32 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
     include '../header.php';
     ?>
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <!-- Messages de succès/erreur -->
+    <!-- Toasts -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
         <?php if ($successMessage): ?>
-            <div class="alert alert-success" style="border-radius: 50px; border: 2px solid #7fb885; background-color: #e8fde8; color: #27ae60; text-align: center; max-width: 600px; margin: 15px auto;">
-                <?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?>
+            <div id="toastSuccess" class="toast align-items-center text-white border-0" role="alert" style="background-color: #7fb885;">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fa-solid fa-check me-2"></i><?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
             </div>
         <?php endif; ?>
         <?php if ($errorMessage): ?>
-            <div class="alert alert-danger" style="border-radius: 50px; border: 2px solid #e74c3c; background-color: #fde8e8; color: #c0392b; text-align: center; max-width: 600px; margin: 15px auto;">
-                <?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?>
+            <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i><?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
 
         <!-- Profile Section -->
         <div class="row">
@@ -129,9 +143,6 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
                             <div class="username-section">
                                 <div class="username"><?= $username ?></div>
                                 <span class="verified">✓</span>
-                                <a href="dashboard.php" class="btn btn-sm btn-brand" style="margin-left: 10px;">
-                                    <i class="fa-solid fa-pen-to-square"></i> Modifier le profil
-                                </a>
                             </div>
                         </div>
 
@@ -171,9 +182,6 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
                             <a href="dashboard.php" class="btn btn-brand">
                                 <i class="fa-solid fa-gear"></i> Gérer le compte
                             </a>
-                            <a href="logout.php" class="btn btn-outline-danger" style="border-radius: 50px; font-weight: 600; font-style: italic;">
-                                <i class="fa-solid fa-right-from-bracket"></i> Se déconnecter
-                            </a>
                         </div>
                     </aside>
                 </div>
@@ -199,6 +207,11 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
     <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Afficher les toasts automatiquement
+        document.querySelectorAll('.toast').forEach(function(el) {
+            new bootstrap.Toast(el, { delay: 3000 }).show();
+        });
+
         function toggleDescriptionEdit() {
             var display = document.getElementById('description-display');
             var edit = document.getElementById('description-edit');
