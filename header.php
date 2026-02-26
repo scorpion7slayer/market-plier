@@ -30,7 +30,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
   <div class="header-bottom">
     <nav>
-      <a href="#">vendre</a>
+      <a href="../shop/sell.php">vendre</a>
       <a href="#">langue</a>
       <a href="#">thème</a>
       <a href="#">aide</a>

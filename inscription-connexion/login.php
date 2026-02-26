@@ -76,6 +76,7 @@ if (empty($_SESSION['csrf_token'])) {
       <p class="auth-link">Pas encore de compte ? <a href="register.php">S'inscrire</a></p>
     </main>
   </div>
+  <script src="../styles/form-validation.js"></script>
 </body>
 
 </html>

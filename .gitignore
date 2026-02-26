@@ -1,11 +1,11 @@
 CLAUDE.md
 .grepai/
 .claude/
-# # Ignorer toutes les photos de profil uploadées
-# profiles/*
-
-# Mais garder le dossier profiles
-!profiles/.gitkeep
+# Ignorer les fichiers uploadés, garder les dossiers
+uploads/profiles/*
+!uploads/profiles/.gitkeep
+uploads/listings/*
+!uploads/listings/.gitkeep
 
 # Environment variables (contains secrets)
 .env

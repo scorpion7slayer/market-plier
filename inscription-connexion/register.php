@@ -60,21 +60,24 @@ if (empty($_SESSION['csrf_token'])) {
           required>
 
         <div class="password-row">
-          <input
-            type="password"
-            class="email-input"
-            name="password"
-            id="password"
-            placeholder="mot de passe"
-            required>
-
-          <input
-            type="password"
-            class="email-input"
-            name="confirm_password"
-            id="confirm_password"
-            placeholder="confirmer le mot de passe"
-            required>
+          <div class="password-field">
+            <input
+              type="password"
+              class="email-input"
+              name="password"
+              id="password"
+              placeholder="mot de passe"
+              required>
+          </div>
+          <div class="password-field">
+            <input
+              type="password"
+              class="email-input"
+              name="confirm_password"
+              id="confirm_password"
+              placeholder="confirmer le mot de passe"
+              required>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn">
@@ -94,6 +97,7 @@ if (empty($_SESSION['csrf_token'])) {
       <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
     </main>
   </div>
+  <script src="../styles/form-validation.js"></script>
 </body>
 
 </html>
