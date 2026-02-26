@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     } else {
       try {
         // Vérifier si le username ou email existe déjà (sauf pour l'utilisateur actuel)
-        $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND auth_token != ?");
+        $checkStmt = $pdo->prepare("SELECT auth_token FROM users WHERE (username = ? OR email = ?) AND auth_token != ?");
         $checkStmt->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
 
         if ($checkStmt->fetch()) {
