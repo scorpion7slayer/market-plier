@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `listings` (
-  `id` int UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `auth_token` varchar(64) NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` text NOT NULL,
@@ -38,6 +38,21 @@ CREATE TABLE `listings` (
   `image` varchar(255) DEFAULT NULL,
   `location` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+-- 
+-- Structure de la table `listing_images`
+--
+
+CREATE TABLE `listing_images` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `listing_id` int UNSIGNED NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `sort_order` int UNSIGNED DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`listing_id`) REFERENCES `listings`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------

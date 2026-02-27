@@ -8,9 +8,10 @@ if (!isset($_SESSION['auth_token'])) {
 
 require_once '../database/db.php';
 
-// Toujours générer un nouveau token CSRF à chaque affichage du formulaire
-// (évite les jetons obsolètes si l'utilisateur revient en arrière / recharge la page).
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Générer un nouveau token CSRF seulement s'il n'existe pas
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $user = null;
 try {
@@ -61,28 +62,27 @@ try {
             <input type="hidden" name="csrf_token"
                 value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
-            <!-- ── Photo ─────────────────────────────────────────── -->
+            <!-- Photos -->
             <div class="form-section">
-                <span class="section-label">Photos</span>
-                <label class="photo-upload-zone" id="upload-zone">
-                    <input type="file" name="image" id="photo" accept=".jpg,.jpeg,.png,.webp">
-                    <div class="upload-placeholder" id="upload-placeholder">
-                        <div class="upload-icon-circle">
-                            <i class="fas fa-camera"></i>
+                <span class="section-label">Photos <span class="photo-counter">(<span id="photo-count">0</span>/5)</span></span>
+                <div class="photos-container" id="photos-container">
+                    <!-- Zone d'upload principale -->
+                    <label class="photo-upload-zone" id="upload-zone">
+                        <input type="file" name="images[]" id="photo-input" accept=".jpg,.jpeg,.png,.webp" multiple>
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <div class="upload-icon-circle">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <span class="upload-text">Ajouter des photos</span>
+                            <span class="upload-hint">JPG, PNG ou WEBP &mdash; max 5&nbsp;Mo par image</span>
                         </div>
-                        <span class="upload-text">Ajouter une photo</span>
-                        <span class="upload-hint">JPG, PNG ou WEBP &mdash; max 5&nbsp;Mo</span>
-                    </div>
-                    <div id="photo-preview-container">
-                        <img id="photo-preview" src="" alt="Aperçu">
-                        <button type="button" class="preview-change-btn" id="change-photo-btn">
-                            <i class="fas fa-sync-alt"></i> Changer
-                        </button>
-                    </div>
-                </label>
+                    </label>
+                    <!-- Les aperçus des photos seront insérés ici -->
+                </div>
+                <p class="photos-help-text">Vous pouvez ajouter jusqu'à 5 photos. Glissez-déposez pour réorganiser.</p>
             </div>
 
-            <!-- ── L'essentiel ───────────────────────────────────── -->
+            <!-- L'essentiel -->
             <div class="form-section">
                 <span class="section-label">L'essentiel</span>
 
@@ -146,7 +146,7 @@ try {
                 </div>
             </div>
 
-            <!-- ── Détails ────────────────────────────────────────── -->
+            <!-- Détails -->
             <div class="form-section">
                 <span class="section-label">Détails</span>
 
@@ -176,7 +176,7 @@ try {
                 </div>
             </div>
 
-            <!-- ── Publier ────────────────────────────────────────── -->
+            <!-- Publier -->
             <button type="submit" class="publish-btn">
                 <i class="fas fa-paper-plane"></i>&nbsp; Publier l'annonce
             </button>
@@ -184,30 +184,196 @@ try {
     </main>
 
     <script>
-        var photoInput = document.getElementById('photo');
-        var preview = document.getElementById('photo-preview');
-        var container = document.getElementById('photo-preview-container');
-        var placeholder = document.getElementById('upload-placeholder');
-        var changeBtn = document.getElementById('change-photo-btn');
+        var photoInput = document.getElementById('photo-input');
+        var photosContainer = document.getElementById('photos-container');
+        var uploadPlaceholder = document.getElementById('upload-placeholder');
+        var photoCountSpan = document.getElementById('photo-count');
+        var selectedFiles = [];
+        var maxFiles = 5;
 
-        photoInput.addEventListener('change', function() {
-            var file = this.files[0];
-            if (!file) return;
+        function updatePhotoCount() {
+            photoCountSpan.textContent = selectedFiles.length;
+            uploadPlaceholder.style.display = selectedFiles.length >= maxFiles ? 'none' : 'flex';
+        }
+
+        function createPhotoPreview(file, index) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'photo-preview-wrapper';
+            wrapper.setAttribute('data-index', index);
+            wrapper.draggable = true;
+
+            var img = document.createElement('img');
+            img.className = 'photo-preview-img';
+            img.alt = 'Aperçu';
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'photo-remove-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+
+            var orderBadge = document.createElement('span');
+            orderBadge.className = 'photo-order-badge';
+            orderBadge.textContent = index + 1;
+
+            // Bouton pour définir comme principale
+            var mainBtn = document.createElement('button');
+            mainBtn.type = 'button';
+            mainBtn.className = 'photo-main-btn' + (index === 0 ? ' active' : '');
+            mainBtn.innerHTML = '<i class="fas fa-star"></i>';
+            mainBtn.title = 'Définir comme image principale';
+
+            // Input hidden pour indiquer l'image principale
+            var mainInput = document.createElement('input');
+            mainInput.type = 'hidden';
+            mainInput.name = 'main_image_index';
+            mainInput.value = '0';
+            mainInput.className = 'main-image-input';
+
             var reader = new FileReader();
             reader.onload = function(e) {
-                preview.src = e.target.result;
-                placeholder.style.display = 'none';
-                container.style.display = 'block';
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                selectedFiles.splice(index, 1);
+                renderPreviews();
+            });
+
+            // Marquer comme principale
+            mainBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Réorganiser les fichiers pour mettre celle-ci en premier
+                var clickedIndex = parseInt(wrapper.getAttribute('data-index'));
+                if (clickedIndex > 0) {
+                    var temp = selectedFiles[clickedIndex];
+                    selectedFiles.splice(clickedIndex, 1);
+                    selectedFiles.unshift(temp);
+                    renderPreviews();
+                }
+            });
+
+            // Drag and drop
+            wrapper.addEventListener('dragstart', function(e) {
+                wrapper.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', index);
+            });
+
+            wrapper.addEventListener('dragend', function() {
+                wrapper.classList.remove('dragging');
+            });
+
+            wrapper.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                wrapper.classList.add('drag-over');
+            });
+
+            wrapper.addEventListener('dragleave', function() {
+                wrapper.classList.remove('drag-over');
+            });
+
+            wrapper.addEventListener('drop', function(e) {
+                e.preventDefault();
+                wrapper.classList.remove('drag-over');
+                var draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                var targetIndex = parseInt(wrapper.getAttribute('data-index'));
+                if (draggedIndex !== targetIndex) {
+                    var temp = selectedFiles[draggedIndex];
+                    selectedFiles.splice(draggedIndex, 1);
+                    selectedFiles.splice(targetIndex, 0, temp);
+                    renderPreviews();
+                }
+            });
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(orderBadge);
+            wrapper.appendChild(mainBtn);
+            wrapper.appendChild(removeBtn);
+
+            if (index === 0) {
+                wrapper.appendChild(mainInput);
+            }
+
+            return wrapper;
+        }
+
+        function renderPreviews() {
+            // Supprime tous les aperçus existants
+            var existingPreviews = photosContainer.querySelectorAll('.photo-preview-wrapper');
+            existingPreviews.forEach(function(el) {
+                el.remove();
+            });
+
+            // Recrée les aperçus
+            selectedFiles.forEach(function(file, index) {
+                var preview = createPhotoPreview(file, index);
+                photosContainer.appendChild(preview);
+            });
+
+            updatePhotoCount();
+            updateFileInput();
+        }
+
+        function updateFileInput() {
+            var dataTransfer = new DataTransfer();
+            selectedFiles.forEach(function(file) {
+                dataTransfer.items.add(file);
+            });
+            photoInput.files = dataTransfer.files;
+        }
+
+        photoInput.addEventListener('change', function() {
+            var newFiles = Array.from(this.files);
+            var remainingSlots = maxFiles - selectedFiles.length;
+
+            if (newFiles.length > remainingSlots) {
+                newFiles = newFiles.slice(0, remainingSlots);
+                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+            }
+
+            selectedFiles = selectedFiles.concat(newFiles);
+            renderPreviews();
         });
 
-        changeBtn.addEventListener('click', function(e) {
+        // Drag and drop sur la zone d'upload
+        var uploadZone = document.getElementById('upload-zone');
+
+        uploadZone.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            photoInput.value = '';
-            container.style.display = 'none';
-            placeholder.style.display = 'flex';
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.classList.remove('drag-over');
+
+            var files = Array.from(e.dataTransfer.files);
+            var imageFiles = files.filter(function(file) {
+                return file.type.startsWith('image/');
+            });
+
+            var remainingSlots = maxFiles - selectedFiles.length;
+            if (imageFiles.length > remainingSlots) {
+                imageFiles = imageFiles.slice(0, remainingSlots);
+                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+            }
+
+            selectedFiles = selectedFiles.concat(imageFiles);
+            renderPreviews();
         });
     </script>
     <script src="../styles/form-validation.js"></script>

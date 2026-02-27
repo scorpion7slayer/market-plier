@@ -30,7 +30,7 @@ body {
     line-height: normal;
 }
 
-/* ─── HEADER ─────────────────────────────────────────────── */
+/* HEADER  */
 header {
     background-color: #8faf72;
     display: flex;
@@ -191,7 +191,7 @@ nav a {
     color: white;
 }
 
-/* ─── MAIN ────────────────────────────────────────────────── */
+/* MAIN */
 main {
     /* Fill remaining height after header (140px) */
     height: calc(100vh - 140px);
@@ -212,7 +212,7 @@ main {
     flex-shrink: 0;
 }
 
-/* ─── SECTION ─────────────────────────────────────────────── */
+/* SECTION */
 section {
     flex: 1;
     min-height: 0;
@@ -236,7 +236,7 @@ section + section {
     margin-top: 50px;
 }
 
-/* ─── CARDS ROW ───────────────────────────────────────────── */
+/* CARDS ROW */
 .cards-row {
     display: flex;
     align-items: center;
@@ -255,7 +255,7 @@ section + section {
     line-height: 1;
 }
 
-/* ─── TRENDING: circles ───────────────────────────────────── */
+/* TRENDING: circles */
 .trending-cards {
     display: flex;
     gap: 22px;
@@ -279,7 +279,7 @@ section + section {
     border-radius: 50%;
 }
 
-/* ─── RECENTLY VIEWED: rounded rectangles ─────────────────── */
+/* RECENTLY VIEWED: rounded rectangles */
 .recent-cards {
     display: flex;
     gap: 18px;

@@ -72,6 +72,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])
 $profilePhoto = $user['profile_photo'] ?? null;
 $profilePhotoExists = $profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto);
 $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
+
+// Récupérer les annonces de l'utilisateur avec toutes leurs images
+$userListings = [];
+try {
+    $listingsStmt = $pdo->prepare("
+        SELECT l.* 
+        FROM listings l 
+        WHERE l.auth_token = ? 
+        ORDER BY l.created_at DESC
+    ");
+    $listingsStmt->execute([$_SESSION['auth_token']]);
+    $listings = $listingsStmt->fetchAll();
+
+    // Pour chaque annonce, récupérer toutes les images
+    foreach ($listings as $listing) {
+        $imagesStmt = $pdo->prepare("
+            SELECT image_path FROM listing_images 
+            WHERE listing_id = ? 
+            ORDER BY sort_order ASC
+        ");
+        $imagesStmt->execute([$listing['id']]);
+        $additionalImages = $imagesStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        // Construire le tableau d'images (image principale + images additionnelles)
+        $allImages = [];
+        if (!empty($listing['image'])) {
+            $allImages[] = $listing['image'];
+        }
+        foreach ($additionalImages as $img) {
+            if ($img !== $listing['image']) {
+                $allImages[] = $img;
+            }
+        }
+
+        $listing['all_images'] = $allImages;
+        $userListings[] = $listing;
+    }
+} catch (PDOException $ex) {
+    error_log("Error fetching user listings: " . $ex->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -192,14 +232,105 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
         <div class="row">
             <div class="col-12">
                 <div class="articles-section">
-                    <h2 class="section-title">Vos articles</h2>
-                    <div class="articles-grid">
-                        <div class="article-card"></div>
-                        <div class="article-card"></div>
-                        <div class="article-card"></div>
-                        <div class="article-card"></div>
-                    </div>
+                    <h2 class="section-title">Vos articles en vente</h2>
+
+                    <?php if (empty($userListings)): ?>
+                        <div class="no-articles">
+                            <i class="fa-solid fa-box-open"></i>
+                            <p>Vous n'avez pas encore d'articles en vente.</p>
+                            <a href="../shop/sell.php" class="btn btn-sm btn-brand">
+                                <i class="fa-solid fa-plus"></i> Poster une annonce
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <div class="articles-grid">
+                            <?php foreach ($userListings as $listing): ?>
+                                <?php
+                                // Déterminer l'image à afficher
+                                $displayImage = $listing['image'] ?? $listing['additional_image'];
+                                $imageUrl = $displayImage ? '../uploads/listings/' . htmlspecialchars($displayImage, ENT_QUOTES, 'UTF-8') : '../assets/images/no-image.svg';
+                                $price = number_format($listing['price'], 2, ',', ' ');
+                                $conditionLabels = [
+                                    'neuf' => 'Neuf',
+                                    'tres_bon_etat' => 'Très bon état',
+                                    'bon_etat' => 'Bon état',
+                                    'etat_correct' => 'État correct',
+                                    'pour_pieces' => 'Pour pièces'
+                                ];
+                                $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item_condition'];
+                                ?>
+                                <div class="article-card">
+                                    <div class="article-image">
+                                        <?php if (count($listing['all_images']) > 1): ?>
+                                            <div id="carousel-<?= $listing['id'] ?>" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                                                <div class="carousel-inner">
+                                                    <?php foreach ($listing['all_images'] as $index => $img): ?>
+                                                        <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                            <img src="../uploads/listings/<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>"
+                                                                class="d-block w-100"
+                                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<?= $listing['id'] ?>" data-bs-slide="prev">
+                                                    <i class="fa-solid fa-caret-left"></i>
+                                                    <span class="visually-hidden">Précédent</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carousel-<?= $listing['id'] ?>" data-bs-slide="next">
+                                                    <i class="fa-solid fa-caret-right"></i>
+                                                    <span class="visually-hidden">Suivant</span>
+                                                </button>
+                                            </div>
+                                        <?php elseif (!empty($listing['all_images'])): ?>
+                                            <img src="../uploads/listings/<?= htmlspecialchars($listing['all_images'][0], ENT_QUOTES, 'UTF-8') ?>"
+                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <?php else: ?>
+                                            <div class="no-image-placeholder">
+                                                <i class="fa-solid fa-image"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="article-condition"><?= htmlspecialchars($conditionLabel) ?></div>
+                                    </div>
+                                    <div class="article-info">
+                                        <h3 class="article-title"><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                                        <p class="article-price"><?= $price ?> €</p>
+                                        <?php if (!empty($listing['location'])): ?>
+                                            <p class="article-location">
+                                                <i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($listing['location'], ENT_QUOTES, 'UTF-8') ?>
+                                            </p>
+                                        <?php endif; ?>
+                                        <div class="article-actions">
+                                            <a href="../shop/edit_listing.php?id=<?= $listing['id'] ?>" class="btn btn-edit" title="Modifier">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <button class="btn btn-delete" title="Supprimer" onclick="deleteListing(<?= $listing['id'] ?>)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <div class="custom-modal-overlay" id="deleteModal">
+        <div class="custom-modal">
+            <div class="custom-modal-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Confirmer la suppression</h3>
+            </div>
+            <div class="custom-modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette annonce ?</p>
+                <p class="modal-warning">Cette action est irréversible.</p>
+            </div>
+            <div class="custom-modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn btn-confirm-delete" id="confirmDeleteBtn">Supprimer</button>
             </div>
         </div>
     </div>
@@ -207,9 +338,46 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
     <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        var listingIdToDelete = null;
+
+        function openDeleteModal(id) {
+            listingIdToDelete = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            listingIdToDelete = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        // Confirmer la suppression
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (listingIdToDelete) {
+                window.location.href = '../shop/delete_listing.php?id=' + listingIdToDelete;
+            }
+        });
+
+        // Fermer le modal en cliquant sur l'overlay
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // Fermer avec la touche Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
         // Afficher les toasts automatiquement
-        document.querySelectorAll('.toast').forEach(function(el) {
-            new bootstrap.Toast(el, { delay: 3000 }).show();
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toast').forEach(function(el) {
+                new bootstrap.Toast(el, {
+                    delay: 3000
+                }).show();
+            });
         });
 
         function toggleDescriptionEdit() {
@@ -222,6 +390,10 @@ $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
                 edit.style.display = 'none';
                 display.style.display = 'block';
             }
+        }
+
+        function deleteListing(id) {
+            openDeleteModal(id);
         }
     </script>
 </body>
