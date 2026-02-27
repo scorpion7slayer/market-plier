@@ -302,3 +302,31 @@ section + section {
     object-fit: cover;
     border-radius: 14px;
 }
+
+/* Theme Toggle in Header */
+.theme-toggle-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle-label:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-input {
+    margin-right: 6px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.theme-toggle-text {
+    user-select: none;
+}

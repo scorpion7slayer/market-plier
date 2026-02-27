@@ -30,19 +30,33 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
   <div class="header-bottom">
     <nav>
-      <a href="#">vendre</a>
+      <a href="<?= $headerBasePath ?>inscription-connexion/dashboard.php">vendre</a>
       <a href="#">langue</a>
-      <a href="#">thème</a>
+      <label class="theme-toggle-label">
+        <input type="checkbox" id="themeToggle" class="theme-toggle-input">
+        <span class="theme-toggle-text">thème</span>
+      </label>
       <a href="#">aide</a>
     </nav>
   </div>
 
-    <script>
+  <script>
     // Global Theme Toggle - apply theme on all pages
     (function() {
         var theme = localStorage.getItem("theme") || 
                    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         document.documentElement.setAttribute("data-bs-theme", theme);
+        
+        // Theme toggle functionality
+        var toggle = document.getElementById("themeToggle");
+        if (toggle) {
+            toggle.checked = (theme === "dark");
+            toggle.addEventListener("change", function() {
+                var newTheme = this.checked ? "dark" : "light";
+                document.documentElement.setAttribute("data-bs-theme", newTheme);
+                localStorage.setItem("theme", newTheme);
+            });
+        }
     })();
-    </script>
+  </script>
 </header>
