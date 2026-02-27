@@ -281,7 +281,7 @@ main {
     border-style: solid;
 }
 
-/* ─── CHAMPS FORMULAIRE ───────────────────────────────────── */
+/* CHAMPS FORMULAIRE */
 .field-group {
     margin-bottom: 18px;
 }
@@ -388,7 +388,7 @@ main {
     pointer-events: none;
 }
 
-/* ─── BOUTON PUBLIER ──────────────────────────────────────── */
+/* BOUTON PUBLIER */
 .publish-btn {
     width: 100%;
     padding: 18px 30px;
@@ -416,7 +416,7 @@ main {
     box-shadow: none;
 }
 
-/* ─── VALIDATION ──────────────────────────────────────────── */
+/* VALIDATION */
 @keyframes errorSlideIn {
     from {
         opacity: 0;
@@ -467,7 +467,7 @@ main {
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
 }
 
-/* ─── RESPONSIVE ──────────────────────────────────────────── */
+/* RESPONSIVE */
 @media (max-width: 640px) {
     main {
         padding: 24px 16px 60px;
