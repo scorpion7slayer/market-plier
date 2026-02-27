@@ -1,0 +1,3 @@
+# Limites PHP pour les uploads d'images (jusqu'à 5 photos × 5 Mo = 25 Mo)
+php_value upload_max_filesize 6M
+php_value post_max_size 32M
