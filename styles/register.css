@@ -338,3 +338,18 @@ body {
     border-color: #e74c3c;
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
 }
+
+/* ─── DARK MODE ───────────────────────────────────────────── */
+[data-bs-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --border-color: #444;
+    --card-bg: #333;
+}
+
+[data-bs-theme="dark"] body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}

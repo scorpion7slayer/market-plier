@@ -302,3 +302,54 @@ section + section {
     object-fit: cover;
     border-radius: 14px;
 }
+
+/* ─── DARK MODE ───────────────────────────────────────────── */
+[data-bs-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --border-color: #444;
+    --header-bg: #2d4a28;
+    --header-divider: #4a6b42;
+    --search-bg: #3a3a3a;
+    --search-border: #555;
+    --card-bg: #333;
+}
+
+[data-bs-theme="dark"] body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .header-divider {
+    background: var(--header-divider);
+}
+
+[data-bs-theme="dark"] .search-bar {
+    background: var(--search-bg);
+    border-color: var(--search-border);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .search-bar::placeholder {
+    color: #888;
+}
+
+[data-bs-theme="dark"] .greeting {
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .section-title {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .chevron {
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .circle-card,
+[data-bs-theme="dark"] .rect-card {
+    background: var(--card-bg);
+}

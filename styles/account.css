@@ -372,3 +372,18 @@ nav a:hover {
         display: none;
     }
 }
+
+/* ─── DARK MODE ───────────────────────────────────────────── */
+[data-bs-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --border-color: #444;
+    --card-bg: #333;
+}
+
+[data-bs-theme="dark"] body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
