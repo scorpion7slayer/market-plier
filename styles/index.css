@@ -32,7 +32,7 @@ body {
 
 /* HEADER  */
 header {
-    background-color: #8faf72;
+    background-color: #7faa58;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -279,7 +279,7 @@ section + section {
     border-radius: 50%;
 }
 
-/* RECENTLY VIEWED: rounded rectangles */
+/* ─── RECENTLY VIEWED: rounded rectangles ─────────────────── */
 .recent-cards {
     display: flex;
     gap: 18px;

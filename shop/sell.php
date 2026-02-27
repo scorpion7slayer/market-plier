@@ -8,8 +8,11 @@ if (!isset($_SESSION['auth_token'])) {
 
 require_once '../database/db.php';
 
-// Générer un nouveau token CSRF seulement s'il n'existe pas
-if (empty($_SESSION['csrf_token'])) {
+// Générer un token CSRF uniquement s'il n'existe pas encore dans la session.
+// Régénérer inconditionnellement provoquait des erreurs CSRF : naviguer vers
+// une autre page (ex. l'accueil) écrasait le token, rendant le formulaire
+// déjà affiché invalide (notamment via le cache bfcache du navigateur).
+if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
@@ -191,6 +194,46 @@ try {
         var selectedFiles = [];
         var maxFiles = 5;
 
+        // Redimensionne et compresse une image via Canvas avant l'upload.
+        // maxPx : dimension max (largeur ou hauteur), quality : 0-1 pour JPEG.
+        // Retourne une Promise<File> avec le fichier compressé.
+        function compressImage(file, maxPx, quality) {
+            return new Promise(function(resolve) {
+                var reader = new FileReader();
+                reader.onerror = function() { resolve(file); };
+                reader.onload = function(e) {
+                    var img = new Image();
+                    img.onerror = function() { resolve(file); };
+                    img.onload = function() {
+                        var w = img.width, h = img.height;
+                        if (w > maxPx || h > maxPx) {
+                            var ratio = Math.min(maxPx / w, maxPx / h);
+                            w = Math.round(w * ratio);
+                            h = Math.round(h * ratio);
+                        }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        canvas.toBlob(function(blob) {
+                            if (!blob) { resolve(file); return; }
+                            var name = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
+                            resolve(new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() }));
+                        }, 'image/jpeg', quality);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Compresse un tableau de fichiers puis appelle callback(fichiersCompressés).
+        function processAndAddFiles(files, callback) {
+            Promise.all(files.map(function(f) {
+                return compressImage(f, 1920, 0.85);
+            })).then(callback);
+        }
+
         function updatePhotoCount() {
             photoCountSpan.textContent = selectedFiles.length;
             uploadPlaceholder.style.display = selectedFiles.length >= maxFiles ? 'none' : 'flex';
@@ -337,8 +380,10 @@ try {
                 alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
             }
 
-            selectedFiles = selectedFiles.concat(newFiles);
-            renderPreviews();
+            processAndAddFiles(newFiles, function(compressed) {
+                selectedFiles = selectedFiles.concat(compressed);
+                renderPreviews();
+            });
         });
 
         // Drag and drop sur la zone d'upload
@@ -372,8 +417,10 @@ try {
                 alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
             }
 
-            selectedFiles = selectedFiles.concat(imageFiles);
-            renderPreviews();
+            processAndAddFiles(imageFiles, function(compressed) {
+                selectedFiles = selectedFiles.concat(compressed);
+                renderPreviews();
+            });
         });
     </script>
     <script src="../styles/form-validation.js"></script>

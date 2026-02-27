@@ -28,7 +28,7 @@ body {
 
 /* HEADER (identique à index.css pour le header partagé) */
 header {
-    background-color: #8faf72;
+    background-color: #7faa58;
     display: flex;
     flex-direction: column;
     justify-content: center;
