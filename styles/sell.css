@@ -1,4 +1,4 @@
-/* ─── OVERRIDES INDEX.CSS ─────────────────────────────────── */
+/* OVERRIDES INDEX.CSS */
 body {
     background: #f2f5f2;
     min-height: 100vh;
@@ -13,7 +13,7 @@ main {
     display: block !important;
 }
 
-/* ─── TITRE ───────────────────────────────────────────────── */
+/* TITRE */
 .page-title {
     font-size: 2.6rem;
     font-style: italic;
@@ -22,7 +22,7 @@ main {
     margin-bottom: 32px;
 }
 
-/* ─── ALERTES ─────────────────────────────────────────────── */
+/* ALERTES */
 .sell-alert {
     display: flex;
     align-items: center;
@@ -47,7 +47,7 @@ main {
     border: 1.5px solid #7fb885;
 }
 
-/* ─── SECTIONS ────────────────────────────────────────────── */
+/* SECTIONS */
 .form-section {
     background: #fff;
     border-radius: 18px;
@@ -66,7 +66,7 @@ main {
     letter-spacing: 0.2px;
 }
 
-/* ─── ZONE UPLOAD PHOTO ───────────────────────────────────── */
+/* ZONE UPLOAD PHOTO */
 .photo-upload-zone {
     border: 2.5px dashed #7fb885;
     border-radius: 14px;
@@ -138,7 +138,7 @@ main {
     text-align: center;
 }
 
-/* ─── MULTI PHOTOS ────────────────────────────────────────── */
+/* MULTI PHOTOS  */
 .photos-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
