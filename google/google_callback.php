@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-require_once '../config/google_oauth.php';
+require_once 'google_oauth.php';
 
 try {
     require '../database/db.php';
 } catch (PDOException $e) {
     error_log("DB connection error (google_callback): " . $e->getMessage());
-    header("Location: login.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Une erreur interne est survenue. Veuillez réessayer plus tard."));
     exit;
 }
 
@@ -16,19 +16,19 @@ if (isset($_GET['error'])) {
     $errorMsg = $_GET['error'] === 'access_denied'
         ? "Vous avez annulé la connexion avec Google."
         : "Erreur lors de la connexion avec Google.";
-    header("Location: login.php?error=" . urlencode($errorMsg));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode($errorMsg));
     exit;
 }
 
 // --- Vérification du code d'autorisation ---
 if (empty($_GET['code'])) {
-    header("Location: login.php?error=" . urlencode("Code d'autorisation manquant."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Code d'autorisation manquant."));
     exit;
 }
 
 // --- Vérification du state token CSRF ---
 if (empty($_GET['state']) || empty($_SESSION['google_oauth_state']) || $_GET['state'] !== $_SESSION['google_oauth_state']) {
-    header("Location: login.php?error=" . urlencode("Token de sécurité invalide. Veuillez réessayer."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Token de sécurité invalide. Veuillez réessayer."));
     exit;
 }
 
@@ -41,7 +41,7 @@ $tokenData = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
 if (isset($tokenData['error'])) {
     error_log("Google token error: " . json_encode($tokenData));
-    header("Location: login.php?error=" . urlencode("Erreur lors de l'authentification Google. Veuillez réessayer."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Erreur lors de l'authentification Google. Veuillez réessayer."));
     exit;
 }
 
@@ -53,7 +53,7 @@ try {
     $googleUser    = $oauth2Service->userinfo->get();
 } catch (Google\Service\Exception $e) {
     error_log("Google userinfo error: " . $e->getMessage());
-    header("Location: login.php?error=" . urlencode("Impossible de récupérer votre profil Google."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Impossible de récupérer votre profil Google."));
     exit;
 }
 
@@ -63,7 +63,7 @@ $googleName  = $googleUser->getName() ?? '';
 
 if (empty($googleId) || empty($googleEmail)) {
     error_log("Google userinfo incomplete: id=$googleId email=$googleEmail");
-    header("Location: login.php?error=" . urlencode("Profil Google incomplet. Veuillez réessayer."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Profil Google incomplet. Veuillez réessayer."));
     exit;
 }
 
@@ -79,7 +79,7 @@ try {
         session_regenerate_id(true);
         $_SESSION['auth_token'] = $user['auth_token'];
         $_SESSION['username']   = $user['username'];
-        header("Location: dashboard.php");
+        header("Location: ../inscription-connexion/dashboard.php");
         exit;
     }
 
@@ -96,7 +96,7 @@ try {
         session_regenerate_id(true);
         $_SESSION['auth_token'] = $user['auth_token'];
         $_SESSION['username']   = $user['username'];
-        header("Location: dashboard.php");
+        header("Location: ../inscription-connexion/dashboard.php");
         exit;
     }
 
@@ -134,10 +134,10 @@ try {
     session_regenerate_id(true);
     $_SESSION['auth_token'] = $auth_token;
     $_SESSION['username']   = $username;
-    header("Location: dashboard.php");
+    header("Location: ../inscription-connexion/dashboard.php");
     exit;
 } catch (PDOException $e) {
     error_log("Google OAuth DB error: " . $e->getMessage());
-    header("Location: login.php?error=" . urlencode("Une erreur est survenue lors de la création du compte. Veuillez réessayer."));
+    header("Location: ../inscription-connexion/login.php?error=" . urlencode("Une erreur est survenue lors de la création du compte. Veuillez réessayer."));
     exit;
 }

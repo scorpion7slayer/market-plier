@@ -2,11 +2,11 @@
 session_start();
 
 if (isset($_SESSION['auth_token'])) {
-    header('Location: dashboard.php');
+    header('Location: ../inscription-connexion/dashboard.php');
     exit();
 }
 
-require_once '../config/google_oauth.php';
+require_once 'google_oauth.php';
 
 $client = getGoogleClient();
 

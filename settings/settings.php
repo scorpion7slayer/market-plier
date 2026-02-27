@@ -11,10 +11,8 @@ try {
   error_log("DB connection error (dashboard): " . $e->getMessage());
 }
 
-// Générer un token CSRF si nécessaire
-if (!isset($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Toujours générer un nouveau token CSRF à chaque chargement de la page
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 $isAdmin = false;
 $username = $_SESSION['username'] ?? '';

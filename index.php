@@ -2,10 +2,9 @@
 session_start();
 require_once 'database/db.php';
 
-// Génération token CSRF si absent
-if (!isset($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Toujours générer un token CSRF ; les formulaires s'appuient sur cette valeur
+// (il est normal qu'un ancien jeton de l'historique soit rejeté)
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if (isset($_SESSION['auth_token'])) {
   $stmt = $pdo->prepare("SELECT auth_token, username, email, profile_photo FROM users WHERE auth_token = ?");
@@ -40,11 +39,11 @@ if ($user) {
 
 <body>
   <!-- Header partagé -->
-    <?php
-    $headerBasePath = './';
-    $headerUser = $user;
-    include 'header.php';
-    ?>
+  <?php
+  $headerBasePath = './';
+  $headerUser = $user;
+  include 'header.php';
+  ?>
   <!-- Message de confirmation suppression compte -->
   <?php if (isset($_GET['account_deleted']) && $_GET['account_deleted'] === '1'): ?>
     <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c3e6cb;">
@@ -52,7 +51,7 @@ if ($user) {
     </div>
   <?php endif; ?>
 
- 
+
 
   <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
   <main>
