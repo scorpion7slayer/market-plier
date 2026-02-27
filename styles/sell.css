@@ -1,0 +1,364 @@
+/* ─── OVERRIDES INDEX.CSS ─────────────────────────────────── */
+body {
+    background: #f2f5f2;
+    min-height: 100vh;
+}
+
+main {
+    height: auto !important;
+    overflow: visible !important;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: block !important;
+}
+
+/* ─── TITRE ───────────────────────────────────────────────── */
+.page-title {
+    font-size: 2.6rem;
+    font-style: italic;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 32px;
+}
+
+/* ─── ALERTES ─────────────────────────────────────────────── */
+.sell-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-style: italic;
+    margin-bottom: 24px;
+    animation: errorSlideIn 0.25s ease;
+}
+
+.sell-alert-error {
+    background: #fde8e8;
+    color: #c0392b;
+    border: 1.5px solid #e74c3c;
+}
+
+.sell-alert-success {
+    background: #e8fde8;
+    color: #27ae60;
+    border: 1.5px solid #7fb885;
+}
+
+/* ─── SECTIONS ────────────────────────────────────────────── */
+.form-section {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+}
+
+.section-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    font-style: italic;
+    color: #222;
+    margin-bottom: 18px;
+    letter-spacing: 0.2px;
+}
+
+/* ─── ZONE UPLOAD PHOTO ───────────────────────────────────── */
+.photo-upload-zone {
+    border: 2.5px dashed #7fb885;
+    border-radius: 14px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #f7fcf7;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-upload-zone:hover {
+    background: #edf7ed;
+    border-color: #6aa070;
+}
+
+.photo-upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    padding: 24px;
+}
+
+.upload-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    border: 2px solid #7fb885;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #7fb885;
+    flex-shrink: 0;
+}
+
+.upload-text {
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 600;
+    color: #555;
+}
+
+.upload-hint {
+    font-size: 0.8rem;
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+}
+
+#photo-preview-container {
+    display: none;
+    width: 100%;
+    position: relative;
+}
+
+#photo-preview {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+
+.preview-change-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-style: italic;
+    cursor: pointer;
+    pointer-events: all;
+    z-index: 3;
+}
+
+/* ─── CHAMPS FORMULAIRE ───────────────────────────────────── */
+.field-group {
+    margin-bottom: 18px;
+}
+
+.field-group:last-child {
+    margin-bottom: 0;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 700;
+    font-style: italic;
+    color: #666;
+    margin-bottom: 7px;
+}
+
+.sell-input,
+.sell-select,
+.sell-textarea {
+    width: 100%;
+    padding: 15px 22px;
+    font-size: 1rem;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    color: #333;
+    background: #f8fdf8;
+    border: 2.5px solid #d4e8d4;
+    border-radius: 50px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-sizing: border-box;
+}
+
+.sell-textarea {
+    border-radius: 20px;
+    resize: vertical;
+    min-height: 130px;
+    line-height: 1.65;
+    padding: 14px 22px;
+}
+
+.sell-input:focus,
+.sell-select:focus,
+.sell-textarea:focus {
+    border-color: #7fb885;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+}
+
+.sell-input::placeholder,
+.sell-textarea::placeholder {
+    color: #bbb;
+}
+
+/* Select custom arrow */
+.sell-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237fb885' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 46px;
+    cursor: pointer;
+    color: #555;
+}
+
+.sell-select option {
+    font-style: normal;
+    color: #333;
+}
+
+/* Ligne à deux colonnes */
+.field-row {
+    display: flex;
+    gap: 14px;
+}
+
+.field-row .field-group {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+/* Prix avec symbole */
+.price-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.price-wrapper .sell-input {
+    padding-right: 50px;
+}
+
+.price-symbol {
+    position: absolute;
+    right: 22px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #7fb885;
+    pointer-events: none;
+}
+
+/* ─── BOUTON PUBLIER ──────────────────────────────────────── */
+.publish-btn {
+    width: 100%;
+    padding: 18px 30px;
+    font-size: 1.1rem;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    background-color: #7fb885;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.publish-btn:hover {
+    background-color: #6aa070;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(127, 184, 133, 0.45);
+}
+
+.publish-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ─── VALIDATION ──────────────────────────────────────────── */
+@keyframes errorSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c0392b;
+    font-size: 0.82rem;
+    font-style: italic;
+    margin-top: 8px;
+    padding: 7px 16px 7px 8px;
+    background-color: #fde8e8;
+    border: 1.5px solid #e74c3c;
+    border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
+    animation: errorSlideIn 0.2s ease;
+}
+
+.field-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-style: normal;
+    flex-shrink: 0;
+}
+
+.sell-input.field-error-active,
+.sell-select.field-error-active,
+.sell-textarea.field-error-active {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+    main {
+        padding: 24px 16px 60px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        margin-bottom: 24px;
+    }
+
+    .form-section {
+        padding: 20px 18px;
+        border-radius: 14px;
+    }
+
+    .field-row {
+        flex-direction: column;
+        gap: 18px;
+    }
+}

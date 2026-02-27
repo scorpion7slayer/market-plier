@@ -462,6 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
                   name="username"
                   value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>"
                   pattern="[a-zA-Z0-9_]{3,30}"
+                  data-pattern-message="3 à 30 caractères : lettres, chiffres et underscore uniquement"
                   required>
                 <div class="form-text">3-30 caractères alphanumériques et underscore uniquement.</div>
               </div>
@@ -609,6 +610,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
   </div>
 
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../styles/form-validation.js"></script>
 </body>
 
 </html>
