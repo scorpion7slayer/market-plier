@@ -17,9 +17,36 @@
     src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
         format("truetype");
 }
+/* ─── THEME COLORS ─────────────────────────────────────────── */
+:root,
+[data-bs-theme="light"] {
+    --bg-color: #F2EFE9;
+    --surface-color: #FDFCFA;
+    --text-color: #1a1a1a;
+    --text-secondary: #555;
+    --card-bg: #E6E2DB;
+    --border-color: #D8D4CD;
+    --placeholder-color: #999;
+    --input-bg: #E8E5DE;
+    --input-border: #C8C4BD;
+}
+
+[data-bs-theme="dark"] {
+    --bg-color: #171615;
+    --surface-color: #222120;
+    --text-color: #EDE9E3;
+    --text-secondary: #A09C96;
+    --card-bg: #2A2927;
+    --border-color: #3A3836;
+    --placeholder-color: #777;
+    --input-bg: #1E1D1B;
+    --input-border: #3A3836;
+}
+
 body {
     font-family: "Archivo", Arial, sans-serif;
-    background-color: #ffffff;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -332,6 +359,51 @@ body {
         flex-direction: column;
         align-items: center;
     }
+}
+
+/* ─── DARK MODE ────────────────────────────────────────────── */
+[data-bs-theme="dark"] .title {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .email-input {
+    background-color: var(--input-bg);
+    border-color: #4a6e33;
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .email-input:focus {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border-color: #5a8040;
+}
+
+[data-bs-theme="dark"] .email-input::placeholder {
+    color: var(--placeholder-color);
+}
+
+[data-bs-theme="dark"] .divider-text {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .divider::before,
+[data-bs-theme="dark"] .divider::after {
+    background-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .btn-google {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .btn-google:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .auth-link {
+    color: var(--text-secondary);
 }
 
 /* Validation personnalisée */

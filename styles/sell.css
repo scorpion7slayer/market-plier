@@ -1,6 +1,6 @@
 /* OVERRIDES INDEX.CSS */
 body {
-    background: #f2f5f2;
+    background: var(--bg-color, #f2f5f2);
     min-height: 100vh;
 }
 
@@ -465,6 +465,78 @@ main {
 .sell-textarea.field-error-active {
     border-color: #e74c3c;
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+}
+
+/* ─── DARK MODE ────────────────────────────────────────────── */
+[data-bs-theme="dark"] .page-title {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-section {
+    background: var(--surface-color);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] .section-label {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .field-label {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .sell-input,
+[data-bs-theme="dark"] .sell-select,
+[data-bs-theme="dark"] .sell-textarea {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .sell-input:focus,
+[data-bs-theme="dark"] .sell-select:focus,
+[data-bs-theme="dark"] .sell-textarea:focus {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] .sell-input::placeholder,
+[data-bs-theme="dark"] .sell-textarea::placeholder {
+    color: var(--placeholder-color);
+}
+
+[data-bs-theme="dark"] .photo-upload-zone {
+    border-color: #4a6e33;
+    background: var(--input-bg);
+}
+
+[data-bs-theme="dark"] .photo-upload-zone:hover {
+    background: var(--surface-color);
+    border-color: #5a8040;
+}
+
+[data-bs-theme="dark"] .upload-text {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .upload-hint {
+    color: var(--placeholder-color);
+}
+
+[data-bs-theme="dark"] .photo-preview-wrapper {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .sell-select {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .photo-counter {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .photos-help-text {
+    color: var(--text-secondary);
 }
 
 /* RESPONSIVE */

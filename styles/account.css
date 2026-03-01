@@ -20,9 +20,44 @@
         format("truetype");
 }
 
+/* ─── THEME COLORS ─────────────────────────────────────────── */
+:root,
+[data-bs-theme="light"] {
+    --bg-color: #F2EFE9;
+    --surface-color: #FDFCFA;
+    --text-color: #1a1a1a;
+    --text-secondary: #555;
+    --card-bg: #E6E2DB;
+    --border-color: #D8D4CD;
+    --placeholder-color: #999;
+    --input-bg: #E8E5DE;
+    --input-border: #C8C4BD;
+    --header-bg: #7faa58;
+    --header-divider: #aec89a;
+    --search-bg: #ddecd4;
+    --search-border: #b5d4a0;
+}
+
+[data-bs-theme="dark"] {
+    --bg-color: #171615;
+    --surface-color: #222120;
+    --text-color: #EDE9E3;
+    --text-secondary: #A09C96;
+    --card-bg: #2A2927;
+    --border-color: #3A3836;
+    --placeholder-color: #777;
+    --input-bg: #1E1D1B;
+    --input-border: #3A3836;
+    --header-bg: #3d5a28;
+    --header-divider: #4a6e33;
+    --search-bg: #1E1D1B;
+    --search-border: #3A3836;
+}
+
 body {
     font-family: "Archivo", sans-serif;
-    background-color: #fff;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     min-height: 100vh;
 }
 
@@ -647,6 +682,106 @@ nav a:hover {
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
+/* ─── DARK MODE ────────────────────────────────────────────── */
+[data-bs-theme="dark"] header {
+    background-color: var(--header-bg);
+}
+
+[data-bs-theme="dark"] .header-divider {
+    background: var(--header-divider);
+}
+
+[data-bs-theme="dark"] .search-bar {
+    background: var(--search-bg);
+    border-color: var(--search-border);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .search-bar::placeholder {
+    color: var(--placeholder-color);
+}
+
+[data-bs-theme="dark"] .header-top .profile-photo-container {
+    background: var(--card-bg);
+}
+
+[data-bs-theme="dark"] .username {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .description-title {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .description-text {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .section-title {
+    color: var(--text-color);
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .article-card {
+    background: var(--surface-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-bs-theme="dark"] .article-title {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .article-location {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .article-image {
+    background: var(--card-bg);
+}
+
+[data-bs-theme="dark"] .article-actions {
+    border-top-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .btn-edit {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] .btn-delete {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] .no-articles {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .no-articles i {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .custom-modal {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] .custom-modal-header h3 {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .custom-modal-body p {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .custom-modal-footer .btn-cancel {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .description-edit-form textarea {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-color);
+}
+
 /* ─── HAMBURGER BUTTON ─────────────────────────────────────── */
 .hamburger-btn {
     display: none;
@@ -770,19 +905,19 @@ nav a:hover {
         display: block;
         width: 100%;
         margin: 0;
-        background: #ddecd4;
-        border: 1.5px solid #b5d4a0;
+        background: var(--search-bg, #ddecd4);
+        border: 1.5px solid var(--search-border, #b5d4a0);
         border-radius: 30px;
         height: 44px;
         padding: 0 16px;
         font-size: 15px;
         font-style: italic;
-        color: #555;
+        color: var(--text-color, #555);
         outline: none;
     }
 
     .search-bar-mobile::placeholder {
-        color: #888;
+        color: var(--placeholder-color, #888);
         font-style: italic;
     }
 

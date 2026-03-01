@@ -70,14 +70,13 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
   const theme = savedTheme || (prefersDark ? 'dark' : 'light');
 
   // Apply theme on load
-  if (theme === 'dark') {
-    html.classList.add('dark-mode');
-  }
+  html.setAttribute('data-bs-theme', theme);
 
   // Toggle handler
   toggle.addEventListener('click', () => {
-    html.classList.toggle('dark-mode');
-    const newTheme = html.classList.contains('dark-mode') ? 'dark' : 'light';
+    const current = html.getAttribute('data-bs-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-bs-theme', newTheme);
     localStorage.setItem('theme', newTheme);
   });
 

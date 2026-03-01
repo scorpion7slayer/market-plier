@@ -20,8 +20,29 @@
         format("truetype");
 }
 
+/* ─── THEME COLORS ─────────────────────────────────────────── */
+:root,
+[data-bs-theme="light"] {
+    --bg-color: #F2EFE9;
+    --surface-color: #FDFCFA;
+    --text-color: #1a1a1a;
+    --text-secondary: #555;
+    --card-bg: #E6E2DB;
+    --border-color: #D8D4CD;
+}
+
+[data-bs-theme="dark"] {
+    --bg-color: #171615;
+    --surface-color: #222120;
+    --text-color: #EDE9E3;
+    --text-secondary: #A09C96;
+    --card-bg: #2A2927;
+    --border-color: #3A3836;
+}
+
 body {
     font-family: "Archivo", Arial, sans-serif;
+    background: var(--bg-color);
     min-height: 100vh;
     padding-top: 80px;
 }
@@ -248,6 +269,42 @@ body {
 
 .card {
     animation: fadeIn 0.5s ease;
+}
+
+/* ─── DARK MODE ────────────────────────────────────────────── */
+[data-bs-theme="dark"] .card {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] .card-header {
+    background: var(--surface-color);
+    border-bottom-color: #4a6e33;
+}
+
+[data-bs-theme="dark"] .card-header h5 {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-control {
+    background: var(--bg-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] .form-label {
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .modal-header {
+    background: var(--surface-color);
+}
+
+[data-bs-theme="dark"] h2 {
+    color: var(--text-color);
+}
+
+[data-bs-theme="dark"] h5 {
+    color: var(--text-secondary);
 }
 
 /* Responsive */

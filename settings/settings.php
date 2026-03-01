@@ -142,9 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
+  <script>
+    (function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-bs-theme',t);})();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -215,28 +218,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
   <script>
     const html = document.documentElement;
     const toggleBtn = document.getElementById('theme-button');
-    const storedTheme = localStorage.getItem('theme');
-
-    // Appliquer thème initial
-    if (storedTheme === 'dark') {
-      html.setAttribute('data-bs-theme', 'dark');
-      toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>'; // Icône lune
-    }
 
     // Toggle au clic
-    toggleBtn.addEventListener('click', () => {
-      const currentTheme = html.getAttribute('data-bs-theme');
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentTheme = html.getAttribute('data-bs-theme') || 'light';
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
       html.setAttribute('data-bs-theme', newTheme);
       localStorage.setItem('theme', newTheme);
-
-      // Changer icône (optionnel)
-      if (newTheme === 'dark') {
-        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#moon-icon"></use></svg>';
-      } else {
-        toggleBtn.innerHTML = '<svg class="bi theme-icon" width="20" height="20" fill="currentColor"><use href="#sun-icon"></use></svg>';
-      }
     });
   </script>
 </body>
