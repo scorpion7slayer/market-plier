@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
               </div>
 
               <div class="d-grid gap-2">
-                <button id="theme-button" type="submit" name="update_profile" class="btn btn-primary">
+                <button id="theme-button" type="button" class="btn btn-primary">
                   <i class="fas fa-save"></i>
                 </button>
               </div>
@@ -220,8 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     const toggleBtn = document.getElementById('theme-button');
 
     // Toggle au clic
-    toggleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
+    toggleBtn.addEventListener('click', () => {
       const currentTheme = html.getAttribute('data-bs-theme') || 'light';
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
