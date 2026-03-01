@@ -34,7 +34,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
   </div>
 
   <div class="header-bottom" id="header-bottom">
-    <input class="search-bar search-bar-mobile" type="text" placeholder="Rechercher" />
+    <input class="search-bar search-bar-mobile" type="text" placeholder="Rechercher" aria-label="Rechercher" />
     <nav>
       <a href="<?= $headerBasePath ?>shop/sell.php">vendre</a>
       <a href="#">langue</a>
