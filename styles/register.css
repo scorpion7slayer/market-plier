@@ -38,10 +38,11 @@ body {
     top: 20px;
     left: 40px;
     z-index: 1000;
+    max-width: 100px;
 }
 
 .logo img {
-    width: 5%;
+    width: 80px;
     height: auto;
 }
 
@@ -272,7 +273,7 @@ body {
     }
 
     .logo img {
-        width: 50px;
+        width: 60px;
     }
 
     .brand-name {
@@ -293,6 +294,43 @@ body {
     .password-row {
         flex-direction: column;
         gap: 30px;
+    }
+
+    body {
+        padding-top: 100px;
+        align-items: flex-start;
+    }
+
+    .register-container {
+        padding: 10px 16px 40px;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.6rem;
+        margin-bottom: 28px;
+    }
+
+    .email-input,
+    .submit-btn {
+        padding: 12px 16px;
+    }
+
+    .logo {
+        position: static;
+        text-align: center;
+        padding: 20px 0 0;
+    }
+
+    body {
+        padding-top: 0;
+        flex-direction: column;
+        align-items: center;
     }
 }
 

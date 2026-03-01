@@ -78,6 +78,7 @@ header {
     height: 100%;
     object-fit: contain;
     display: block;
+    margin: 0;
 }
 
 .header-divider {
@@ -646,46 +647,222 @@ nav a:hover {
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
-/* RESPONSIVE */
+/* ─── HAMBURGER BUTTON ─────────────────────────────────────── */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center;
+}
+
+.hamburger-btn.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-btn.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger-btn.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile search bar (hidden on desktop) */
+.search-bar-mobile {
+    display: none;
+}
+
+/* ─── RESPONSIVE: ≤ 1024px ─────────────────────────────────── */
 @media (max-width: 1024px) {
     .articles-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
+/* ─── RESPONSIVE: ≤ 768px ──────────────────────────────────── */
 @media (max-width: 768px) {
-    .username {
-        font-size: 36px;
-    }
-
+    /* Header */
     header {
-        padding: 0 15px;
+        height: auto;
+        min-height: 64px;
+        padding: 10px 16px;
+        gap: 0;
     }
 
-    .container-fluid {
-        padding: 20px;
+    .header-top {
+        position: static;
+        height: 44px;
     }
 
+    .logo-area {
+        width: auto;
+        flex: 1;
+    }
+
+    .logo-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* Hide desktop-only elements */
+    .header-divider {
+        display: none;
+    }
+
+    .search-bar {
+        display: none;
+    }
+
+    /* Compact profile photo in header */
+    .header-top .profile-photo-container {
+        width: 40px;
+        height: 40px;
+        margin: 0 4px 0 0;
+    }
+
+    .header-top .profile-photo {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Show hamburger */
+    .hamburger-btn {
+        display: flex;
+    }
+
+    /* Collapsible mobile nav */
     .header-bottom {
-        padding-left: 20px;
+        display: none;
+        padding-left: 0;
         margin-left: 0;
+        margin-top: 12px;
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 8px;
+    }
+
+    .header-bottom.open {
+        display: flex;
+    }
+
+    /* Mobile search bar visible in nav */
+    .search-bar-mobile {
+        display: block;
+        width: 100%;
+        margin: 0;
+        background: #ddecd4;
+        border: 1.5px solid #b5d4a0;
+        border-radius: 30px;
+        height: 44px;
+        padding: 0 16px;
+        font-size: 15px;
+        font-style: italic;
+        color: #555;
+        outline: none;
+    }
+
+    .search-bar-mobile::placeholder {
+        color: #888;
+        font-style: italic;
     }
 
     nav {
-        gap: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 14px 24px;
+        align-items: center;
     }
 
+    nav a {
+        font-size: 13px;
+    }
+
+    /* Main content */
+    .container-fluid {
+        padding: 20px 16px;
+    }
+
+    /* Profile section stacks vertically */
+    .profile-section {
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .profile-sidebar {
+        width: 100%;
+    }
+
+    .username {
+        font-size: 34px;
+    }
+
+    .description-title {
+        font-size: 22px;
+    }
+
+    .description-text {
+        font-size: 15px;
+    }
+
+    /* Articles grid */
     .articles-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .section-title {
+        font-size: 22px;
+    }
 }
 
+/* ─── RESPONSIVE: ≤ 480px ──────────────────────────────────── */
 @media (max-width: 480px) {
     .articles-grid {
         grid-template-columns: 1fr;
     }
 
-    .logo-text {
-        display: none;
+    .username {
+        font-size: 26px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-brand {
+        width: 100%;
+        text-align: center;
     }
 }

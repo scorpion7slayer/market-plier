@@ -10,7 +10,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
   <div class="header-top">
     <div class="logo-area">
       <a href="<?= $headerBasePath ?>index.php" class="logo-icon">
-        <img src="<?= $headerBasePath ?>assets/images/logo.svg" alt="Logo Market Plier" style="width: auto; height: 100%; margin-left: 250%;">
+        <img src="<?= $headerBasePath ?>assets/images/logo.svg" alt="Logo Market Plier">
       </a>
     </div>
     <div class="header-divider"></div>
@@ -26,9 +26,15 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     <?php else: ?>
       <a class="profile-photo-container" href="<?= $headerBasePath ?><?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>"></a>
     <?php endif; ?>
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 
-  <div class="header-bottom">
+  <div class="header-bottom" id="header-bottom">
+    <input class="search-bar search-bar-mobile" type="text" placeholder="Rechercher" />
     <nav>
       <a href="<?= $headerBasePath ?>shop/sell.php">vendre</a>
       <a href="#">langue</a>
@@ -57,22 +63,34 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 (function() {
   const toggle = document.getElementById('theme-toggle');
   const html = document.documentElement;
-  
+
   // Check localStorage or system preference
   const savedTheme = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-  
+
   // Apply theme on load
   if (theme === 'dark') {
     html.classList.add('dark-mode');
   }
-  
+
   // Toggle handler
   toggle.addEventListener('click', () => {
     html.classList.toggle('dark-mode');
     const newTheme = html.classList.contains('dark-mode') ? 'dark' : 'light';
     localStorage.setItem('theme', newTheme);
   });
+
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger-btn');
+  const headerBottom = document.getElementById('header-bottom');
+  if (hamburger && headerBottom) {
+    hamburger.addEventListener('click', () => {
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+      hamburger.setAttribute('aria-expanded', String(!expanded));
+      hamburger.classList.toggle('open');
+      headerBottom.classList.toggle('open');
+    });
+  }
 })();
 </script>

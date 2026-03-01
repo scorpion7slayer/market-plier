@@ -22,7 +22,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 <body>
   <div class="logo">
-    <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
+    <img src="../assets/images/logo.svg" alt="Logo Market Plier">
     <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">← Retour à l'accueil</a></p>
   </div>
 
