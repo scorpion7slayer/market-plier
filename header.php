@@ -90,6 +90,23 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       hamburger.classList.toggle('open');
       headerBottom.classList.toggle('open');
     });
+
+    // Reset hamburger state on breakpoint changes (e.g., around 768px)
+    let isMobileView = window.innerWidth < 768;
+
+    window.addEventListener('resize', () => {
+      const currentlyMobile = window.innerWidth < 768;
+
+      // Only act when crossing the breakpoint (mobile <-> desktop)
+      if (currentlyMobile !== isMobileView) {
+        isMobileView = currentlyMobile;
+
+        // Clear open state and reset aria-expanded to false
+        hamburger.classList.remove('open');
+        headerBottom.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
 })();
 </script>
