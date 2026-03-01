@@ -16,10 +16,18 @@ Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
 
 ## Truc a faire
 
-  1-Mettre des porduits en ligne
-  -leur donner des catégorie
-  2-page de recherche pour produits
-  -chercher par catégorie (pays,prix etc)
-  3-fonction panier et acheter
-  4-systeme commentaire vendeur
-  6-systeme de vérification avec carte id
+1. Page de recherche pour produits (chercher par catégorie : pays, prix, etc)
+2. Fonction panier et acheter
+3. Système de commentaire vendeur
+
+## TODO IMPORTANT
+
+1. Convertir tout avec Bootstrap CSS et utiliser la police Archivo
+2. Page admin pour gérer les utilisateurs, les articles et autres paramètres
+
+- Mettre un système de notification pour les messages
+- Mettre un système de notification pour les ventes
+- Mettre un système de notification pour les achats
+- Mettre un système de notification pour les commentaires
+- Mettre un système de notification pour les évaluations
+  

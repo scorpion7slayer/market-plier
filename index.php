@@ -2,9 +2,12 @@
 session_start();
 require_once 'database/db.php';
 
-// Toujours générer un token CSRF ; les formulaires s'appuient sur cette valeur
-// (il est normal qu'un ancien jeton de l'historique soit rejeté)
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Générer un token CSRF uniquement s'il n'existe pas encore.
+// Régénérer inconditionnellement écrasait le token des formulaires ouverts
+// dans d'autres onglets ou pages (ex. sell.php), causant des erreurs CSRF.
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 if (isset($_SESSION['auth_token'])) {
   $stmt = $pdo->prepare("SELECT auth_token, username, email, profile_photo FROM users WHERE auth_token = ?");

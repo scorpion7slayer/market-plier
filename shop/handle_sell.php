@@ -13,11 +13,32 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once '../database/db.php';
 
-// CSRF
-if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    header('Location: sell.php?error=' . urlencode("Token de sécurité invalide. Veuillez réessayer."));
+// Détecter si post_max_size a été dépassé (PHP vide $_POST dans ce cas,
+// ce qui causerait une fausse erreur CSRF non informative).
+if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+    $limit = ini_get('post_max_size');
+    error_log("handle_sell: post_max_size dépassé, CONTENT_LENGTH=" . $_SERVER['CONTENT_LENGTH'] . ", limit=" . $limit);
+    header('Location: sell.php?error=' . urlencode("Les fichiers envoyés sont trop volumineux (limite : " . $limit . "). Réduisez la taille ou le nombre de photos."));
     exit();
 }
+
+// CSRF
+// Comparer contre le jeton stocké (utiliser l'opérateur ?? pour éviter
+// un avertissement si la session n'en contient pas encore).
+if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    // enregistrer le cas pour faciliter le debug (valeurs tronquées)
+    $posted = $_POST['csrf_token'] ?? '(absent)';
+    $stored = $_SESSION['csrf_token'] ?? '(absent)';
+    error_log("CSRF mismatch in handle_sell.php: posted={$posted}, session={$stored}");
+
+    // Générer un nouveau jeton immédiatement de sorte que le formulaire
+    // affiché après redirection n'affiche pas le jeton anciennement utilisé.
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    header('Location: sell.php?error=' . urlencode("Token de sécurité invalide ou expiré. Veuillez actualiser la page et réessayer."));
+    exit();
+}
+// Générer un jeton jetable qui sera différent pour la prochaine requête.
+// Cette ligne ne sera pas atteinte si le jeton était invalide.
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 // Récupération des champs

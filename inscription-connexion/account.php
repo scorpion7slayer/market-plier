@@ -238,8 +238,8 @@ try {
                         <div class="no-articles">
                             <i class="fa-solid fa-box-open"></i>
                             <p>Vous n'avez pas encore d'articles en vente.</p>
-                            <a href="../shop/sell.php" class="btn btn-sm btn-brand">
-                                <i class="fa-solid fa-plus"></i> Poster une annonce
+                            <a href="../shop/sell.php" class="btn btn-brand btn-sm">
+                                Poster une annonce
                             </a>
                         </div>
                     <?php else: ?>
