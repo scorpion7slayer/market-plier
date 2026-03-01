@@ -302,3 +302,100 @@ section + section {
     object-fit: cover;
     border-radius: 14px;
 }
+
+/* THEME TOGGLE BUTTON */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle svg {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-toggle .icon-moon {
+  display: none;
+}
+
+/* Show moon icon in dark mode */
+.dark-mode .theme-toggle .icon-sun {
+  display: none;
+}
+
+.dark-mode .theme-toggle .icon-moon {
+  display: block;
+}
+
+/* DARK MODE COLORS - Light mode (default) */
+:root {
+  --bg-color: #fff;
+  --text-color: #111;
+  --card-bg: #d4d4d4;
+  --nav-color: #111;
+  --border-color: #ccc;
+  --placeholder-color: #888;
+  --input-bg: #ddecd4;
+  --input-border: #b5d4a0;
+}
+
+/* Dark mode */
+:root.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #f0f0f0;
+  --card-bg: #2d2d2d;
+  --nav-color: #f0f0f0;
+  --border-color: #444;
+  --placeholder-color: #aaa;
+  --input-bg: #2a2a2a;
+  --input-border: #3d3d3d;
+}
+
+/* Apply dark mode to body */
+:root.dark-mode,
+:root.dark-mode body {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+:root.dark-mode .greeting,
+:root.dark-mode .section-title,
+:root.dark-mode .chevron {
+  color: var(--text-color);
+}
+
+:root.dark-mode .circle-card,
+:root.dark-mode .rect-card {
+  background: var(--card-bg);
+}
+
+:root.dark-mode .search-bar {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-color);
+}
+
+:root.dark-mode .search-bar::placeholder {
+  color: var(--placeholder-color);
+}
+
+:root.dark-mode nav a {
+  color: var(--text-color);
+}
+
+:root.dark-mode .section-title {
+  border-bottom-color: var(--border-color);
+}
