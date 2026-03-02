@@ -555,8 +555,8 @@ $user = [
             });
         });
 
-        // Initialiser l'ordre
-        updateImageOrder();
+        // Initialiser : remplacer les éléments PHP statiques par les éléments JS interactifs
+        renderAll();
     </script>
     <script>
         // Custom dropdown

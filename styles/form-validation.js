@@ -99,7 +99,7 @@ function clearFieldError(field) {
     field.classList.remove("field-error-active");
 }
 
-/* ═══ Password visibility toggle ═══ */
+/* Affichage/masquage du mot de passe */
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".password-toggle").forEach(function (btn) {
         btn.addEventListener("click", function () {

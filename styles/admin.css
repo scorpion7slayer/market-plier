@@ -1,11 +1,11 @@
-/* ═══ ADMIN CONTAINER ════════════════════════════════════════ */
+/* Conteneur admin */
 .admin-container {
     max-width: 960px;
     margin: 0 auto;
     padding: 10px 24px 80px;
 }
 
-/* ═══ STATS GRID (4 colonnes) ═══════════════════════════════ */
+/* Grille de statistiques (4 colonnes) */
 .admin-stats-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -13,7 +13,7 @@
     margin-bottom: 8px;
 }
 
-/* ═══ TABLE ══════════════════════════════════════════════════ */
+/* Tableau */
 .admin-table-wrapper {
     overflow-x: auto;
     margin: 0 -8px;
@@ -59,7 +59,7 @@
     vertical-align: middle;
 }
 
-/* ═══ USER CELL ═════════════════════════════════════════════ */
+/* Cellule utilisateur */
 .admin-user-cell {
     display: flex;
     align-items: center;
@@ -121,7 +121,7 @@
     white-space: nowrap;
 }
 
-/* ═══ PROVIDER BADGE ════════════════════════════════════════ */
+/* Badge fournisseur */
 .admin-provider {
     font-size: 0.8rem;
     font-style: italic;
@@ -137,7 +137,7 @@
     color: var(--mp-text-muted, #999);
 }
 
-/* ═══ ROLE BADGES ═══════════════════════════════════════════ */
+/* Badges de rôle */
 .admin-role-badge {
     font-size: 0.75rem;
     font-weight: 700;
@@ -166,7 +166,7 @@
     border: 1.5px solid var(--mp-border-light, #e8e5df);
 }
 
-/* ═══ ACTION BUTTONS ════════════════════════════════════════ */
+/* Boutons d'action */
 .admin-actions-cell {
     display: flex;
     gap: 6px;
@@ -211,7 +211,7 @@
     color: var(--mp-text-muted, #ccc);
 }
 
-/* ═══ LISTING SPECIFIC ══════════════════════════════════════ */
+/* Spécifique aux annonces */
 .admin-listing-title {
     font-weight: 600;
     font-style: italic;
@@ -233,7 +233,7 @@
     text-transform: capitalize;
 }
 
-/* ═══ ADMIN BUTTON IN SETTINGS ══════════════════════════════ */
+/* Bouton admin dans les paramètres */
 .settings-btn-admin {
     background: linear-gradient(135deg, #f0c040 0%, #e6a800 100%);
     color: #fff;
@@ -252,7 +252,7 @@
     text-decoration: none;
 }
 
-/* ═══ RESPONSIVE ════════════════════════════════════════════ */
+/* RESPONSIVE */
 @media (max-width: 768px) {
     .admin-container {
         padding: 10px 16px 60px;
@@ -300,7 +300,7 @@
     }
 }
 
-/* ═══ MODAL SUPPRESSION ════════════════════════════════════ */
+/* Modal de suppression */
 .admin-modal-overlay {
     position: fixed;
     inset: 0;
@@ -313,7 +313,9 @@
     padding: 24px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
 }
 
 .admin-modal-overlay.visible {
