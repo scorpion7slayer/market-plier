@@ -38,6 +38,16 @@ if (isset($pdo)) {
       $profilePhoto = $userData['profile_photo'];
       $authProvider = $userData['auth_provider'] ?? 'local';
       $hasPassword = !empty($userData['password_hash']);
+    } else {
+      // Compte supprimé par un admin
+      $_SESSION = [];
+      if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+      }
+      session_destroy();
+      header('Location: ../index.php?account_deleted=1');
+      exit();
     }
   } catch (PDOException $ex) {
     error_log("Error fetching user data: " . $ex->getMessage());
@@ -483,7 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
   <script src="../styles/form-validation.js"></script>
   <script>
     // Boutons de thème
-    (function () {
+    (function() {
       var themeLight = document.getElementById('theme-light');
       var themeDark = document.getElementById('theme-dark');
 
@@ -493,19 +503,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
         if (themeDark) themeDark.classList.toggle('active', c === 'dark');
       }
 
-      if (themeLight) themeLight.addEventListener('click', function () {
+      if (themeLight) themeLight.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'light');
         localStorage.setItem('mp-theme', 'light');
         update();
       });
-      if (themeDark) themeDark.addEventListener('click', function () {
+      if (themeDark) themeDark.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'dark');
         localStorage.setItem('mp-theme', 'dark');
         update();
       });
 
       update();
-      new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+      new MutationObserver(update).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-bs-theme']
+      });
     })();
   </script>
 </body>

@@ -6,13 +6,25 @@ require_once 'database/db.php';
 // Régénérer inconditionnellement écrasait le token des formulaires ouverts
 // dans d'autres onglets ou pages (ex. sell.php), causant des erreurs CSRF.
 if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 if (isset($_SESSION['auth_token'])) {
   $stmt = $pdo->prepare("SELECT auth_token, username, email, profile_photo FROM users WHERE auth_token = ?");
   $stmt->execute([$_SESSION['auth_token']]);
   $user = $stmt->fetch();
+
+  // Compte supprimé par un admin : nettoyer la session
+  if (!$user) {
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+      $params = session_get_cookie_params();
+      setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+    }
+    session_destroy();
+    header('Location: index.php?account_deleted=1');
+    exit();
+  }
 }
 // Vérifier si l'utilisateur est admin
 $user = $user ?? null;
@@ -49,10 +61,16 @@ if ($user) {
   $headerUser = $user;
   include 'header.php';
   ?>
-  <!-- Message de confirmation suppression compte -->
+  <!-- Message compte supprimé par admin -->
   <?php if (isset($_GET['account_deleted']) && $_GET['account_deleted'] === '1'): ?>
-    <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 0.5rem; border: 1px solid #c3e6cb;">
-      <i class="fas fa-check-circle"></i> Votre compte a été supprimé avec succès. Merci d'avoir utilisé Market Plier.
+    <div style="max-width: 500px; margin: 40px auto; padding: 32px; background: var(--mp-card-bg, #fff); border-radius: 18px; box-shadow: 0 8px 32px var(--mp-card-shadow, rgba(0,0,0,0.08)); text-align: center; font-family: 'Archivo', sans-serif;">
+      <div style="width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-user-slash" style="font-size: 1.3rem; color: #e74c3c;"></i>
+      </div>
+      <h3 style="font-weight: 700; font-style: italic; font-size: 1.1rem; color: var(--mp-text, #111); margin-bottom: 8px;">Compte supprimé</h3>
+      <p style="font-style: italic; font-size: 0.9rem; color: var(--mp-text-muted, #888); line-height: 1.5; margin-bottom: 0;">
+        Votre compte a été supprimé par un administrateur.<br>Merci d'avoir utilisé Market Plier.
+      </p>
     </div>
   <?php endif; ?>
 
@@ -91,7 +109,7 @@ if ($user) {
     </section>
   </main>
 
-<script src="styles/theme.js"></script>
+  <script src="styles/theme.js"></script>
 </body>
 
 </html>
