@@ -79,7 +79,7 @@ try {
         session_regenerate_id(true);
         $_SESSION['auth_token'] = $user['auth_token'];
         $_SESSION['username']   = $user['username'];
-        header("Location: ../inscription-connexion/dashboard.php");
+        header("Location: ../settings/settings.php");
         exit;
     }
 
@@ -96,7 +96,7 @@ try {
         session_regenerate_id(true);
         $_SESSION['auth_token'] = $user['auth_token'];
         $_SESSION['username']   = $user['username'];
-        header("Location: ../inscription-connexion/dashboard.php");
+        header("Location: ../settings/settings.php");
         exit;
     }
 
@@ -134,7 +134,7 @@ try {
     session_regenerate_id(true);
     $_SESSION['auth_token'] = $auth_token;
     $_SESSION['username']   = $username;
-    header("Location: ../inscription-connexion/dashboard.php");
+    header("Location: ../settings/settings.php");
     exit;
 } catch (PDOException $e) {
     error_log("Google OAuth DB error: " . $e->getMessage());

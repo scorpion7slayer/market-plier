@@ -19,7 +19,8 @@
 }
 body {
     font-family: "Archivo", Arial, sans-serif;
-    background-color: #ffffff;
+    background-color: var(--mp-bg, #F2EFE9);
+    color: var(--mp-text, #1a1a1a);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -64,6 +65,7 @@ body {
     text-align: center;
     margin-bottom: 40px;
     font-weight: 600;
+    color: var(--mp-text, #1a1a1a);
 }
 
 .signup-form {
@@ -92,16 +94,16 @@ body {
     font-size: 1.1rem;
     border: 3px solid #7fb885;
     border-radius: 50px;
-    background-color: #f5f5f5;
+    background-color: var(--mp-input-bg, #f5f5f5);
     font-style: italic;
-    color: #999;
+    color: var(--mp-input-text, #999);
     outline: none;
     transition: all 0.3s ease;
 }
 
 .email-input:focus {
-    background-color: #fff;
-    color: #333;
+    background-color: var(--mp-bg-secondary, #fff);
+    color: var(--mp-input-text, #333);
     border-color: #6aa070;
 }
 
@@ -267,8 +269,8 @@ body {
 
 @media (max-width: 768px) {
     .logo {
-        top: 15px;
-        left: 20px;
+        top: 10px;
+        left: 15px;
     }
 
     .logo img {
@@ -292,7 +294,38 @@ body {
 
     .password-row {
         flex-direction: column;
-        gap: 30px;
+        gap: 20px;
+    }
+
+    .register-container {
+        padding: 15px;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.6rem;
+        margin-bottom: 25px;
+    }
+
+    .email-input,
+    .submit-btn {
+        font-size: 0.95rem;
+        padding: 14px 18px;
+        border-width: 2px;
+    }
+
+    .signup-form {
+        gap: 20px;
+    }
+
+    .logo {
+        top: 8px;
+        left: 10px;
     }
 }
 

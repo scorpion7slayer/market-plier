@@ -31,15 +31,10 @@ if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_tok
     $stored = $_SESSION['csrf_token'] ?? '(absent)';
     error_log("CSRF mismatch in handle_sell.php: posted={$posted}, session={$stored}");
 
-    // Générer un nouveau jeton immédiatement de sorte que le formulaire
-    // affiché après redirection n'affiche pas le jeton anciennement utilisé.
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     header('Location: sell.php?error=' . urlencode("Token de sécurité invalide ou expiré. Veuillez actualiser la page et réessayer."));
     exit();
 }
-// Générer un jeton jetable qui sera différent pour la prochaine requête.
-// Cette ligne ne sera pas atteinte si le jeton était invalide.
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Token CSRF par session : pas de régénération après chaque requête
 
 // Récupération des champs
 $title       = trim($_POST['title']       ?? '');

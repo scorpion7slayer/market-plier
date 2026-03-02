@@ -72,14 +72,25 @@ function showFieldError(field, message) {
     var span = document.createElement("span");
     span.className = "field-error";
     span.textContent = message;
-    field.insertAdjacentElement("afterend", span);
-    field.classList.add("field-error-active");
+
+    // Si le champ est dans un custom dropdown, afficher l'erreur après le wrapper
+    var wrapper = field.closest(".custom-select-wrapper");
+    if (wrapper) {
+        wrapper.insertAdjacentElement("afterend", span);
+        wrapper.classList.add("field-error-active");
+    } else {
+        field.insertAdjacentElement("afterend", span);
+        field.classList.add("field-error-active");
+    }
 }
 
 function clearFieldError(field) {
-    var next = field.nextElementSibling;
+    var wrapper = field.closest(".custom-select-wrapper");
+    var target = wrapper || field;
+    var next = target.nextElementSibling;
     if (next && next.classList.contains("field-error")) {
         next.remove();
     }
+    target.classList.remove("field-error-active");
     field.classList.remove("field-error-active");
 }

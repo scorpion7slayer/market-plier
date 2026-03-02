@@ -26,16 +26,18 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Plier - Poster une annonce</title>
     <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../styles/index.css">
     <link rel="stylesheet" href="../styles/sell.css">
+    <link rel="stylesheet" href="../styles/theme.css">
 </head>
 
 <body>
@@ -423,6 +425,124 @@ try {
             });
         });
     </script>
+    <script>
+    // Custom dropdown : remplace les <select> natifs par des menus déroulants modernes
+    (function() {
+        var selects = document.querySelectorAll('.sell-select');
+
+        selects.forEach(function(nativeSelect) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'custom-select-wrapper';
+
+            var trigger = document.createElement('div');
+            trigger.className = 'custom-select-trigger';
+            trigger.setAttribute('tabindex', '0');
+            trigger.setAttribute('role', 'listbox');
+
+            var textSpan = document.createElement('span');
+            textSpan.className = 'custom-select-text';
+
+            var arrow = document.createElement('span');
+            arrow.className = 'custom-select-arrow';
+            arrow.innerHTML = '<i class="fas fa-chevron-down"></i>';
+
+            trigger.appendChild(textSpan);
+            trigger.appendChild(arrow);
+
+            var panel = document.createElement('div');
+            panel.className = 'custom-select-panel';
+
+            // Texte initial
+            var selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
+            var hasValue = selectedOpt && selectedOpt.value !== '';
+            textSpan.textContent = hasValue ? selectedOpt.text : 'Choisir...';
+            if (!hasValue) trigger.classList.add('placeholder');
+
+            // Créer les options
+            Array.from(nativeSelect.options).forEach(function(opt) {
+                if (opt.disabled && opt.value === '') return;
+
+                var optDiv = document.createElement('div');
+                optDiv.className = 'custom-select-option';
+                if (opt.selected && opt.value !== '') optDiv.classList.add('selected');
+                optDiv.setAttribute('data-value', opt.value);
+                optDiv.setAttribute('role', 'option');
+
+                var optText = document.createElement('span');
+                optText.textContent = opt.text;
+
+                var checkIcon = document.createElement('i');
+                checkIcon.className = 'fas fa-check check-icon';
+
+                optDiv.appendChild(optText);
+                optDiv.appendChild(checkIcon);
+
+                optDiv.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    nativeSelect.value = opt.value;
+                    textSpan.textContent = opt.text;
+                    trigger.classList.remove('placeholder');
+
+                    panel.querySelectorAll('.custom-select-option').forEach(function(o) {
+                        o.classList.remove('selected');
+                    });
+                    optDiv.classList.add('selected');
+
+                    trigger.classList.remove('open');
+                    panel.classList.remove('open');
+
+                    nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                panel.appendChild(optDiv);
+            });
+
+            // Insérer dans le DOM
+            nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
+            wrapper.appendChild(trigger);
+            wrapper.appendChild(panel);
+            nativeSelect.style.display = 'none';
+            wrapper.appendChild(nativeSelect);
+
+            // Toggle
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = trigger.classList.contains('open');
+
+                // Fermer tous les autres
+                document.querySelectorAll('.custom-select-trigger.open').forEach(function(t) {
+                    t.classList.remove('open');
+                    t.parentNode.querySelector('.custom-select-panel').classList.remove('open');
+                });
+
+                if (!isOpen) {
+                    trigger.classList.add('open');
+                    panel.classList.add('open');
+                }
+            });
+
+            // Clavier
+            trigger.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    trigger.click();
+                } else if (e.key === 'Escape') {
+                    trigger.classList.remove('open');
+                    panel.classList.remove('open');
+                }
+            });
+        });
+
+        // Fermer au clic extérieur
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.custom-select-trigger.open').forEach(function(t) {
+                t.classList.remove('open');
+                t.parentNode.querySelector('.custom-select-panel').classList.remove('open');
+            });
+        });
+    })();
+    </script>
+    <script src="../styles/theme.js"></script>
     <script src="../styles/form-validation.js"></script>
 </body>
 

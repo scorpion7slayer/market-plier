@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['auth_token'])) {
-    header('Location: ../inscription-connexion/dashboard.php');
+    header('Location: ../settings/settings.php');
     exit();
 }
 

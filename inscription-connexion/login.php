@@ -1,21 +1,25 @@
 <?php
 session_start();
 if (isset($_SESSION['auth_token'])) {
-  header('Location: dashboard.php');
+  header('Location: ../settings/settings.php');
   exit();
 }
 
-// Générer un nouveau token CSRF à chaque affichage du formulaire
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Générer un token CSRF s'il n'existe pas encore (token par session)
+if (!isset($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/register.css">
+  <link rel="stylesheet" href="../styles/theme.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - Connexion</title>
 </head>
@@ -23,8 +27,13 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 <body>
   <div class="logo">
     <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
-    <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">← Retour à l'accueil</a></p>
+    <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; Retour à l'accueil</a></p>
   </div>
+  <!-- Theme toggle flottant -->
+  <button class="theme-toggle" data-theme-toggle style="position: fixed; top: 20px; right: 20px; z-index: 1001; color: var(--mp-text-muted); font-size: 20px;" title="Changer le thème">
+    <i class="fa-solid fa-moon"></i>
+    <i class="fa-solid fa-sun"></i>
+  </button>
 
   <div class="register-container">
 
@@ -74,6 +83,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
       <p class="auth-link">Pas encore de compte ? <a href="register.php">S'inscrire</a></p>
     </main>
   </div>
+  <script src="../styles/theme.js"></script>
   <script src="../styles/form-validation.js"></script>
 </body>
 

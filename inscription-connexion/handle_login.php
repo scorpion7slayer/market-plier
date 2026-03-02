@@ -15,8 +15,7 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_to
   exit;
 }
 
-// Régénérer le token CSRF après utilisation
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Token CSRF par session : pas de régénération après chaque requête
 
 if (empty($_POST['email']) || empty($_POST['password'])) {
   header("Location: login.php?error=" . urlencode("Veuillez remplir tous les champs"));
@@ -37,9 +36,11 @@ try {
   if ($user && password_verify($_POST['password'], $user['password_hash'])) {
     // Régénérer l'ID de session pour éviter la fixation de session
     session_regenerate_id(true);
+    // Nouveau token CSRF pour la session authentifiée
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     $_SESSION['auth_token'] = $user['auth_token'];
     $_SESSION['username'] = $user['username'];
-    header("Location: dashboard.php");
+    header("Location: ../settings/settings.php");
     exit;
   } else {
     header("Location: login.php?error=" . urlencode("Email ou mot de passe incorrect"));

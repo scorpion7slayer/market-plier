@@ -26,7 +26,8 @@ body {
     width: 100%;
     height: 100%;
     font-family: "Archivo", Arial, sans-serif;
-    background: #fff;
+    background: var(--mp-bg, #F2EFE9);
+    color: var(--mp-text, #1a1a1a);
     line-height: normal;
 }
 
@@ -60,9 +61,16 @@ header {
     display: flex;
     align-items: center;
     padding-left: 210px;
-    /* align under searchbar */
     margin-top: 6px;
     margin-left: 200px;
+}
+
+@media (max-width: 992px) {
+    .header-bottom {
+        padding-left: 0;
+        margin-left: 0;
+        justify-content: center;
+    }
 }
 
 /* Logo zone - adjusted for image only */
@@ -84,11 +92,20 @@ header {
     justify-content: center;
 }
 
-.logo-icon img {
-    width: 100%;
+.logo-icon img,
+.logo-icon .logo-img {
+    width: auto;
     height: 100%;
     object-fit: contain;
     display: block;
+    margin-left: 250%;
+}
+
+@media (max-width: 992px) {
+    .logo-icon .logo-img,
+    .logo-icon img {
+        margin-left: 0;
+    }
 }
 
 .logo-icon svg {
@@ -117,6 +134,12 @@ header {
     margin-left: 180px;
 }
 
+@media (max-width: 992px) {
+    .header-divider {
+        display: none;
+    }
+}
+
 .search-bar {
     background: #ddecd4;
     border: 1.5px solid #b5d4a0;
@@ -130,6 +153,14 @@ header {
     outline: none;
     margin-right: -150px;
     margin-left: 20px;
+}
+
+@media (max-width: 992px) {
+    .search-bar {
+        margin-left: 10px;
+        margin-right: 10px;
+        height: 42px;
+    }
 }
 
 .search-bar::placeholder {
@@ -207,7 +238,7 @@ main {
     font-style: italic;
     font-weight: 700;
     font-size: 30px;
-    color: #111;
+    color: var(--mp-text, #111);
     margin-bottom: 30px;
     flex-shrink: 0;
 }
@@ -230,9 +261,9 @@ section + section {
     font-style: italic;
     font-weight: 700;
     font-size: 22px;
-    color: #111;
+    color: var(--mp-text, #111);
     padding-bottom: 8px;
-    border-bottom: 1.5px solid #ccc;
+    border-bottom: 1.5px solid var(--mp-border, #ccc);
     margin-top: 50px;
 }
 
@@ -248,7 +279,7 @@ section + section {
 .chevron {
     font-size: 36px;
     font-weight: 900;
-    color: #111;
+    color: var(--mp-text, #111);
     cursor: pointer;
     user-select: none;
     flex-shrink: 0;

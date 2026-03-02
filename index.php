@@ -29,14 +29,16 @@ if ($user) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Market Plier</title>
-  <link rel="stylesheet" href="styles/index.css" />
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
+  <link rel="stylesheet" href="styles/index.css" />
+  <link rel="stylesheet" href="styles/theme.css" />
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" />
 </head>
 
@@ -89,6 +91,7 @@ if ($user) {
     </section>
   </main>
 
+<script src="styles/theme.js"></script>
 </body>
 
 </html>
