@@ -142,3 +142,80 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     })();
   </script>
 <?php endif; ?>
+
+<!-- ═══ COOKIE CONSENT BANNER ═══════════════════════════════ -->
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-banner-inner">
+    <div class="cookie-banner-text">
+      <strong><i class="fa-solid fa-cookie-bite"></i> Nous utilisons des cookies</strong><br>
+      Ce site utilise des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.
+      Vous pouvez accepter tous les cookies, les refuser ou personnaliser vos préférences.
+    </div>
+    <div class="cookie-banner-actions">
+      <button class="cookie-btn cookie-btn-accept" id="cookieAcceptAll">Tout accepter</button>
+      <button class="cookie-btn cookie-btn-refuse" id="cookieRefuseAll">Tout refuser</button>
+      <button class="cookie-btn cookie-btn-settings" id="cookieSettings">Personnaliser</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal personnalisation cookies -->
+<div class="cookie-modal-overlay" id="cookieModal">
+  <div class="cookie-modal">
+    <h3>Paramètres des cookies</h3>
+    <p>Choisissez les types de cookies que vous souhaitez autoriser. Les cookies nécessaires sont toujours actifs car ils sont indispensables au fonctionnement du site.</p>
+
+    <div class="cookie-category">
+      <div class="cookie-category-info">
+        <div class="cookie-category-name">Nécessaires</div>
+        <div class="cookie-category-desc">Essentiels au fonctionnement du site (session, sécurité).</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" checked disabled>
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-category">
+      <div class="cookie-category-info">
+        <div class="cookie-category-name">Analytiques</div>
+        <div class="cookie-category-desc">Nous aident à comprendre comment les visiteurs utilisent le site.</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" id="cookieAnalytics">
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-category">
+      <div class="cookie-category-info">
+        <div class="cookie-category-name">Marketing</div>
+        <div class="cookie-category-desc">Utilisés pour afficher des publicités pertinentes.</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" id="cookieMarketing">
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-category">
+      <div class="cookie-category-info">
+        <div class="cookie-category-name">Préférences</div>
+        <div class="cookie-category-desc">Mémorisent vos choix (thème, langue) pour une meilleure expérience.</div>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" id="cookiePreferences">
+        <span class="cookie-toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="cookie-modal-actions">
+      <button class="cookie-btn cookie-btn-refuse" id="cookieModalClose">Annuler</button>
+      <button class="cookie-btn cookie-btn-accept" id="cookieModalSave">Enregistrer mes choix</button>
+      <button class="cookie-btn cookie-btn-accept" id="cookieModalAccept">Tout accepter</button>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="<?= $headerBasePath ?>styles/cookie-banner.css" />
+<script src="<?= $headerBasePath ?>styles/cookie-banner.js"></script>

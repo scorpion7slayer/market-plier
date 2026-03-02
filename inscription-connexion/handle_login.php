@@ -40,7 +40,17 @@ try {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     $_SESSION['auth_token'] = $user['auth_token'];
     $_SESSION['username'] = $user['username'];
-    header("Location: ../settings/settings.php");
+
+    // "Rester connecté" : cookie persistant 30 jours
+    if (!empty($_POST['remember_me'])) {
+      $rememberToken = bin2hex(random_bytes(32));
+      $tokenHash = hash('sha256', $rememberToken);
+      $stmtRemember = $pdo->prepare("UPDATE users SET remember_token = ? WHERE auth_token = ?");
+      $stmtRemember->execute([$tokenHash, $user['auth_token']]);
+      setcookie('mp_remember', $rememberToken, time() + 30 * 24 * 3600, '/', '', false, true);
+    }
+
+    header("Location: ../index.php");
     exit;
   } else {
     header("Location: login.php?error=" . urlencode("Email ou mot de passe incorrect"));

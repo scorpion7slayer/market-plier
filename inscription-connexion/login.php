@@ -1,7 +1,10 @@
 <?php
 session_start();
+require_once '../database/db.php';
+require_once '../includes/remember_me.php';
+
 if (isset($_SESSION['auth_token'])) {
-  header('Location: ../settings/settings.php');
+  header('Location: ../index.php');
   exit();
 }
 
@@ -58,13 +61,24 @@ if (!isset($_SESSION['csrf_token'])) {
           placeholder="adresse email"
           required>
 
-        <input
-          type="password"
-          class="email-input"
-          name="password"
-          id="password"
-          placeholder="mot de passe"
-          required>
+        <div class="password-wrapper">
+          <input
+            type="password"
+            class="email-input"
+            name="password"
+            id="password"
+            placeholder="mot de passe"
+            required>
+          <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+            <i class="fa-solid fa-eye"></i>
+            <i class="fa-solid fa-eye-slash"></i>
+          </button>
+        </div>
+
+        <label class="remember-me">
+          <input type="checkbox" name="remember_me" value="1">
+          <span>Rester connecté</span>
+        </label>
 
         <button type="submit" class="submit-btn">
           Se connecter

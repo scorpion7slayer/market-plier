@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../database/db.php';
+require_once '../includes/remember_me.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['auth_token'])) {

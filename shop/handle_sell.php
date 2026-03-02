@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../database/db.php';
+require_once '../includes/remember_me.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -10,8 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: sell.php');
     exit();
 }
-
-require_once '../database/db.php';
 
 // Détecter si post_max_size a été dépassé (PHP vide $_POST dans ce cas,
 // ce qui causerait une fausse erreur CSRF non informative).

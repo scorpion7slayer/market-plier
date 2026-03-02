@@ -6,6 +6,8 @@
 
 [fontawesome](https://fontawesome.com/search?ic=free-collection)
 
+[cropper.js](https://fengyuanchen.github.io/cropperjs/)
+
 ## Notes
 
 Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)

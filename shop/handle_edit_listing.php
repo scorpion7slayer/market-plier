@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../database/db.php';
+require_once '../includes/remember_me.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -10,8 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../inscription-connexion/account.php');
     exit();
 }
-
-require_once '../database/db.php';
 
 // Détecter si post_max_size a été dépassé
 if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
