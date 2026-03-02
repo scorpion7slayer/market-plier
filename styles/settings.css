@@ -23,7 +23,7 @@
 
 body {
     font-family: "Archivo", Arial, sans-serif;
-    background: var(--mp-bg, #F2EFE9);
+    background: var(--mp-bg, #f2efe9);
     color: var(--mp-text, #1a1a1a);
     min-height: 100vh;
 }
@@ -37,7 +37,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--mp-bg, #F2EFE9);
+    background: var(--mp-bg, #f2efe9);
 }
 
 .settings-logo img {
@@ -107,8 +107,14 @@ body {
 }
 
 @keyframes settingsSlideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ═══ SECTIONS ═══════════════════════════════════════════════ */
@@ -172,7 +178,10 @@ body {
     border: 2.5px solid var(--mp-input-border, #d4d0ca);
     border-radius: 14px;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
     box-sizing: border-box;
 }
 
@@ -184,6 +193,49 @@ body {
 
 .settings-input::placeholder {
     color: var(--mp-input-placeholder, #bbb);
+}
+
+/* Password visibility toggle (settings) */
+.settings-field .password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.settings-field .password-wrapper .settings-input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+.settings-field .password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--mp-text-muted, #999);
+    font-size: 1rem;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.settings-field .password-toggle:hover {
+    color: var(--mp-green, #7fb885);
+}
+
+.settings-field .password-toggle .fa-eye-slash {
+    display: none;
+}
+
+.settings-field .password-toggle.visible .fa-eye {
+    display: none;
+}
+
+.settings-field .password-toggle.visible .fa-eye-slash {
+    display: inline;
 }
 
 .settings-hint {
@@ -212,7 +264,9 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237fb885' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 20px center;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     box-sizing: border-box;
 }
 
@@ -285,10 +339,147 @@ body {
 }
 
 /* ═══ PHOTO DE PROFIL ════════════════════════════════════════ */
-.settings-photo-area {
+.settings-dropzone {
     display: flex;
     align-items: center;
     gap: 24px;
+    padding: 24px;
+    border: 2.5px dashed var(--mp-border, #d4d0ca);
+    border-radius: 16px;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+    position: relative;
+}
+
+.settings-dropzone:hover {
+    border-color: #7fb885;
+    background: rgba(127, 184, 133, 0.04);
+}
+
+.settings-dropzone.dragover {
+    border-color: #7fb885;
+    background: rgba(127, 184, 133, 0.08);
+    box-shadow: 0 0 0 4px rgba(127, 184, 133, 0.12);
+}
+
+.settings-dropzone-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.settings-dropzone-main {
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--mp-text, #333);
+    margin: 0;
+}
+
+.settings-dropzone-main i {
+    color: #7fb885;
+    margin-right: 6px;
+}
+
+.settings-dropzone-sub {
+    font-size: 0.86rem;
+    font-style: italic;
+    color: var(--mp-text-muted, #888);
+    margin: 0;
+}
+
+.settings-dropzone-link {
+    color: #7fb885;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.settings-dropzone-hint {
+    font-size: 0.76rem;
+    font-style: italic;
+    color: var(--mp-text-muted, #aaa);
+    margin: 2px 0 0;
+}
+
+/* \u2550\u2550\u2550 CROP MODAL \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */
+/* ─── Crop modal content ─── */
+.crop-modal-content {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2.5px solid #7fb885;
+    background: var(--mp-card-bg, #fff);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.crop-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--mp-card-bg, #fff);
+    border-bottom: 1.5px solid var(--mp-border-light, #e8e5df);
+}
+
+.crop-modal-title {
+    font-family: "Archivo", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--mp-text, #222);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.crop-modal-title i {
+    color: #7fb885;
+    font-size: 1rem;
+}
+
+.crop-modal-body {
+    padding: 0;
+    background: #1a1a1a;
+    position: relative;
+}
+
+/* ─── Crop container ─── */
+#cropContainer {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+#cropContainer cropper-canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.crop-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--mp-card-bg, #fff);
+    border-top: 1.5px solid var(--mp-border-light, #e8e5df);
+}
+
+.crop-btn-cancel {
+    border-color: var(--mp-border, #d4d0ca) !important;
+    color: var(--mp-text-muted, #888) !important;
+}
+
+.crop-btn-cancel:hover {
+    border-color: var(--mp-text-muted) !important;
+    color: var(--mp-text) !important;
+    background: var(--mp-bg-tertiary) !important;
 }
 
 .settings-avatar {
@@ -299,6 +490,7 @@ body {
     border: 4px solid #7fb885;
     box-shadow: 0 4px 14px rgba(127, 184, 133, 0.25);
     flex-shrink: 0;
+    pointer-events: none;
 }
 
 .settings-avatar-placeholder {
@@ -586,7 +778,7 @@ body {
         width: 38px;
     }
 
-    .settings-photo-area {
+    .settings-dropzone {
         flex-direction: column;
         text-align: center;
     }

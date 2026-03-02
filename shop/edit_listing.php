@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../database/db.php';
+require_once '../includes/remember_me.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -10,8 +12,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: ../inscription-connexion/account.php');
     exit();
 }
-
-require_once '../database/db.php';
 
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -243,9 +243,9 @@ $user = [
 
     <script>
         // Données des images existantes
-        var existingImages = <?php echo json_encode(array_map(function($img) {
-            return ['id' => $img['id'], 'path' => $img['image_path']];
-        }, $existingImages)); ?>;
+        var existingImages = <?php echo json_encode(array_map(function ($img) {
+                                    return ['id' => $img['id'], 'path' => $img['image_path']];
+                                }, $existingImages)); ?>;
 
         var photoInput = document.getElementById('photo-input');
         var photosContainer = document.getElementById('photos-container');
@@ -258,12 +258,17 @@ $user = [
         function compressImage(file, maxPx, quality) {
             return new Promise(function(resolve) {
                 var reader = new FileReader();
-                reader.onerror = function() { resolve(file); };
+                reader.onerror = function() {
+                    resolve(file);
+                };
                 reader.onload = function(e) {
                     var img = new Image();
-                    img.onerror = function() { resolve(file); };
+                    img.onerror = function() {
+                        resolve(file);
+                    };
                     img.onload = function() {
-                        var w = img.width, h = img.height;
+                        var w = img.width,
+                            h = img.height;
                         if (w > maxPx || h > maxPx) {
                             var ratio = Math.min(maxPx / w, maxPx / h);
                             w = Math.round(w * ratio);
@@ -274,9 +279,15 @@ $user = [
                         canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         canvas.toBlob(function(blob) {
-                            if (!blob) { resolve(file); return; }
+                            if (!blob) {
+                                resolve(file);
+                                return;
+                            }
                             var name = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
-                            resolve(new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() }));
+                            resolve(new File([blob], name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            }));
                         }, 'image/jpeg', quality);
                     };
                     img.src = e.target.result;
@@ -313,20 +324,28 @@ $user = [
 
         function updateImageOrder() {
             var order = [];
-            existingImages.forEach(function(img) { order.push('existing:' + img.id); });
-            newFiles.forEach(function(f, i) { order.push('new:' + i); });
+            existingImages.forEach(function(img) {
+                order.push('existing:' + img.id);
+            });
+            newFiles.forEach(function(f, i) {
+                order.push('new:' + i);
+            });
             imageOrderInput.value = order.join(',');
         }
 
         function updateFileInput() {
             var dataTransfer = new DataTransfer();
-            newFiles.forEach(function(file) { dataTransfer.items.add(file); });
+            newFiles.forEach(function(file) {
+                dataTransfer.items.add(file);
+            });
             photoInput.files = dataTransfer.files;
         }
 
         function renderAll() {
             var previews = photosContainer.querySelectorAll('.photo-preview-wrapper');
-            previews.forEach(function(el) { el.remove(); });
+            previews.forEach(function(el) {
+                el.remove();
+            });
 
             var uploadZone = document.getElementById('upload-zone');
             var globalIndex = 0;
@@ -368,7 +387,9 @@ $user = [
                 imgEl.src = '../uploads/listings/' + imgData.path;
             } else {
                 var reader = new FileReader();
-                reader.onload = function(e) { imgEl.src = e.target.result; };
+                reader.onload = function(e) {
+                    imgEl.src = e.target.result;
+                };
                 reader.readAsDataURL(file);
             }
 
@@ -407,8 +428,18 @@ $user = [
                 if (globalIndex === 0) return;
 
                 var allItems = [];
-                existingImages.forEach(function(img) { allItems.push({ type: 'existing', data: img }); });
-                newFiles.forEach(function(f) { allItems.push({ type: 'new', data: f }); });
+                existingImages.forEach(function(img) {
+                    allItems.push({
+                        type: 'existing',
+                        data: img
+                    });
+                });
+                newFiles.forEach(function(f) {
+                    allItems.push({
+                        type: 'new',
+                        data: f
+                    });
+                });
 
                 var item = allItems.splice(globalIndex, 1)[0];
                 allItems.unshift(item);
@@ -428,13 +459,17 @@ $user = [
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', String(globalIndex));
             });
-            wrapper.addEventListener('dragend', function() { wrapper.classList.remove('dragging'); });
+            wrapper.addEventListener('dragend', function() {
+                wrapper.classList.remove('dragging');
+            });
             wrapper.addEventListener('dragover', function(e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
                 wrapper.classList.add('drag-over');
             });
-            wrapper.addEventListener('dragleave', function() { wrapper.classList.remove('drag-over'); });
+            wrapper.addEventListener('dragleave', function() {
+                wrapper.classList.remove('drag-over');
+            });
             wrapper.addEventListener('drop', function(e) {
                 e.preventDefault();
                 wrapper.classList.remove('drag-over');
@@ -443,8 +478,18 @@ $user = [
                 if (fromIndex === toIndex) return;
 
                 var allItems = [];
-                existingImages.forEach(function(img) { allItems.push({ type: 'existing', data: img }); });
-                newFiles.forEach(function(f) { allItems.push({ type: 'new', data: f }); });
+                existingImages.forEach(function(img) {
+                    allItems.push({
+                        type: 'existing',
+                        data: img
+                    });
+                });
+                newFiles.forEach(function(f) {
+                    allItems.push({
+                        type: 'new',
+                        data: f
+                    });
+                });
 
                 var item = allItems.splice(fromIndex, 1)[0];
                 allItems.splice(toIndex, 0, item);
@@ -495,7 +540,9 @@ $user = [
             e.preventDefault();
             e.stopPropagation();
             uploadZone.classList.remove('drag-over');
-            var files = Array.from(e.dataTransfer.files).filter(function(f) { return f.type.startsWith('image/'); });
+            var files = Array.from(e.dataTransfer.files).filter(function(f) {
+                return f.type.startsWith('image/');
+            });
             var remaining = maxFiles - getTotalCount();
             if (files.length > remaining) {
                 files = files.slice(0, remaining);
@@ -512,114 +559,116 @@ $user = [
         updateImageOrder();
     </script>
     <script>
-    // Custom dropdown
-    (function() {
-        var selects = document.querySelectorAll('.sell-select');
+        // Custom dropdown
+        (function() {
+            var selects = document.querySelectorAll('.sell-select');
 
-        selects.forEach(function(nativeSelect) {
-            var wrapper = document.createElement('div');
-            wrapper.className = 'custom-select-wrapper';
+            selects.forEach(function(nativeSelect) {
+                var wrapper = document.createElement('div');
+                wrapper.className = 'custom-select-wrapper';
 
-            var trigger = document.createElement('div');
-            trigger.className = 'custom-select-trigger';
-            trigger.setAttribute('tabindex', '0');
-            trigger.setAttribute('role', 'listbox');
+                var trigger = document.createElement('div');
+                trigger.className = 'custom-select-trigger';
+                trigger.setAttribute('tabindex', '0');
+                trigger.setAttribute('role', 'listbox');
 
-            var textSpan = document.createElement('span');
-            textSpan.className = 'custom-select-text';
+                var textSpan = document.createElement('span');
+                textSpan.className = 'custom-select-text';
 
-            var arrow = document.createElement('span');
-            arrow.className = 'custom-select-arrow';
-            arrow.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                var arrow = document.createElement('span');
+                arrow.className = 'custom-select-arrow';
+                arrow.innerHTML = '<i class="fas fa-chevron-down"></i>';
 
-            trigger.appendChild(textSpan);
-            trigger.appendChild(arrow);
+                trigger.appendChild(textSpan);
+                trigger.appendChild(arrow);
 
-            var panel = document.createElement('div');
-            panel.className = 'custom-select-panel';
+                var panel = document.createElement('div');
+                panel.className = 'custom-select-panel';
 
-            var selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
-            var hasValue = selectedOpt && selectedOpt.value !== '';
-            textSpan.textContent = hasValue ? selectedOpt.text : 'Choisir...';
-            if (!hasValue) trigger.classList.add('placeholder');
+                var selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
+                var hasValue = selectedOpt && selectedOpt.value !== '';
+                textSpan.textContent = hasValue ? selectedOpt.text : 'Choisir...';
+                if (!hasValue) trigger.classList.add('placeholder');
 
-            Array.from(nativeSelect.options).forEach(function(opt) {
-                if (opt.disabled && opt.value === '') return;
+                Array.from(nativeSelect.options).forEach(function(opt) {
+                    if (opt.disabled && opt.value === '') return;
 
-                var optDiv = document.createElement('div');
-                optDiv.className = 'custom-select-option';
-                if (opt.selected && opt.value !== '') optDiv.classList.add('selected');
-                optDiv.setAttribute('data-value', opt.value);
-                optDiv.setAttribute('role', 'option');
+                    var optDiv = document.createElement('div');
+                    optDiv.className = 'custom-select-option';
+                    if (opt.selected && opt.value !== '') optDiv.classList.add('selected');
+                    optDiv.setAttribute('data-value', opt.value);
+                    optDiv.setAttribute('role', 'option');
 
-                var optText = document.createElement('span');
-                optText.textContent = opt.text;
+                    var optText = document.createElement('span');
+                    optText.textContent = opt.text;
 
-                var checkIcon = document.createElement('i');
-                checkIcon.className = 'fas fa-check check-icon';
+                    var checkIcon = document.createElement('i');
+                    checkIcon.className = 'fas fa-check check-icon';
 
-                optDiv.appendChild(optText);
-                optDiv.appendChild(checkIcon);
+                    optDiv.appendChild(optText);
+                    optDiv.appendChild(checkIcon);
 
-                optDiv.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    nativeSelect.value = opt.value;
-                    textSpan.textContent = opt.text;
-                    trigger.classList.remove('placeholder');
+                    optDiv.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        nativeSelect.value = opt.value;
+                        textSpan.textContent = opt.text;
+                        trigger.classList.remove('placeholder');
 
-                    panel.querySelectorAll('.custom-select-option').forEach(function(o) {
-                        o.classList.remove('selected');
+                        panel.querySelectorAll('.custom-select-option').forEach(function(o) {
+                            o.classList.remove('selected');
+                        });
+                        optDiv.classList.add('selected');
+
+                        trigger.classList.remove('open');
+                        panel.classList.remove('open');
+
+                        nativeSelect.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
                     });
-                    optDiv.classList.add('selected');
 
-                    trigger.classList.remove('open');
-                    panel.classList.remove('open');
-
-                    nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    panel.appendChild(optDiv);
                 });
 
-                panel.appendChild(optDiv);
+                nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(panel);
+                nativeSelect.style.display = 'none';
+                wrapper.appendChild(nativeSelect);
+
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var isOpen = trigger.classList.contains('open');
+
+                    document.querySelectorAll('.custom-select-trigger.open').forEach(function(t) {
+                        t.classList.remove('open');
+                        t.parentNode.querySelector('.custom-select-panel').classList.remove('open');
+                    });
+
+                    if (!isOpen) {
+                        trigger.classList.add('open');
+                        panel.classList.add('open');
+                    }
+                });
+
+                trigger.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        trigger.click();
+                    } else if (e.key === 'Escape') {
+                        trigger.classList.remove('open');
+                        panel.classList.remove('open');
+                    }
+                });
             });
 
-            nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
-            wrapper.appendChild(trigger);
-            wrapper.appendChild(panel);
-            nativeSelect.style.display = 'none';
-            wrapper.appendChild(nativeSelect);
-
-            trigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var isOpen = trigger.classList.contains('open');
-
+            document.addEventListener('click', function() {
                 document.querySelectorAll('.custom-select-trigger.open').forEach(function(t) {
                     t.classList.remove('open');
                     t.parentNode.querySelector('.custom-select-panel').classList.remove('open');
                 });
-
-                if (!isOpen) {
-                    trigger.classList.add('open');
-                    panel.classList.add('open');
-                }
             });
-
-            trigger.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    trigger.click();
-                } else if (e.key === 'Escape') {
-                    trigger.classList.remove('open');
-                    panel.classList.remove('open');
-                }
-            });
-        });
-
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.custom-select-trigger.open').forEach(function(t) {
-                t.classList.remove('open');
-                t.parentNode.querySelector('.custom-select-panel').classList.remove('open');
-            });
-        });
-    })();
+        })();
     </script>
     <script src="../styles/theme.js"></script>
     <script src="../styles/form-validation.js"></script>

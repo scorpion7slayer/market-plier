@@ -1,15 +1,17 @@
 <?php
 session_start();
-if (!isset($_SESSION['auth_token'])) {
-  header('Location: ../inscription-connexion/login.php');
-  exit();
-}
 
 try {
   require_once '../database/db.php';
 } catch (PDOException $e) {
   error_log("DB connection error (admin): " . $e->getMessage());
   die("Erreur de connexion à la base de données.");
+}
+require_once '../includes/remember_me.php';
+
+if (!isset($_SESSION['auth_token'])) {
+  header('Location: ../inscription-connexion/login.php');
+  exit();
 }
 
 if (!isset($_SESSION['csrf_token'])) {
@@ -386,26 +388,28 @@ try {
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script>
-    (function () {
+    (function() {
       var overlay = document.getElementById('deleteUserOverlay');
       var tokenInput = document.getElementById('deleteUserToken');
       var nameEl = document.getElementById('deleteUserName');
 
-      document.querySelectorAll('[data-open-delete]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-open-delete]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
           tokenInput.value = btn.getAttribute('data-token');
           nameEl.textContent = btn.getAttribute('data-username');
           overlay.classList.add('visible');
         });
       });
 
-      function close() { overlay.classList.remove('visible'); }
+      function close() {
+        overlay.classList.remove('visible');
+      }
 
       document.getElementById('deleteUserCancel').addEventListener('click', close);
-      overlay.addEventListener('click', function (e) {
+      overlay.addEventListener('click', function(e) {
         if (e.target === overlay) close();
       });
-      document.addEventListener('keydown', function (e) {
+      document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') close();
       });
     })();

@@ -19,7 +19,7 @@
 }
 body {
     font-family: "Archivo", Arial, sans-serif;
-    background-color: var(--mp-bg, #F2EFE9);
+    background-color: var(--mp-bg, #f2efe9);
     color: var(--mp-text, #1a1a1a);
     min-height: 100vh;
     display: flex;
@@ -86,6 +86,49 @@ body {
 
 .password-field .email-input {
     width: 100%;
+}
+
+/* Password visibility toggle */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper .email-input {
+    width: 100%;
+    padding-right: 55px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--mp-text-muted, #999);
+    font-size: 1.1rem;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--mp-green, #7fb885);
+}
+
+.password-toggle .fa-eye-slash {
+    display: none;
+}
+
+.password-toggle.visible .fa-eye {
+    display: none;
+}
+
+.password-toggle.visible .fa-eye-slash {
+    display: inline;
 }
 
 .email-input {
@@ -168,6 +211,30 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+/* Checkbox "Rester connecté" */
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--mp-text-secondary, #555);
+    user-select: none;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7fb885;
+    cursor: pointer;
+}
+
+.remember-me span {
+    font-style: italic;
+    font-weight: 500;
 }
 
 .submit-btn:hover {

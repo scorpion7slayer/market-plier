@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['auth_token'])) {
-    header('Location: ../settings/settings.php');
+    header('Location: ../index.php');
     exit();
 }
 

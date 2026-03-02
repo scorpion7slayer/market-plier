@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'database/db.php';
+require_once 'includes/remember_me.php';
 
 // Générer un token CSRF uniquement s'il n'existe pas encore.
 // Régénérer inconditionnellement écrasait le token des formulaires ouverts

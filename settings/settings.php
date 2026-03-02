@@ -1,14 +1,16 @@
 <?php
 session_start();
-if (!isset($_SESSION['auth_token'])) {
-  header('Location: ../inscription-connexion/login.php');
-  exit();
-}
 
 try {
   require_once '../database/db.php';
 } catch (PDOException $e) {
   error_log("DB connection error (settings): " . $e->getMessage());
+}
+require_once '../includes/remember_me.php';
+
+if (!isset($_SESSION['auth_token'])) {
+  header('Location: ../inscription-connexion/login.php');
+  exit();
 }
 
 if (!isset($_SESSION['csrf_token'])) {
@@ -23,6 +25,11 @@ $authProvider = 'local';
 $hasPassword = false;
 $successMessage = '';
 $errorMessage = '';
+
+// Message de succès via query param (après upload XHR)
+if (isset($_GET['success']) && $_GET['success'] === 'photo') {
+  $successMessage = "Photo de profil mise à jour !";
+}
 
 // Récupérer les informations utilisateur
 if (isset($pdo)) {
@@ -229,6 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/settings.css">
   <link rel="stylesheet" href="../styles/theme.css">
+  <script src="../node_modules/cropperjs/dist/cropper.js"></script>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - Paramètres</title>
 </head>
@@ -272,8 +280,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
             <?php if ($hasPassword): ?>
               <div class="settings-field" style="margin-top: 12px;">
                 <label class="settings-label" for="confirm_delete_password">Mot de passe</label>
-                <input type="password" class="settings-input" id="confirm_delete_password"
-                  name="confirm_delete_password" required>
+                <div class="password-wrapper">
+                  <input type="password" class="settings-input" id="confirm_delete_password"
+                    name="confirm_delete_password" required>
+                  <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+                    <i class="fa-solid fa-eye"></i>
+                    <i class="fa-solid fa-eye-slash"></i>
+                  </button>
+                </div>
               </div>
             <?php endif; ?>
           </div>
@@ -334,17 +348,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
     <!-- Photo de profil -->
     <section class="settings-section">
       <h2 class="settings-section-title"><i class="fas fa-camera"></i> Photo de profil</h2>
-      <div class="settings-photo-area">
+      <div id="photoDropzone" class="settings-dropzone" data-csrf="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+        <input type="file" id="photoInput" accept=".jpg,.jpeg,.png,.webp" style="position:absolute;left:-9999px;">
         <img src="<?= ($profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto)) ? '../uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : '../assets/images/default-avatar.svg' ?>"
-          alt="Photo de profil" class="settings-avatar">
-        <form method="POST" enctype="multipart/form-data">
-          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-          <input type="hidden" name="changer_photo" value="1">
-          <label class="settings-btn settings-btn-outline" style="cursor: pointer;">
-            <i class="fas fa-upload"></i> Changer la photo
-            <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="this.form.submit()">
-          </label>
-        </form>
+          alt="Photo de profil" class="settings-avatar" id="avatarPreview">
+        <div class="settings-dropzone-text">
+          <p class="settings-dropzone-main"><i class="fas fa-cloud-upload-alt"></i> Glissez votre photo ici</p>
+          <p class="settings-dropzone-sub">ou <span class="settings-dropzone-link">parcourez vos fichiers</span></p>
+          <p class="settings-dropzone-hint">JPG, PNG ou WEBP — compressé automatiquement</p>
+        </div>
       </div>
     </section>
 
@@ -363,19 +375,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
         <?php if ($hasPassword): ?>
           <div class="settings-field">
             <label class="settings-label" for="current_password">Mot de passe actuel</label>
-            <input type="password" class="settings-input" id="current_password" name="current_password" required>
+            <div class="password-wrapper">
+              <input type="password" class="settings-input" id="current_password" name="current_password" required>
+              <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+                <i class="fa-solid fa-eye"></i>
+                <i class="fa-solid fa-eye-slash"></i>
+              </button>
+            </div>
           </div>
         <?php endif; ?>
         <div class="settings-field">
           <label class="settings-label" for="new_password">
             <?= $hasPassword ? 'Nouveau mot de passe' : 'Définir un mot de passe' ?>
           </label>
-          <input type="password" class="settings-input" id="new_password" name="new_password" required minlength="6">
+          <div class="password-wrapper">
+            <input type="password" class="settings-input" id="new_password" name="new_password" required minlength="6">
+            <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+              <i class="fa-solid fa-eye"></i>
+              <i class="fa-solid fa-eye-slash"></i>
+            </button>
+          </div>
           <span class="settings-hint">Minimum 6 caractères</span>
         </div>
         <div class="settings-field">
           <label class="settings-label" for="confirm_password">Confirmer le mot de passe</label>
-          <input type="password" class="settings-input" id="confirm_password" name="confirm_password" required minlength="6">
+          <div class="password-wrapper">
+            <input type="password" class="settings-input" id="confirm_password" name="confirm_password" required minlength="6">
+            <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+              <i class="fa-solid fa-eye"></i>
+              <i class="fa-solid fa-eye-slash"></i>
+            </button>
+          </div>
         </div>
         <button type="submit" class="settings-btn settings-btn-primary">
           <i class="fas fa-key"></i> <?= $hasPassword ? 'Changer le mot de passe' : 'Définir le mot de passe' ?>
@@ -488,9 +518,180 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
     </section>
   </main>
 
+  <!-- Modal recadrage -->
+  <div class="modal fade" id="cropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content crop-modal-content">
+        <div class="crop-modal-header">
+          <h5 class="crop-modal-title">
+            <i class="fas fa-crop-alt"></i> Recadrer la photo
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="crop-modal-body">
+          <div id="cropContainer"></div>
+        </div>
+        <div class="crop-modal-footer">
+          <button type="button" class="settings-btn settings-btn-outline crop-btn-cancel" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="settings-btn settings-btn-primary" id="cropConfirmBtn">
+            <i class="fas fa-check"></i> Valider
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script src="../styles/form-validation.js"></script>
+  <script>
+    // Photo de profil : drag/drop + recadrage Cropper.js v2 + compression
+    (function() {
+      var dropzone = document.getElementById('photoDropzone');
+      var input = document.getElementById('photoInput');
+      if (!dropzone || !input) return;
+
+      var csrfToken = dropzone.getAttribute('data-csrf');
+      var cropModalEl = document.getElementById('cropModal');
+      var cropModal = new bootstrap.Modal(cropModalEl);
+      var cropContainer = document.getElementById('cropContainer');
+      var confirmBtn = document.getElementById('cropConfirmBtn');
+
+      function validateFile(file) {
+        var allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (allowed.indexOf(file.type) === -1) {
+          alert('Format non autorisé. Utilisez JPG, PNG ou WEBP.');
+          return false;
+        }
+        if (file.size > 50 * 1024 * 1024) {
+          alert('Fichier trop volumineux (max 50 MB).');
+          return false;
+        }
+        return true;
+      }
+
+      var pendingImageSrc = null;
+
+      function initCropperInModal() {
+        if (!pendingImageSrc) return;
+        cropContainer.innerHTML =
+          '<cropper-canvas style="width:100%;height:100%;">' +
+          '<cropper-image src="' + pendingImageSrc + '" alt="Recadrer" initial-center-size="contain" scalable rotatable translatable></cropper-image>' +
+          '<cropper-shade hidden></cropper-shade>' +
+          '<cropper-handle action="select" plain></cropper-handle>' +
+          '<cropper-selection id="cropSelection" initial-coverage="0.5" aspect-ratio="1" movable resizable outlined theme-color="#7fb885">' +
+          '<cropper-grid role="grid" bordered covered theme-color="rgba(127, 184, 133, 0.35)"></cropper-grid>' +
+          '<cropper-crosshair centered theme-color="rgba(127, 184, 133, 0.5)"></cropper-crosshair>' +
+          '<cropper-handle action="move" theme-color="rgba(127, 184, 133, 0.15)"></cropper-handle>' +
+          '<cropper-handle action="n-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="e-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="s-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="w-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="ne-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="nw-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="se-resize" theme-color="#7fb885"></cropper-handle>' +
+          '<cropper-handle action="sw-resize" theme-color="#7fb885"></cropper-handle>' +
+          '</cropper-selection>' +
+          '</cropper-canvas>';
+        pendingImageSrc = null;
+      }
+
+      // Injecter le cropper une fois la modal visible (dimensions calculables)
+      cropModalEl.addEventListener('shown.bs.modal', initCropperInModal);
+
+      function openCropper(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          pendingImageSrc = e.target.result;
+          cropModal.show();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Valider le recadrage
+      confirmBtn.addEventListener('click', function() {
+        var selection = document.getElementById('cropSelection');
+        if (!selection || typeof selection.$toCanvas !== 'function') {
+          alert('Erreur : le recadrage n\'est pas prêt.');
+          return;
+        }
+        confirmBtn.disabled = true;
+        selection.$toCanvas({
+          width: 400,
+          height: 400
+        }).then(function(canvas) {
+          canvas.toBlob(function(blob) {
+            confirmBtn.disabled = false;
+            if (!blob) {
+              alert('Erreur de recadrage.');
+              return;
+            }
+            uploadBlob(blob);
+            cropModal.hide();
+          }, 'image/jpeg', 0.85);
+        }).catch(function() {
+          confirmBtn.disabled = false;
+          alert('Erreur lors du recadrage.');
+        });
+      });
+
+      // Nettoyage à la fermeture de la modal
+      cropModalEl.addEventListener('hidden.bs.modal', function() {
+        cropContainer.innerHTML = '';
+        input.value = '';
+      });
+
+      function uploadBlob(blob) {
+        var fd = new FormData();
+        fd.append('csrf_token', csrfToken);
+        fd.append('changer_photo', '1');
+        fd.append('photo', blob, 'avatar.jpg');
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'settings.php', true);
+        xhr.onload = function() {
+          window.location.href = 'settings.php?success=photo';
+        };
+        xhr.onerror = function() {
+          alert('Erreur réseau.');
+        };
+        xhr.send(fd);
+      }
+
+      // Clic sur la zone = ouvrir le sélecteur de fichiers
+      dropzone.addEventListener('click', function() {
+        input.click();
+      });
+
+      // Fichier sélectionné via le sélecteur
+      input.addEventListener('change', function() {
+        if (input.files.length && validateFile(input.files[0])) {
+          openCropper(input.files[0]);
+        }
+      });
+
+      // Drag & drop
+      ['dragenter', 'dragover'].forEach(function(evt) {
+        dropzone.addEventListener(evt, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(function(evt) {
+        dropzone.addEventListener(evt, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        });
+      });
+      dropzone.addEventListener('drop', function(e) {
+        var files = e.dataTransfer.files;
+        if (files.length && validateFile(files[0])) {
+          openCropper(files[0]);
+        }
+      });
+    })();
+  </script>
   <script>
     // Boutons de thème
     (function() {

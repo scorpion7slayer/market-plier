@@ -73,8 +73,10 @@ function showFieldError(field, message) {
     span.className = "field-error";
     span.textContent = message;
 
-    // Si le champ est dans un custom dropdown, afficher l'erreur après le wrapper
-    var wrapper = field.closest(".custom-select-wrapper");
+    // Trouver le bon conteneur pour afficher l'erreur après
+    var wrapper =
+        field.closest(".custom-select-wrapper") ||
+        field.closest(".password-wrapper");
     if (wrapper) {
         wrapper.insertAdjacentElement("afterend", span);
         wrapper.classList.add("field-error-active");
@@ -85,7 +87,9 @@ function showFieldError(field, message) {
 }
 
 function clearFieldError(field) {
-    var wrapper = field.closest(".custom-select-wrapper");
+    var wrapper =
+        field.closest(".custom-select-wrapper") ||
+        field.closest(".password-wrapper");
     var target = wrapper || field;
     var next = target.nextElementSibling;
     if (next && next.classList.contains("field-error")) {
@@ -94,3 +98,16 @@ function clearFieldError(field) {
     target.classList.remove("field-error-active");
     field.classList.remove("field-error-active");
 }
+
+/* ═══ Password visibility toggle ═══ */
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".password-toggle").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var wrapper = btn.closest(".password-wrapper");
+            var input = wrapper.querySelector("input");
+            var isVisible = input.type === "text";
+            input.type = isVisible ? "password" : "text";
+            btn.classList.toggle("visible", !isVisible);
+        });
+    });
+});

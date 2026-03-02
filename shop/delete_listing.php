@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../database/db.php';
+require_once '../includes/remember_me.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -10,8 +12,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: ../inscription-connexion/account.php');
     exit();
 }
-
-require_once '../database/db.php';
 
 $listingId = (int)$_GET['id'];
 
