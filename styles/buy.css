@@ -1,0 +1,476 @@
+/* PAGE D'ACHAT */
+
+.buy-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    height: auto;
+    overflow: visible;
+}
+
+/* Fil d'ariane */
+.buy-breadcrumb {
+    margin-bottom: 20px;
+}
+
+.buy-breadcrumb a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mp-text-secondary);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.buy-breadcrumb a:hover {
+    color: var(--mp-green);
+}
+
+/* Disposition 2 colonnes */
+.buy-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    align-items: start;
+}
+
+/* Galerie d'images */
+.buy-gallery {
+    position: sticky;
+    top: 170px;
+}
+
+.gallery-main {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--mp-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.25s ease;
+}
+
+.gallery-placeholder {
+    flex-direction: column;
+    gap: 12px;
+    color: var(--mp-text-muted);
+    font-size: 1rem;
+}
+
+.gallery-placeholder i {
+    font-size: 3rem;
+    opacity: 0.4;
+}
+
+/* Navigation avec flèches */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: #333;
+    opacity: 0;
+    transition:
+        opacity 0.25s,
+        background 0.2s,
+        transform 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+}
+
+.gallery-main:hover .gallery-nav {
+    opacity: 1;
+}
+
+.gallery-nav:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.gallery-nav-prev {
+    left: 12px;
+}
+
+.gallery-nav-next {
+    right: 12px;
+}
+
+/* Compteur d'images */
+.gallery-counter {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    z-index: 2;
+}
+
+/* Miniatures */
+.gallery-thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.gallery-thumb {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    background: var(--mp-bg-tertiary);
+    padding: 0;
+    transition:
+        border-color 0.2s,
+        opacity 0.2s;
+    opacity: 0.6;
+}
+
+.gallery-thumb.active {
+    border-color: var(--mp-green);
+    opacity: 1;
+}
+
+.gallery-thumb:hover {
+    opacity: 1;
+}
+
+.gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Détails (colonne droite) */
+.buy-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Cartes */
+.buy-card {
+    background: var(--mp-card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 4px var(--mp-card-shadow);
+}
+
+/* Prix */
+.buy-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--mp-text);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+/* Titre */
+.buy-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--mp-text);
+    margin: 0 0 14px;
+    line-height: 1.4;
+}
+
+/* Tags (catégorie, état) */
+.buy-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.buy-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.buy-tag-category {
+    background: rgba(127, 184, 133, 0.15);
+    color: var(--mp-green);
+}
+
+.buy-tag-condition {
+    background: var(--mp-bg-tertiary);
+    color: var(--mp-text-secondary);
+}
+
+/* Localisation */
+.buy-location {
+    font-size: 0.88rem;
+    color: var(--mp-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.buy-location i {
+    color: var(--mp-green);
+    width: 16px;
+    text-align: center;
+}
+
+/* Date */
+.buy-date {
+    font-size: 0.82rem;
+    color: var(--mp-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Boutons d'action */
+.buy-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.buy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+}
+
+.buy-btn:hover {
+    transform: translateY(-1px);
+}
+
+.buy-btn:active {
+    transform: translateY(0);
+}
+
+.buy-btn-primary {
+    background: var(--mp-green);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(127, 184, 133, 0.35);
+}
+
+.buy-btn-primary:hover {
+    background: var(--mp-green-hover);
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(127, 184, 133, 0.45);
+}
+
+.buy-btn-danger {
+    background: transparent;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+}
+
+.buy-btn-danger:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Description */
+.buy-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 14px;
+    color: var(--mp-text);
+}
+
+.buy-description-text {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--mp-text-secondary);
+    word-break: break-word;
+}
+
+/* Vendeur */
+.seller-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.seller-avatar {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--mp-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mp-text-muted);
+    font-size: 1.2rem;
+}
+
+.seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.seller-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.seller-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--mp-text);
+}
+
+.seller-meta {
+    font-size: 0.8rem;
+    color: var(--mp-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.seller-link {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 12px;
+    padding: 8px;
+    margin: -8px;
+    transition: background 0.2s;
+}
+
+.seller-link:hover {
+    background: var(--mp-bg-tertiary);
+    text-decoration: none;
+    color: inherit;
+}
+
+.seller-bio {
+    margin-top: 12px;
+    font-size: 0.88rem;
+    color: var(--mp-text-secondary);
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px solid var(--mp-border-light);
+}
+
+/* RESPONSIVE */
+
+/* Tablette */
+@media (max-width: 900px) {
+    .buy-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .buy-gallery {
+        position: static;
+    }
+
+    .gallery-main {
+        aspect-ratio: 16 / 10;
+    }
+
+    .buy-main {
+        padding: 16px 14px 50px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .buy-layout {
+        gap: 14px;
+    }
+
+    .buy-card {
+        padding: 18px 16px;
+        border-radius: 12px;
+    }
+
+    .buy-price {
+        font-size: 1.5rem;
+    }
+
+    .buy-title {
+        font-size: 1.05rem;
+    }
+
+    .gallery-main {
+        border-radius: 12px;
+        aspect-ratio: 4 / 3;
+    }
+
+    .gallery-nav {
+        opacity: 1;
+        width: 34px;
+        height: 34px;
+        font-size: 0.75rem;
+    }
+
+    .gallery-thumb {
+        width: 58px;
+        height: 58px;
+    }
+
+    .buy-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* SURCHARGES MODE SOMBRE */
+[data-bs-theme="dark"] .gallery-nav {
+    background: rgba(30, 29, 28, 0.85);
+    color: #e0ddd7;
+}
+
+[data-bs-theme="dark"] .gallery-nav:hover {
+    background: rgba(37, 36, 35, 0.95);
+}
+
+[data-bs-theme="dark"] .buy-tag-category {
+    background: rgba(127, 184, 133, 0.12);
+}

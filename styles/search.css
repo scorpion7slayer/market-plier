@@ -1,0 +1,324 @@
+/* PAGE DE RECHERCHE */
+
+.search-main {
+    padding: 24px 30px;
+    min-height: calc(100vh - 140px);
+    overflow: auto;
+    display: block;
+    height: auto;
+}
+
+/* Filtres de catégorie */
+.category-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background: var(--mp-card-bg, #fff);
+    border: 1.5px solid var(--mp-border, #ddd);
+    color: var(--mp-text, #333);
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.category-chip:hover {
+    background: #7fb88520;
+    border-color: #7fb885;
+    color: #5a9060;
+    text-decoration: none;
+}
+
+.category-chip.active {
+    background: #7fb885;
+    border-color: #7fb885;
+    color: #fff;
+}
+
+.category-chip.active:hover {
+    background: #6aa070;
+    border-color: #6aa070;
+    color: #fff;
+}
+
+/* Informations de recherche */
+.search-info {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--mp-border, #e0e0e0);
+}
+
+.search-info-text {
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--mp-text-muted, #888);
+}
+
+.search-info-text strong {
+    color: var(--mp-text, #333);
+}
+
+/* Grille de résultats */
+.search-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* Carte d'annonce */
+.listing-card {
+    background: var(--mp-card-bg, #fff);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px var(--mp-card-shadow, rgba(0, 0, 0, 0.06));
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+}
+
+.listing-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px var(--mp-card-shadow, rgba(0, 0, 0, 0.12));
+    text-decoration: none;
+    color: inherit;
+}
+
+.listing-card-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #e8e8e8;
+    overflow: hidden;
+}
+
+.listing-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.listing-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+    font-size: 2.5rem;
+}
+
+.listing-card-body {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.listing-card-price {
+    font-family: "Archivo", sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--mp-text, #111);
+}
+
+.listing-card-title {
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--mp-text, #333);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.listing-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--mp-text-muted, #999);
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+}
+
+.listing-card-meta i {
+    font-size: 11px;
+}
+
+.listing-card-category {
+    background: #7fb88518;
+    color: #5a9060;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+/* Pas de résultats */
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--mp-text-muted, #999);
+}
+
+.no-results i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.4;
+}
+
+.no-results p {
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--mp-text, #333);
+    margin-bottom: 6px;
+}
+
+.no-results span {
+    font-size: 14px;
+}
+
+/* Charger plus */
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding-bottom: 40px;
+}
+
+.load-more-btn {
+    font-family: "Archivo", sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 32px;
+    border-radius: 30px;
+    border: 1.5px solid #7fb885;
+    background: transparent;
+    color: #7fb885;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+    background: #7fb885;
+    color: #fff;
+}
+
+.load-more-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-main {
+        padding: 16px 14px;
+    }
+
+    .category-filters {
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+
+    .category-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .search-results {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .listing-card-price {
+        font-size: 15px;
+    }
+
+    .listing-card-title {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-results {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Thème sombre */
+[data-bs-theme="dark"] .category-chip {
+    background: var(--mp-card-bg, #1e1e1e);
+    border-color: var(--mp-border, #3a3a3a);
+    color: var(--mp-text, #ddd);
+}
+
+[data-bs-theme="dark"] .category-chip:hover {
+    background: #7fb88530;
+    border-color: #7fb885;
+    color: #7fb885;
+}
+
+[data-bs-theme="dark"] .category-chip.active {
+    background: #7fb885;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .listing-card {
+    background: var(--mp-card-bg, #1e1e1e);
+}
+
+[data-bs-theme="dark"] .listing-card-img {
+    background: #2a2a2a;
+}
+
+[data-bs-theme="dark"] .listing-card-placeholder {
+    color: #555;
+}
+
+[data-bs-theme="dark"] .listing-card-category {
+    background: #7fb88525;
+    color: #7fb885;
+}
+
+[data-bs-theme="dark"] .load-more-btn {
+    border-color: #7fb885;
+    color: #7fb885;
+}
+
+[data-bs-theme="dark"] .load-more-btn:hover {
+    background: #7fb885;
+    color: #fff;
+}
+
+/* ─── Header search form ────────────────────────────────── */
+.search-form {
+    flex: 1;
+    display: flex;
+    position: relative;
+}

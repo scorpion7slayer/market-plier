@@ -29,7 +29,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
 <body>
   <div class="logo">
-    <img src="../assets/images/logo.svg" alt="" style="width: 120%; height: auto;">
+    <img src="../assets/images/logo.svg" alt="" class="auth-logo-img">
     <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; Retour à l'accueil</a></p>
   </div>
   <!-- Theme toggle flottant -->

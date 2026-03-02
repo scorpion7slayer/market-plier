@@ -14,7 +14,12 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       </a>
     </div>
     <div class="header-divider"></div>
-    <input class="search-bar" type="text" placeholder="Rechercher" />
+    <form class="search-form" action="<?= $headerBasePath ?>shop/search.php" method="GET" autocomplete="off">
+      <input class="search-bar" type="text" name="q" placeholder="Rechercher"
+        value="<?= htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+        id="searchInput" />
+      <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+    </form>
     <div class="header-divider"></div>
     <a class="profile-photo-container" href="<?= $headerBasePath ?><?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>">
       <img src="<?= $profilePhotoExists ? $headerBasePath . 'uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : $headerBasePath . 'assets/images/default-avatar.svg' ?>"
@@ -171,7 +176,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
         <div class="cookie-category-desc">Essentiels au fonctionnement du site (session, sécurité).</div>
       </div>
       <label class="cookie-toggle">
-        <input type="checkbox" checked disabled>
+        <input type="checkbox" id="cookieNecessary" checked disabled>
         <span class="cookie-toggle-slider"></span>
       </label>
     </div>
@@ -219,3 +224,182 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
 <link rel="stylesheet" href="<?= $headerBasePath ?>styles/cookie-banner.css" />
 <script src="<?= $headerBasePath ?>styles/cookie-banner.js"></script>
+
+<!-- ═══ AUTOCOMPLETE ════════════════════════════════════════ -->
+<script>
+  (function() {
+    var input = document.getElementById('searchInput');
+    var dropdown = document.getElementById('autocompleteDropdown');
+    if (!input || !dropdown) return;
+
+    var basePath = <?= json_encode($headerBasePath) ?>;
+    var debounceTimer = null;
+    var activeIndex = -1;
+    var currentItems = [];
+
+    var categoryIcons = {
+      vetements: 'fa-shirt',
+      electronique: 'fa-laptop',
+      livres: 'fa-book',
+      maison: 'fa-house',
+      sport: 'fa-futbol',
+      vehicules: 'fa-car',
+      autre: 'fa-ellipsis'
+    };
+
+    function escapeHtml(t) {
+      var d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    function hide() {
+      dropdown.classList.remove('visible');
+      activeIndex = -1;
+    }
+
+    function show() {
+      if (dropdown.children.length > 0) dropdown.classList.add('visible');
+    }
+
+    function setActive(idx) {
+      var items = dropdown.querySelectorAll('.ac-item');
+      items.forEach(function(el) {
+        el.classList.remove('ac-active');
+      });
+      if (idx >= 0 && idx < items.length) {
+        items[idx].classList.add('ac-active');
+        items[idx].scrollIntoView({
+          block: 'nearest'
+        });
+      }
+      activeIndex = idx;
+    }
+
+    function doSearch(q) {
+      if (q.length < 2) {
+        hide();
+        dropdown.innerHTML = '';
+        return;
+      }
+
+      fetch(basePath + 'api/autocomplete.php?q=' + encodeURIComponent(q))
+        .then(function(r) {
+          return r.json();
+        })
+        .then(function(data) {
+          dropdown.innerHTML = '';
+          currentItems = [];
+          activeIndex = -1;
+
+          // Category matches
+          if (data.categories && data.categories.length > 0) {
+            data.categories.forEach(function(cat) {
+              var a = document.createElement('a');
+              a.href = basePath + 'shop/search.php?category=' + cat.key;
+              a.className = 'ac-item ac-category';
+              a.innerHTML =
+                '<i class="fa-solid ' + (categoryIcons[cat.key] || 'fa-tag') + ' ac-icon"></i>' +
+                '<div class="ac-text">' +
+                '<span class="ac-label">' + escapeHtml(cat.label) + '</span>' +
+                '<span class="ac-count">' + cat.count + ' annonce' + (cat.count > 1 ? 's' : '') + '</span>' +
+                '</div>' +
+                '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+              dropdown.appendChild(a);
+              currentItems.push(a);
+            });
+          }
+
+          // Listing matches
+          if (data.suggestions && data.suggestions.length > 0) {
+            if (data.categories && data.categories.length > 0) {
+              var sep = document.createElement('div');
+              sep.className = 'ac-separator';
+              dropdown.appendChild(sep);
+            }
+
+            data.suggestions.forEach(function(item) {
+              var a = document.createElement('a');
+              a.href = basePath + 'shop/buy.php?id=' + item.id;
+              a.className = 'ac-item ac-listing';
+
+              var imgHtml = '';
+              if (item.image) {
+                imgHtml = '<img class="ac-thumb" src="' + basePath + 'uploads/listings/' + escapeHtml(item.image) + '" alt="">';
+              } else {
+                imgHtml = '<div class="ac-thumb ac-thumb-empty"><i class="fa-solid fa-image"></i></div>';
+              }
+
+              var price = parseFloat(item.price).toLocaleString('fr-FR', {
+                minimumFractionDigits: 2
+              }) + ' €';
+              a.innerHTML = imgHtml +
+                '<div class="ac-text">' +
+                '<span class="ac-label">' + escapeHtml(item.title) + '</span>' +
+                '<span class="ac-price">' + price + '</span>' +
+                '</div>' +
+                '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+              dropdown.appendChild(a);
+              currentItems.push(a);
+            });
+          }
+
+          // "Voir tous les résultats" link
+          if (data.suggestions.length > 0 || data.categories.length > 0) {
+            var sep2 = document.createElement('div');
+            sep2.className = 'ac-separator';
+            dropdown.appendChild(sep2);
+
+            var allLink = document.createElement('a');
+            allLink.href = basePath + 'shop/search.php?q=' + encodeURIComponent(q);
+            allLink.className = 'ac-item ac-all';
+            allLink.innerHTML =
+              '<i class="fa-solid fa-magnifying-glass ac-icon"></i>' +
+              '<span class="ac-label">Rechercher « ' + escapeHtml(q) + ' »</span>' +
+              '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+            dropdown.appendChild(allLink);
+            currentItems.push(allLink);
+          }
+
+          if (currentItems.length > 0) show();
+          else hide();
+        })
+        .catch(function() {
+          hide();
+        });
+    }
+
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      var q = input.value.trim();
+      debounceTimer = setTimeout(function() {
+        doSearch(q);
+      }, 250);
+    });
+
+    input.addEventListener('focus', function() {
+      if (input.value.trim().length >= 2 && dropdown.children.length > 0) show();
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (!dropdown.classList.contains('visible')) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActive(Math.min(activeIndex + 1, currentItems.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActive(Math.max(activeIndex - 1, -1));
+      } else if (e.key === 'Enter' && activeIndex >= 0) {
+        e.preventDefault();
+        currentItems[activeIndex].click();
+      } else if (e.key === 'Escape') {
+        hide();
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) hide();
+    });
+  })();
+</script>

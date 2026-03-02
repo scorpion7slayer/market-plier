@@ -1,4 +1,4 @@
-/* ═══ COOKIE CONSENT BANNER ═══════════════════════════════════ */
+/* BANNEAU DE CONSENTEMENT AUX COOKIES */
 
 /* Bandeau principal */
 .cookie-banner {
@@ -102,7 +102,7 @@
     color: var(--mp-green);
 }
 
-/* ═══ MODAL PERSONNALISATION ══════════════════════════════════ */
+/* MODAL DE PERSONNALISATION */
 .cookie-modal-overlay {
     display: none;
     position: fixed;
@@ -230,7 +230,7 @@
     flex-wrap: wrap;
 }
 
-/* ═══ RESPONSIVE ══════════════════════════════════════════════ */
+/* RESPONSIVE */
 @media (max-width: 600px) {
     .cookie-banner {
         padding: 16px;

@@ -1,4 +1,4 @@
-/* ═══ THEME VARIABLES ═══════════════════════════════════════════ */
+/* VARIABLES DE THÈME */
 /* Thème clair (par défaut) */
 :root,
 [data-bs-theme="light"] {
@@ -74,7 +74,7 @@
     color-scheme: dark;
 }
 
-/* ═══ BASE THEME APPLICATION ═══════════════════════════════════ */
+/* APPLICATION DU THÈME DE BASE */
 html,
 body {
     background-color: var(--mp-bg) !important;
@@ -84,7 +84,7 @@ body {
         color 0.3s ease;
 }
 
-/* ═══ THEME TOGGLE BUTTON ═════════════════════════════════════ */
+/* BOUTON DE BASCULEMENT DU THÈME */
 .theme-toggle {
     background: none;
     border: none;
@@ -102,7 +102,7 @@ body {
     opacity: 0.8;
 }
 
-/* Icone soleil/lune */
+/* Icône soleil/lune */
 .theme-toggle .fa-sun {
     display: none;
 }
@@ -117,7 +117,7 @@ body {
     display: none;
 }
 
-/* Le header en dark mode */
+/* Header en mode sombre */
 [data-bs-theme="dark"] header {
     background-color: var(--mp-header-bg);
     border-bottom: 1px solid var(--mp-border);
@@ -137,11 +137,29 @@ body {
     color: var(--mp-input-placeholder);
 }
 
+[data-bs-theme="dark"] .autocomplete-dropdown {
+    background: var(--mp-card-bg, #1e1e1e);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .ac-item:hover,
+[data-bs-theme="dark"] .ac-item.ac-active {
+    background: #7fb88520;
+}
+
+[data-bs-theme="dark"] .ac-thumb {
+    background: #333;
+}
+
+[data-bs-theme="dark"] .ac-separator {
+    background: var(--mp-border, #333);
+}
+
 [data-bs-theme="dark"] nav a {
     color: var(--mp-text);
 }
 
-/* ═══ HAMBURGER MENU ═══════════════════════════════════════════ */
+/* MENU HAMBURGER */
 .hamburger-btn {
     display: none;
     background: none;
@@ -289,7 +307,7 @@ body {
     }
 
     .logo-icon {
-        width: 50px;
+        width: auto;
         height: 50px;
     }
 
@@ -343,7 +361,7 @@ body {
     }
 
     .logo-icon {
-        width: 40px;
+        width: auto;
         height: 40px;
     }
 

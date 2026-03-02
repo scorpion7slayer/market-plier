@@ -22,7 +22,7 @@
 
 body {
     font-family: "Archivo", sans-serif;
-    background-color: var(--mp-bg, #F2EFE9);
+    background-color: var(--mp-bg, #f2efe9);
     color: var(--mp-text, #1a1a1a);
     min-height: 100vh;
 }
@@ -113,25 +113,34 @@ header {
     }
 }
 
+.search-form {
+    flex: 1;
+    display: flex;
+    position: relative;
+    margin-right: -150px;
+    margin-left: 20px;
+}
+
 .search-bar {
     background: #ddecd4;
     border: 1.5px solid #b5d4a0;
     border-radius: 30px;
     height: 50px;
-    flex: 1;
+    width: 100%;
     padding: 0 14px;
     font-size: 15px;
     font-style: italic;
     color: #555;
     outline: none;
-    margin-right: -150px;
-    margin-left: 20px;
 }
 
 @media (max-width: 992px) {
-    .search-bar {
+    .search-form {
         margin-left: 10px;
         margin-right: 10px;
+    }
+
+    .search-bar {
         height: 42px;
     }
 }
@@ -139,6 +148,128 @@ header {
 .search-bar::placeholder {
     color: #888;
     font-style: italic;
+}
+
+/* ─── Autocomplete dropdown ─────────────────────────────── */
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--mp-card-bg, #fff);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    padding: 6px 0;
+}
+
+.autocomplete-dropdown.visible {
+    display: block;
+}
+
+.ac-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--mp-text, #333);
+    transition: background 0.15s ease;
+    cursor: pointer;
+}
+
+.ac-item:hover,
+.ac-item.ac-active {
+    background: #7fb88518;
+    text-decoration: none;
+    color: var(--mp-text, #333);
+}
+
+.ac-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #7fb885;
+    flex-shrink: 0;
+}
+
+.ac-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #eee;
+}
+
+.ac-thumb.ac-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 16px;
+}
+
+.ac-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ac-label {
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ac-count {
+    font-size: 11px;
+    color: var(--mp-text-muted, #999);
+    font-style: italic;
+}
+
+.ac-price {
+    font-size: 12px;
+    font-weight: 700;
+    color: #7fb885;
+}
+
+.ac-arrow {
+    font-size: 11px;
+    color: var(--mp-text-muted, #bbb);
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.ac-item:hover .ac-arrow,
+.ac-item.ac-active .ac-arrow {
+    opacity: 1;
+}
+
+.ac-separator {
+    height: 1px;
+    background: var(--mp-border, #eee);
+    margin: 4px 12px;
+}
+
+.ac-all {
+    font-style: italic;
+    color: var(--mp-text-muted, #888);
+}
+
+.ac-all .ac-label {
+    font-weight: 500;
+    font-style: italic;
+    font-size: 13px;
 }
 
 .search-bar:focus {
