@@ -69,3 +69,76 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     </button>
   </div>
 </div>
+
+<?php if (isset($_SESSION['auth_token'])): ?>
+  <!-- Modal compte supprimé -->
+  <div class="deleted-account-overlay" id="deletedAccountOverlay">
+    <div class="deleted-account-modal">
+      <div class="deleted-account-icon">
+        <i class="fa-solid fa-user-slash"></i>
+      </div>
+      <h3 class="deleted-account-title">Compte supprimé</h3>
+      <p class="deleted-account-text">
+        Votre compte a été supprimé par un administrateur.<br>
+        Vous allez être déconnecté automatiquement.
+      </p>
+      <button class="deleted-account-btn" onclick="window.location.href='<?= $headerBasePath ?>inscription-connexion/logout.php'">
+        <i class="fa-solid fa-right-from-bracket"></i> Fermer
+      </button>
+      <div class="deleted-account-countdown" id="deletedCountdown"></div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      var basePath = <?= json_encode($headerBasePath) ?>;
+      var checkUrl = basePath + 'api/check_session.php';
+      var logoutUrl = basePath + 'inscription-connexion/logout.php';
+      var intervalId = null;
+      var shown = false;
+
+      function showDeletedModal() {
+        if (shown) return;
+        shown = true;
+        if (intervalId) clearInterval(intervalId);
+
+        var overlay = document.getElementById('deletedAccountOverlay');
+        var countdown = document.getElementById('deletedCountdown');
+        if (!overlay) return;
+
+        overlay.classList.add('visible');
+
+        var seconds = 8;
+        countdown.textContent = 'Redirection dans ' + seconds + 's...';
+        var timer = setInterval(function() {
+          seconds--;
+          if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = logoutUrl;
+          } else {
+            countdown.textContent = 'Redirection dans ' + seconds + 's...';
+          }
+        }, 1000);
+      }
+
+      function checkSession() {
+        fetch(checkUrl, {
+            credentials: 'same-origin'
+          })
+          .then(function(r) {
+            return r.json();
+          })
+          .then(function(data) {
+            if (!data.valid) showDeletedModal();
+          })
+          .catch(function() {});
+      }
+
+      // Vérifier toutes les 10 secondes
+      intervalId = setInterval(checkSession, 10000);
+      // Vérifier aussi au retour sur l'onglet
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && !shown) checkSession();
+      });
+    })();
+  </script>
+<?php endif; ?>
