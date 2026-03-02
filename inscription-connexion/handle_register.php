@@ -15,8 +15,7 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_to
   exit;
 }
 
-// Régénérer le token CSRF après utilisation
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Token CSRF par session : pas de régénération après chaque requête
 
 if (empty($_POST['username']) || empty($_POST['email']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
   header("Location: register.php?error=" . urlencode("Veuillez remplir tous les champs"));
@@ -58,7 +57,7 @@ try {
       exit;
     }
     // Vérifier plus précisément si c'est le username ou l'email qui est en doublon
-    $checkUsername = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+    $checkUsername = $pdo->prepare("SELECT 1 FROM users WHERE username = ?");
     $checkUsername->execute([$_POST['username']]);
     if ($checkUsername->fetch()) {
       header("Location: register.php?error=" . urlencode("Ce nom d'utilisateur est déjà utilisé."));
@@ -69,7 +68,7 @@ try {
   }
 
   // Vérifier si le username existe déjà
-  $checkUsername = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+  $checkUsername = $pdo->prepare("SELECT 1 FROM users WHERE username = ?");
   $checkUsername->execute([$_POST['username']]);
   if ($checkUsername->fetch()) {
     header("Location: register.php?error=" . urlencode("Ce nom d'utilisateur est déjà utilisé."));

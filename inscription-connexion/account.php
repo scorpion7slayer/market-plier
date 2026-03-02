@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])
                 $upsert = $pdo->prepare("INSERT INTO profile (auth_token, description) VALUES (?, ?)
                     ON DUPLICATE KEY UPDATE description = VALUES(description)");
                 $upsert->execute([$_SESSION['auth_token'], $newDescription]);
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 header('Location: account.php?success=description');
                 exit();
             } catch (PDOException $ex) {
@@ -65,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])
                 error_log("Error updating description: " . $ex->getMessage());
             }
         }
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
 }
 
@@ -115,17 +113,16 @@ try {
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Plier - Profil Utilisateur</title>
-    <!-- Bootstrap local -->
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <!-- FontAwesome local -->
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../styles/account.css">
+    <link rel="stylesheet" href="../styles/theme.css">
     <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
 </head>
 
@@ -171,14 +168,10 @@ try {
                     <aside class="profile-sidebar">
                         <div class="profile-header">
                             <div class="avatar-container">
-                                <?php if ($profilePhotoExists): ?>
-                                    <img src="../uploads/profiles/<?= htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') ?>"
-                                        alt="Photo de profil"
-                                        class="avatar"
-                                        style="object-fit: cover;">
-                                <?php else: ?>
-                                    <div class="avatar"></div>
-                                <?php endif; ?>
+                                <img src="<?= $profilePhotoExists ? '../uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : '../assets/images/default-avatar.svg' ?>"
+                                    alt="Photo de profil"
+                                    class="avatar"
+                                    style="object-fit: cover;">
                             </div>
                             <div class="username-section">
                                 <div class="username"><?= $username ?></div>
@@ -219,7 +212,7 @@ try {
 
                         <!-- Boutons d'actions -->
                         <div class="profile-actions">
-                            <a href="dashboard.php" class="btn btn-brand">
+                            <a href="../settings/settings.php" class="btn btn-brand">
                                 <i class="fa-solid fa-gear"></i> Gérer le compte
                             </a>
                         </div>
@@ -335,8 +328,8 @@ try {
         </div>
     </div>
 
-    <!-- Bootstrap JS local -->
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../styles/theme.js"></script>
     <script>
         var listingIdToDelete = null;
 
