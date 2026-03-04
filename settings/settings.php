@@ -7,6 +7,7 @@ try {
   error_log("DB connection error (settings): " . $e->getMessage());
 }
 require_once '../includes/remember_me.php';
+require_once __DIR__ . '/settings_handlers.php';
 
 if (!isset($_SESSION['auth_token'])) {
   header('Location: ../inscription-connexion/login.php');
@@ -17,221 +18,25 @@ if (!isset($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$isAdmin = false;
-$username = $_SESSION['username'] ?? '';
-$email = '';
-$profilePhoto = null;
-$authProvider = 'local';
-$hasPassword = false;
-$successMessage = '';
-$errorMessage = '';
+// --- INITIALISATION ET TRAITEMENT ---
+$state = initPageState($pdo ?? null);
 
-// Message de succès via query param (après upload XHR)
-if (isset($_GET['success']) && $_GET['success'] === 'photo') {
-  $successMessage = "Photo de profil mise à jour !";
+if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+  handlePhotoUpload($pdo, $state);
+  handleUpdateProfile($pdo, $state);
+  handleChangePassword($pdo, $state);
+  handleDeleteAccount($pdo, $state);
 }
 
-// Récupérer les informations utilisateur
-if (isset($pdo)) {
-  try {
-    $stmt = $pdo->prepare("SELECT username, email, is_admin, profile_photo, auth_provider, password_hash FROM users WHERE auth_token = ?");
-    $stmt->execute([$_SESSION['auth_token']]);
-    $userData = $stmt->fetch();
-
-    if ($userData) {
-      $username = $userData['username'];
-      $email = $userData['email'];
-      $isAdmin = ($userData['is_admin'] == 1);
-      $profilePhoto = $userData['profile_photo'];
-      $authProvider = $userData['auth_provider'] ?? 'local';
-      $hasPassword = !empty($userData['password_hash']);
-    } else {
-      // Compte supprimé par un admin
-      $_SESSION = [];
-      if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
-      }
-      session_destroy();
-      header('Location: ../index.php?account_deleted=1');
-      exit();
-    }
-  } catch (PDOException $ex) {
-    error_log("Error fetching user data: " . $ex->getMessage());
-  }
-}
-
-// --- TRAITEMENT DES FORMULAIRES POST ---
-
-// Upload de photo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['changer_photo'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-      $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      $maxSize = 5 * 1024 * 1024;
-      $fileType = $_FILES['photo']['type'];
-      $fileSize = $_FILES['photo']['size'];
-
-      if (!in_array($fileType, $allowedTypes)) {
-        $errorMessage = "Format non autorisé. Utilisez JPG, PNG ou WEBP.";
-      } elseif ($fileSize > $maxSize) {
-        $errorMessage = "Fichier trop volumineux (max 5MB).";
-      } else {
-        $uploadDir = '../uploads/profiles/';
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-
-        $extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-        $newFileName = 'user_' . $_SESSION['auth_token'] . '_' . time() . '.' . $extension;
-        $uploadPath = $uploadDir . $newFileName;
-
-        if ($profilePhoto && file_exists($uploadDir . $profilePhoto)) {
-          unlink($uploadDir . $profilePhoto);
-        }
-
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadPath)) {
-          try {
-            $pdo->prepare("UPDATE users SET profile_photo = ? WHERE auth_token = ?")->execute([$newFileName, $_SESSION['auth_token']]);
-            $profilePhoto = $newFileName;
-            $successMessage = "Photo de profil mise à jour !";
-          } catch (PDOException $ex) {
-            $errorMessage = "Erreur lors de la mise à jour.";
-            error_log("Error updating profile photo: " . $ex->getMessage());
-          }
-        } else {
-          $errorMessage = "Erreur lors de l'upload.";
-        }
-      }
-    } else {
-      $errorMessage = "Aucun fichier sélectionné.";
-    }
-  }
-}
-
-// Mise à jour du profil
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    $newUsername = trim($_POST['username'] ?? '');
-    $newEmail = trim($_POST['email'] ?? '');
-
-    if (empty($newUsername) || empty($newEmail)) {
-      $errorMessage = "Tous les champs sont requis.";
-    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $newUsername)) {
-      $errorMessage = "Nom d'utilisateur : 3-30 caractères alphanumériques.";
-    } elseif (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-      $errorMessage = "Adresse email invalide.";
-    } else {
-      try {
-        $check = $pdo->prepare("SELECT auth_token FROM users WHERE (username = ? OR email = ?) AND auth_token != ?");
-        $check->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
-        if ($check->fetch()) {
-          $errorMessage = "Ce nom d'utilisateur ou email est déjà utilisé.";
-        } else {
-          $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE auth_token = ?")->execute([$newUsername, $newEmail, $_SESSION['auth_token']]);
-          $username = $newUsername;
-          $email = $newEmail;
-          $_SESSION['username'] = $newUsername;
-          $successMessage = "Profil mis à jour !";
-        }
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la mise à jour.";
-        error_log("Error updating profile: " . $ex->getMessage());
-      }
-    }
-  }
-}
-
-// Changement de mot de passe
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-
-    if (empty($currentPassword) && $hasPassword) {
-      $errorMessage = "Veuillez entrer votre mot de passe actuel.";
-    } elseif (empty($newPassword) || empty($confirmPassword)) {
-      $errorMessage = "Veuillez remplir tous les champs.";
-    } elseif (strlen($newPassword) < 6) {
-      $errorMessage = "Minimum 6 caractères pour le mot de passe.";
-    } elseif ($newPassword !== $confirmPassword) {
-      $errorMessage = "Les mots de passe ne correspondent pas.";
-    } else {
-      try {
-        if ($hasPassword) {
-          $pwdStmt = $pdo->prepare("SELECT password_hash FROM users WHERE auth_token = ?");
-          $pwdStmt->execute([$_SESSION['auth_token']]);
-          $pwdData = $pwdStmt->fetch();
-          if (!$pwdData || !password_verify($currentPassword, $pwdData['password_hash'])) {
-            $errorMessage = "Mot de passe actuel incorrect.";
-          }
-        }
-        if (empty($errorMessage)) {
-          $newHash = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12]);
-          $pdo->prepare("UPDATE users SET password_hash = ? WHERE auth_token = ?")->execute([$newHash, $_SESSION['auth_token']]);
-          $hasPassword = true;
-          $successMessage = "Mot de passe modifié !";
-        }
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors du changement de mot de passe.";
-        error_log("Error changing password: " . $ex->getMessage());
-      }
-    }
-  }
-}
-
-// Suppression de compte
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token de sécurité invalide.";
-  } else {
-    $confirmEmail = trim($_POST['confirm_email'] ?? '');
-    $confirmPassword = $_POST['confirm_delete_password'] ?? '';
-
-    if (empty($confirmEmail)) {
-      $errorMessage = "Entrez votre email pour confirmer.";
-    } elseif ($confirmEmail !== $email) {
-      $errorMessage = "L'email ne correspond pas.";
-    } elseif ($hasPassword && empty($confirmPassword)) {
-      $errorMessage = "Entrez votre mot de passe pour confirmer.";
-    } else {
-      try {
-        if ($hasPassword) {
-          $pwdStmt = $pdo->prepare("SELECT password_hash FROM users WHERE auth_token = ?");
-          $pwdStmt->execute([$_SESSION['auth_token']]);
-          $pwdData = $pwdStmt->fetch();
-          if (!$pwdData || !password_verify($confirmPassword, $pwdData['password_hash'])) {
-            $errorMessage = "Mot de passe incorrect.";
-          }
-        }
-        if (empty($errorMessage)) {
-          if ($profilePhoto && file_exists('../uploads/profiles/' . basename($profilePhoto))) {
-            unlink('../uploads/profiles/' . basename($profilePhoto));
-          }
-          $pdo->prepare("DELETE FROM users WHERE auth_token = ?")->execute([$_SESSION['auth_token']]);
-          session_destroy();
-          header('Location: ../index.php?account_deleted=1');
-          exit();
-        }
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la suppression.";
-        error_log("Error deleting account: " . $ex->getMessage());
-      }
-    }
-  }
-}
+extract($state);
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php include '../includes/theme_init.php'; ?>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/settings.css">
