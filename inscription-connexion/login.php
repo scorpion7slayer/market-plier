@@ -14,11 +14,12 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php include '../includes/theme_init.php'; ?>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/register.css">

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Remember Me - Auto-login via cookie persistant.
- * À inclure APRÈS session_start() et require db.php.
- *
- * Si l'utilisateur n'a pas de session active mais possède un cookie
- * "mp_remember", on vérifie le token en base et on restaure la session.
- */
 if (!isset($_SESSION['auth_token']) && isset($_COOKIE['mp_remember'])) {
   $rememberToken = $_COOKIE['mp_remember'];
 

@@ -315,7 +315,6 @@ nav a:hover {
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 4px 15px rgba(127, 184, 133, 0.3);
 }
 
 /* CONTENU PRINCIPAL */
@@ -814,41 +813,110 @@ nav a:hover {
     .articles-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    .profile-section {
+        gap: 30px;
+    }
+
+    .profile-sidebar {
+        width: 280px;
+    }
+
+    .username {
+        font-size: 38px;
+    }
+
+    .description-title {
+        font-size: 26px;
+    }
 }
 
 @media (max-width: 768px) {
     .username {
-        font-size: 36px;
-    }
-
-    header {
-        padding: 0 15px;
+        font-size: 30px;
     }
 
     .container-fluid {
         padding: 20px;
     }
 
-    .header-bottom {
-        padding-left: 20px;
-        margin-left: 0;
+    .profile-section {
+        flex-direction: column;
+        gap: 20px;
     }
 
-    nav {
-        gap: 20px;
+    .profile-sidebar {
+        width: 100%;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .description-title {
+        font-size: 22px;
+    }
+
+    .description-text {
+        font-size: 16px;
     }
 
     .articles-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .profile-actions {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
-    .articles-grid {
-        grid-template-columns: 1fr;
+    .container-fluid {
+        padding: 15px 12px;
     }
 
-    .logo-text {
-        display: none;
+    .username {
+        font-size: 24px;
+    }
+
+    .articles-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .article-info {
+        padding: 10px;
+    }
+
+    .article-title {
+        font-size: 14px;
+        min-height: auto;
+    }
+
+    .article-price {
+        font-size: 16px;
+    }
+
+    .description-section {
+        margin-top: 20px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .profile-actions {
+        gap: 10px;
+    }
+
+    .btn-brand {
+        padding: 8px 18px;
+        font-size: 0.9rem;
     }
 }

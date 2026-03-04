@@ -461,6 +461,54 @@
     }
 }
 
+/* Petit mobile */
+@media (max-width: 480px) {
+    .buy-main {
+        padding: 12px 10px 40px;
+    }
+
+    .buy-price {
+        font-size: 1.3rem;
+    }
+
+    .buy-title {
+        font-size: 0.95rem;
+    }
+
+    .buy-card {
+        padding: 14px 12px;
+        border-radius: 10px;
+    }
+
+    .gallery-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+    }
+
+    .buy-tag {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+
+    .seller-avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    .buy-section-title {
+        font-size: 0.92rem;
+    }
+
+    .buy-description-text {
+        font-size: 0.85rem;
+    }
+
+    .buy-breadcrumb a {
+        font-size: 0.82rem;
+    }
+}
+
 /* SURCHARGES MODE SOMBRE */
 [data-bs-theme="dark"] .gallery-nav {
     background: rgba(30, 29, 28, 0.85);

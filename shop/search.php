@@ -73,11 +73,12 @@ $stmt->execute($stmtParams);
 $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <?php include '../includes/theme_init.php'; ?>
   <title>Recherche — Market Plier</title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">

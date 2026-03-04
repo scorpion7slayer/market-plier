@@ -9,130 +9,196 @@ try {
 }
 require_once '../includes/remember_me.php';
 
-if (!isset($_SESSION['auth_token'])) {
-  header('Location: ../inscription-connexion/login.php');
-  exit();
+// --- FONCTIONS ---
+
+function initAdminPage($pdo)
+{
+  if (!isset($_SESSION['auth_token'])) {
+    header('Location: ../inscription-connexion/login.php');
+    exit();
+  }
+  if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  }
+  $currentToken = $_SESSION['auth_token'];
+  if (!checkIsAdmin($pdo, $currentToken)) {
+    header('Location: settings.php');
+    exit();
+  }
+  return $currentToken;
 }
 
-if (!isset($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Vérifier que l'utilisateur est admin
-$isAdmin = false;
-$currentToken = $_SESSION['auth_token'];
-if (isset($pdo)) {
+function checkIsAdmin($pdo, $token)
+{
+  if (!isset($pdo)) return false;
   $stmt = $pdo->prepare("SELECT is_admin FROM users WHERE auth_token = ?");
-  $stmt->execute([$currentToken]);
+  $stmt->execute([$token]);
   $check = $stmt->fetch();
-  $isAdmin = $check && $check['is_admin'] == 1;
+  return $check && $check['is_admin'] == 1;
 }
 
-if (!$isAdmin) {
-  header('Location: settings.php');
-  exit();
+function fetchAdminData($pdo)
+{
+  $data = ['users' => [], 'listings' => [], 'stats' => ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0]];
+  try {
+    $data['stats']['users'] = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    $data['stats']['listings'] = $pdo->query("SELECT COUNT(*) FROM listings")->fetchColumn();
+    $data['stats']['admins'] = $pdo->query("SELECT COUNT(*) FROM users WHERE is_admin = 1")->fetchColumn();
+    $data['stats']['new_month'] = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
+    $data['users'] = $pdo->query("SELECT username, email, auth_provider, is_admin, created_at, auth_token, profile_photo FROM users ORDER BY created_at DESC")->fetchAll();
+    $data['listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT 20")->fetchAll();
+  } catch (PDOException $ex) {
+    error_log("Error fetching admin data: " . $ex->getMessage());
+  }
+  return $data;
 }
 
+/**
+ * Validate CSRF token
+ */
+function validateCsrfToken()
+{
+  return isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token'];
+}
+
+/**
+ * Handle toggle admin action
+ */
+function handleToggleAdmin($pdo, $currentToken, &$successMessage, &$errorMessage)
+{
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['toggle_admin'])) {
+    return;
+  }
+
+  if (!validateCsrfToken()) {
+    $errorMessage = "Token CSRF invalide.";
+    return;
+  }
+
+  $targetToken = $_POST['target_token'] ?? '';
+  $newStatus = (int) ($_POST['new_admin_status'] ?? 0);
+
+  if ($targetToken === $currentToken) {
+    $errorMessage = "Vous ne pouvez pas modifier votre propre statut admin.";
+    return;
+  }
+
+  if (empty($targetToken)) {
+    return;
+  }
+
+  try {
+    $pdo->prepare("UPDATE users SET is_admin = ? WHERE auth_token = ?")->execute([$newStatus, $targetToken]);
+    $successMessage = $newStatus ? "Utilisateur promu administrateur." : "Droits admin retirés.";
+  } catch (PDOException $ex) {
+    $errorMessage = "Erreur lors de la modification.";
+    error_log("Error toggling admin: " . $ex->getMessage());
+  }
+}
+
+/**
+ * Delete user profile photo
+ */
+function deleteUserProfilePhoto($pdo, $targetToken)
+{
+  $photoStmt = $pdo->prepare("SELECT profile_photo FROM users WHERE auth_token = ?");
+  $photoStmt->execute([$targetToken]);
+  $photoData = $photoStmt->fetch();
+
+  if ($photoData && $photoData['profile_photo']) {
+    $photoPath = '../uploads/profiles/' . $photoData['profile_photo'];
+    if (file_exists($photoPath)) {
+      unlink($photoPath);
+    }
+  }
+}
+
+/**
+ * Handle delete user action
+ */
+function handleDeleteUser($pdo, $currentToken, &$successMessage, &$errorMessage)
+{
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['delete_user'])) {
+    return;
+  }
+
+  if (!validateCsrfToken()) {
+    $errorMessage = "Token CSRF invalide.";
+    return;
+  }
+
+  $targetToken = $_POST['target_token'] ?? '';
+
+  if ($targetToken === $currentToken) {
+    $errorMessage = "Vous ne pouvez pas supprimer votre propre compte ici.";
+    return;
+  }
+
+  if (empty($targetToken)) {
+    return;
+  }
+
+  try {
+    deleteUserProfilePhoto($pdo, $targetToken);
+    $pdo->prepare("DELETE FROM users WHERE auth_token = ?")->execute([$targetToken]);
+    $successMessage = "Utilisateur supprimé.";
+  } catch (PDOException $ex) {
+    $errorMessage = "Erreur lors de la suppression.";
+    error_log("Error deleting user: " . $ex->getMessage());
+  }
+}
+
+/**
+ * Handle delete listing action
+ */
+function handleDeleteListing($pdo, &$successMessage, &$errorMessage)
+{
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['delete_listing'])) {
+    return;
+  }
+
+  if (!validateCsrfToken()) {
+    $errorMessage = "Token CSRF invalide.";
+    return;
+  }
+
+  $listingId = (int) ($_POST['listing_id'] ?? 0);
+
+  if ($listingId <= 0) {
+    return;
+  }
+
+  try {
+    $pdo->prepare("DELETE FROM listings WHERE id = ?")->execute([$listingId]);
+    $successMessage = "Annonce supprimée.";
+  } catch (PDOException $ex) {
+    $errorMessage = "Erreur lors de la suppression.";
+    error_log("Error deleting listing: " . $ex->getMessage());
+  }
+}
+
+// --- INITIALISATION ---
+$currentToken = initAdminPage($pdo);
 $successMessage = '';
 $errorMessage = '';
 
-// --- ACTIONS ADMIN ---
+// Process admin actions
+handleToggleAdmin($pdo, $currentToken, $successMessage, $errorMessage);
+handleDeleteUser($pdo, $currentToken, $successMessage, $errorMessage);
+handleDeleteListing($pdo, $successMessage, $errorMessage);
 
-// Toggle admin
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_admin'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token CSRF invalide.";
-  } else {
-    $targetToken = $_POST['target_token'] ?? '';
-    $newStatus = (int) ($_POST['new_admin_status'] ?? 0);
-
-    if ($targetToken === $currentToken) {
-      $errorMessage = "Vous ne pouvez pas modifier votre propre statut admin.";
-    } elseif (!empty($targetToken)) {
-      try {
-        $pdo->prepare("UPDATE users SET is_admin = ? WHERE auth_token = ?")->execute([$newStatus, $targetToken]);
-        $successMessage = $newStatus ? "Utilisateur promu administrateur." : "Droits admin retirés.";
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la modification.";
-        error_log("Error toggling admin: " . $ex->getMessage());
-      }
-    }
-  }
-}
-
-// Supprimer un utilisateur
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token CSRF invalide.";
-  } else {
-    $targetToken = $_POST['target_token'] ?? '';
-
-    if ($targetToken === $currentToken) {
-      $errorMessage = "Vous ne pouvez pas supprimer votre propre compte ici.";
-    } elseif (!empty($targetToken)) {
-      try {
-        // Supprimer photo de profil
-        $photoStmt = $pdo->prepare("SELECT profile_photo FROM users WHERE auth_token = ?");
-        $photoStmt->execute([$targetToken]);
-        $photoData = $photoStmt->fetch();
-        if ($photoData && $photoData['profile_photo'] && file_exists('../uploads/profiles/' . $photoData['profile_photo'])) {
-          unlink('../uploads/profiles/' . $photoData['profile_photo']);
-        }
-
-        $pdo->prepare("DELETE FROM users WHERE auth_token = ?")->execute([$targetToken]);
-        $successMessage = "Utilisateur supprimé.";
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la suppression.";
-        error_log("Error deleting user: " . $ex->getMessage());
-      }
-    }
-  }
-}
-
-// Supprimer une annonce
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_listing'])) {
-  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    $errorMessage = "Token CSRF invalide.";
-  } else {
-    $listingId = (int) ($_POST['listing_id'] ?? 0);
-    if ($listingId > 0) {
-      try {
-        $pdo->prepare("DELETE FROM listings WHERE id = ?")->execute([$listingId]);
-        $successMessage = "Annonce supprimée.";
-      } catch (PDOException $ex) {
-        $errorMessage = "Erreur lors de la suppression.";
-        error_log("Error deleting listing: " . $ex->getMessage());
-      }
-    }
-  }
-}
-
-// --- FETCH DATA ---
-$users = [];
-$listings = [];
-$stats = ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0];
-
-try {
-  // Statistiques
-  $stats['users'] = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-  $stats['listings'] = $pdo->query("SELECT COUNT(*) FROM listings")->fetchColumn();
-  $stats['admins'] = $pdo->query("SELECT COUNT(*) FROM users WHERE is_admin = 1")->fetchColumn();
-  $stats['new_month'] = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
-
-  // Utilisateurs
-  $users = $pdo->query("SELECT username, email, auth_provider, is_admin, created_at, auth_token, profile_photo FROM users ORDER BY created_at DESC")->fetchAll();
-
-  // Annonces récentes
-  $listings = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT 20")->fetchAll();
-} catch (PDOException $ex) {
-  error_log("Error fetching admin data: " . $ex->getMessage());
-}
+// Fetch data
+$adminData = fetchAdminData($pdo);
+$users = $adminData['users'];
+$listings = $adminData['listings'];
+$stats = $adminData['stats'];
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
+  <?php include '../includes/theme_init.php'; ?>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">

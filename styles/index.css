@@ -349,13 +349,12 @@ nav a {
 
 /* MAIN */
 main {
-    /* Fill remaining height after header (140px) */
-    height: calc(100vh - 140px);
-    padding: 20px 30px 10px 30px;
+    min-height: calc(100vh - 140px);
+    padding: 20px 30px 30px 30px;
     display: flex;
     flex-direction: column;
     gap: 0;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .greeting {
@@ -370,11 +369,9 @@ main {
 
 /* SECTION */
 section {
-    flex: 1;
-    min-height: 0;
     display: flex;
     flex-direction: column;
-    margin-top: 50px;
+    margin-top: 10px;
 }
 
 section + section {
@@ -389,7 +386,8 @@ section + section {
     color: var(--mp-text, #111);
     padding-bottom: 8px;
     border-bottom: 1.5px solid var(--mp-border, #ccc);
-    margin-top: 50px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
 }
 
 /* CARDS ROW */

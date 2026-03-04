@@ -20,7 +20,14 @@ if (isset($_SESSION['auth_token'])) {
     $_SESSION = [];
     if (ini_get("session.use_cookies")) {
       $params = session_get_cookie_params();
-      setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+      setcookie(ini_get('session.name'), '', [
+        'expires' => time() - 42000,
+        'path' => $params['path'],
+        'domain' => $params['domain'],
+        'secure' => $params['secure'],
+        'httponly' => $params['httponly'],
+        'samesite' => $params['samesite'] ?? 'Lax'
+      ]);
     }
     session_destroy();
     header('Location: index.php?account_deleted=1');
@@ -42,11 +49,12 @@ if ($user) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <?php include 'includes/theme_init.php'; ?>
   <title>Market Plier</title>
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
