@@ -98,13 +98,6 @@ header {
     display: block;
 }
 
-@media (max-width: 992px) {
-    .logo-icon .logo-img,
-    .logo-icon img {
-        /* already no extra margin */
-    }
-}
-
 .logo-icon svg {
     width: 100%;
     height: 100%;

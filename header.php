@@ -276,6 +276,61 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       activeIndex = idx;
     }
 
+    function createCategoryLink(cat) {
+      var a = document.createElement('a');
+      a.href = basePath + 'shop/search.php?category=' + cat.key;
+      a.className = 'ac-item ac-category';
+      a.innerHTML =
+        '<i class="fa-solid ' + (categoryIcons[cat.key] || 'fa-tag') + ' ac-icon"></i>' +
+        '<div class="ac-text">' +
+        '<span class="ac-label">' + escapeHtml(cat.label) + '</span>' +
+        '<span class="ac-count">' + cat.count + ' annonce' + (cat.count > 1 ? 's' : '') + '</span>' +
+        '</div>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      return a;
+    }
+
+    function createListingLink(item) {
+      var a = document.createElement('a');
+      a.href = basePath + 'shop/buy.php?id=' + item.id;
+      a.className = 'ac-item ac-listing';
+
+      var imgHtml = '';
+      if (item.image) {
+        imgHtml = '<img class="ac-thumb" src="' + basePath + 'uploads/listings/' + escapeHtml(item.image) + '" alt="">';
+      } else {
+        imgHtml = '<div class="ac-thumb ac-thumb-empty"><i class="fa-solid fa-image"></i></div>';
+      }
+
+      var price = parseFloat(item.price).toLocaleString('fr-FR', {
+        minimumFractionDigits: 2
+      }) + ' €';
+      a.innerHTML = imgHtml +
+        '<div class="ac-text">' +
+        '<span class="ac-label">' + escapeHtml(item.title) + '</span>' +
+        '<span class="ac-price">' + price + '</span>' +
+        '</div>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      return a;
+    }
+
+    function createSearchAllLink(q) {
+      var allLink = document.createElement('a');
+      allLink.href = basePath + 'shop/search.php?q=' + encodeURIComponent(q);
+      allLink.className = 'ac-item ac-all';
+      allLink.innerHTML =
+        '<i class="fa-solid fa-magnifying-glass ac-icon"></i>' +
+        '<span class="ac-label">Rechercher « ' + escapeHtml(q) + ' »</span>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      return allLink;
+    }
+
+    function appendSeparator() {
+      var sep = document.createElement('div');
+      sep.className = 'ac-separator';
+      dropdown.appendChild(sep);
+    }
+
     function doSearch(q) {
       if (q.length < 2) {
         hide();
@@ -292,71 +347,27 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
           currentItems = [];
           activeIndex = -1;
 
-          // Category matches
           if (data.categories && data.categories.length > 0) {
             data.categories.forEach(function(cat) {
-              var a = document.createElement('a');
-              a.href = basePath + 'shop/search.php?category=' + cat.key;
-              a.className = 'ac-item ac-category';
-              a.innerHTML =
-                '<i class="fa-solid ' + (categoryIcons[cat.key] || 'fa-tag') + ' ac-icon"></i>' +
-                '<div class="ac-text">' +
-                '<span class="ac-label">' + escapeHtml(cat.label) + '</span>' +
-                '<span class="ac-count">' + cat.count + ' annonce' + (cat.count > 1 ? 's' : '') + '</span>' +
-                '</div>' +
-                '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+              var a = createCategoryLink(cat);
               dropdown.appendChild(a);
               currentItems.push(a);
             });
           }
 
-          // Listing matches
           if (data.suggestions && data.suggestions.length > 0) {
-            if (data.categories && data.categories.length > 0) {
-              var sep = document.createElement('div');
-              sep.className = 'ac-separator';
-              dropdown.appendChild(sep);
-            }
+            if (data.categories && data.categories.length > 0) appendSeparator();
 
             data.suggestions.forEach(function(item) {
-              var a = document.createElement('a');
-              a.href = basePath + 'shop/buy.php?id=' + item.id;
-              a.className = 'ac-item ac-listing';
-
-              var imgHtml = '';
-              if (item.image) {
-                imgHtml = '<img class="ac-thumb" src="' + basePath + 'uploads/listings/' + escapeHtml(item.image) + '" alt="">';
-              } else {
-                imgHtml = '<div class="ac-thumb ac-thumb-empty"><i class="fa-solid fa-image"></i></div>';
-              }
-
-              var price = parseFloat(item.price).toLocaleString('fr-FR', {
-                minimumFractionDigits: 2
-              }) + ' €';
-              a.innerHTML = imgHtml +
-                '<div class="ac-text">' +
-                '<span class="ac-label">' + escapeHtml(item.title) + '</span>' +
-                '<span class="ac-price">' + price + '</span>' +
-                '</div>' +
-                '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+              var a = createListingLink(item);
               dropdown.appendChild(a);
               currentItems.push(a);
             });
           }
 
-          // "Voir tous les résultats" link
           if (data.suggestions.length > 0 || data.categories.length > 0) {
-            var sep2 = document.createElement('div');
-            sep2.className = 'ac-separator';
-            dropdown.appendChild(sep2);
-
-            var allLink = document.createElement('a');
-            allLink.href = basePath + 'shop/search.php?q=' + encodeURIComponent(q);
-            allLink.className = 'ac-item ac-all';
-            allLink.innerHTML =
-              '<i class="fa-solid fa-magnifying-glass ac-icon"></i>' +
-              '<span class="ac-label">Rechercher « ' + escapeHtml(q) + ' »</span>' +
-              '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+            appendSeparator();
+            var allLink = createSearchAllLink(q);
             dropdown.appendChild(allLink);
             currentItems.push(allLink);
           }

@@ -43,29 +43,31 @@ function validateForm(form) {
     return isValid;
 }
 
-function getErrorMessage(field, form) {
-    if (field.validity.valueMissing) {
-        return "Ce champ est obligatoire";
-    }
-    if (field.validity.typeMismatch && field.type === "email") {
+function getValidityError(field) {
+    if (field.validity.valueMissing) return "Ce champ est obligatoire";
+    if (field.validity.typeMismatch && field.type === "email")
         return "Veuillez saisir une adresse email valide";
-    }
     if (field.validity.tooShort) {
         var n = field.minLength;
         return "Minimum " + n + " caractère" + (n > 1 ? "s" : "") + " requis";
     }
-    if (field.validity.patternMismatch) {
+    if (field.validity.patternMismatch)
         return field.dataset.patternMessage || "Format invalide";
-    }
-    if (field.name === "confirm_password" && field.value !== "") {
-        var ref =
-            form.querySelector('[name="new_password"]') ||
-            form.querySelector('[name="password"]');
-        if (ref && field.value !== ref.value) {
-            return "Les mots de passe ne correspondent pas";
-        }
-    }
     return null;
+}
+
+function getPasswordMismatch(field, form) {
+    if (field.name !== "confirm_password" || field.value === "") return null;
+    var ref =
+        form.querySelector('[name="new_password"]') ||
+        form.querySelector('[name="password"]');
+    if (ref && field.value !== ref.value)
+        return "Les mots de passe ne correspondent pas";
+    return null;
+}
+
+function getErrorMessage(field, form) {
+    return getValidityError(field) || getPasswordMismatch(field, form);
 }
 
 function showFieldError(field, message) {
