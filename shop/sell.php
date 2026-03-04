@@ -253,6 +253,37 @@ try {
             uploadPlaceholder.style.display = selectedFiles.length >= maxFiles ? 'none' : 'flex';
         }
 
+        function setupSellDragDrop(wrapper, index) {
+            wrapper.addEventListener('dragstart', function(e) {
+                wrapper.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', index);
+            });
+            wrapper.addEventListener('dragend', function() {
+                wrapper.classList.remove('dragging');
+            });
+            wrapper.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                wrapper.classList.add('drag-over');
+            });
+            wrapper.addEventListener('dragleave', function() {
+                wrapper.classList.remove('drag-over');
+            });
+            wrapper.addEventListener('drop', function(e) {
+                e.preventDefault();
+                wrapper.classList.remove('drag-over');
+                var draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                var targetIndex = parseInt(wrapper.getAttribute('data-index'));
+                if (draggedIndex !== targetIndex) {
+                    var temp = selectedFiles[draggedIndex];
+                    selectedFiles.splice(draggedIndex, 1);
+                    selectedFiles.splice(targetIndex, 0, temp);
+                    renderPreviews();
+                }
+            });
+        }
+
         function createPhotoPreview(file, index) {
             var wrapper = document.createElement('div');
             wrapper.className = 'photo-preview-wrapper';
@@ -272,14 +303,12 @@ try {
             orderBadge.className = 'photo-order-badge';
             orderBadge.textContent = index + 1;
 
-            // Bouton pour définir comme principale
             var mainBtn = document.createElement('button');
             mainBtn.type = 'button';
             mainBtn.className = 'photo-main-btn' + (index === 0 ? ' active' : '');
             mainBtn.innerHTML = '<i class="fas fa-star"></i>';
             mainBtn.title = 'Définir comme image principale';
 
-            // Input hidden pour indiquer l'image principale
             var mainInput = document.createElement('input');
             mainInput.type = 'hidden';
             mainInput.name = 'main_image_index';
@@ -299,12 +328,9 @@ try {
                 renderPreviews();
             });
 
-            // Marquer comme principale
             mainBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-
-                // Réorganiser les fichiers pour mettre celle-ci en premier
                 var clickedIndex = parseInt(wrapper.getAttribute('data-index'));
                 if (clickedIndex > 0) {
                     var temp = selectedFiles[clickedIndex];
@@ -314,39 +340,7 @@ try {
                 }
             });
 
-            // Drag and drop
-            wrapper.addEventListener('dragstart', function(e) {
-                wrapper.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', index);
-            });
-
-            wrapper.addEventListener('dragend', function() {
-                wrapper.classList.remove('dragging');
-            });
-
-            wrapper.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                wrapper.classList.add('drag-over');
-            });
-
-            wrapper.addEventListener('dragleave', function() {
-                wrapper.classList.remove('drag-over');
-            });
-
-            wrapper.addEventListener('drop', function(e) {
-                e.preventDefault();
-                wrapper.classList.remove('drag-over');
-                var draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                var targetIndex = parseInt(wrapper.getAttribute('data-index'));
-                if (draggedIndex !== targetIndex) {
-                    var temp = selectedFiles[draggedIndex];
-                    selectedFiles.splice(draggedIndex, 1);
-                    selectedFiles.splice(targetIndex, 0, temp);
-                    renderPreviews();
-                }
-            });
+            setupSellDragDrop(wrapper, index);
 
             wrapper.appendChild(img);
             wrapper.appendChild(orderBadge);

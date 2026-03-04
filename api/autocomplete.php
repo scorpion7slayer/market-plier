@@ -18,8 +18,8 @@ $stmt = $pdo->prepare(
             COALESCE(
                 (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
                 l.image
-            ) AS image
-     FROM listings l
+            ) AS image 
+     FROM listings l 
      WHERE l.title LIKE ?
      ORDER BY l.created_at DESC
      LIMIT 6"

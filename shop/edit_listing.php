@@ -353,14 +353,26 @@ $user = [
 
             // Images existantes
             existingImages.forEach(function(img, i) {
-                var wrapper = createPreviewWrapper(globalIndex, 'existing', i, img);
+                var wrapper = createPreviewWrapper({
+                    globalIndex: globalIndex,
+                    type: 'existing',
+                    localIndex: i,
+                    imgData: img,
+                    file: null
+                });
                 photosContainer.insertBefore(wrapper, uploadZone);
                 globalIndex++;
             });
 
             // Nouvelles images
             newFiles.forEach(function(file, i) {
-                var wrapper = createPreviewWrapper(globalIndex, 'new', i, null, file);
+                var wrapper = createPreviewWrapper({
+                    globalIndex: globalIndex,
+                    type: 'new',
+                    localIndex: i,
+                    imgData: null,
+                    file: file
+                });
                 photosContainer.insertBefore(wrapper, uploadZone);
                 globalIndex++;
             });
@@ -371,7 +383,69 @@ $user = [
             updateFileInput();
         }
 
-        function createPreviewWrapper(globalIndex, type, localIndex, imgData, file) {
+        function buildAllItems() {
+            var allItems = [];
+            existingImages.forEach(function(img) {
+                allItems.push({
+                    type: 'existing',
+                    data: img
+                });
+            });
+            newFiles.forEach(function(f) {
+                allItems.push({
+                    type: 'new',
+                    data: f
+                });
+            });
+            return allItems;
+        }
+
+        function applyAllItems(allItems) {
+            existingImages = [];
+            newFiles = [];
+            allItems.forEach(function(it) {
+                if (it.type === 'existing') existingImages.push(it.data);
+                else newFiles.push(it.data);
+            });
+            renderAll();
+        }
+
+        function setupDragDrop(wrapper, globalIndex) {
+            wrapper.addEventListener('dragstart', function(e) {
+                wrapper.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', String(globalIndex));
+            });
+            wrapper.addEventListener('dragend', function() {
+                wrapper.classList.remove('dragging');
+            });
+            wrapper.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                wrapper.classList.add('drag-over');
+            });
+            wrapper.addEventListener('dragleave', function() {
+                wrapper.classList.remove('drag-over');
+            });
+            wrapper.addEventListener('drop', function(e) {
+                e.preventDefault();
+                wrapper.classList.remove('drag-over');
+                var fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                if (fromIndex === globalIndex) return;
+                var allItems = buildAllItems();
+                var item = allItems.splice(fromIndex, 1)[0];
+                allItems.splice(globalIndex, 0, item);
+                applyAllItems(allItems);
+            });
+        }
+
+        function createPreviewWrapper(opts) {
+            var globalIndex = opts.globalIndex;
+            var type = opts.type;
+            var localIndex = opts.localIndex;
+            var imgData = opts.imgData;
+            var file = opts.file;
+
             var wrapper = document.createElement('div');
             wrapper.className = 'photo-preview-wrapper';
             wrapper.setAttribute('data-global-index', globalIndex);
@@ -410,7 +484,6 @@ $user = [
             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
             removeBtn.title = 'Supprimer cette photo';
 
-            // Supprimer
             removeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -422,87 +495,17 @@ $user = [
                 renderAll();
             });
 
-            // Image principale : déplacer en tête
             mainBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (globalIndex === 0) return;
-
-                var allItems = [];
-                existingImages.forEach(function(img) {
-                    allItems.push({
-                        type: 'existing',
-                        data: img
-                    });
-                });
-                newFiles.forEach(function(f) {
-                    allItems.push({
-                        type: 'new',
-                        data: f
-                    });
-                });
-
+                var allItems = buildAllItems();
                 var item = allItems.splice(globalIndex, 1)[0];
                 allItems.unshift(item);
-
-                existingImages = [];
-                newFiles = [];
-                allItems.forEach(function(it) {
-                    if (it.type === 'existing') existingImages.push(it.data);
-                    else newFiles.push(it.data);
-                });
-                renderAll();
+                applyAllItems(allItems);
             });
 
-            // Drag & drop
-            wrapper.addEventListener('dragstart', function(e) {
-                wrapper.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', String(globalIndex));
-            });
-            wrapper.addEventListener('dragend', function() {
-                wrapper.classList.remove('dragging');
-            });
-            wrapper.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                wrapper.classList.add('drag-over');
-            });
-            wrapper.addEventListener('dragleave', function() {
-                wrapper.classList.remove('drag-over');
-            });
-            wrapper.addEventListener('drop', function(e) {
-                e.preventDefault();
-                wrapper.classList.remove('drag-over');
-                var fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                var toIndex = globalIndex;
-                if (fromIndex === toIndex) return;
-
-                var allItems = [];
-                existingImages.forEach(function(img) {
-                    allItems.push({
-                        type: 'existing',
-                        data: img
-                    });
-                });
-                newFiles.forEach(function(f) {
-                    allItems.push({
-                        type: 'new',
-                        data: f
-                    });
-                });
-
-                var item = allItems.splice(fromIndex, 1)[0];
-                allItems.splice(toIndex, 0, item);
-
-                existingImages = [];
-                newFiles = [];
-                allItems.forEach(function(it) {
-                    if (it.type === 'existing') existingImages.push(it.data);
-                    else newFiles.push(it.data);
-                });
-                renderAll();
-            });
+            setupDragDrop(wrapper, globalIndex);
 
             wrapper.appendChild(imgEl);
             wrapper.appendChild(badge);

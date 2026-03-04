@@ -71,40 +71,32 @@
 
     // ─── Actions ──────────────────────────────────────────────
 
-    function acceptAll() {
+    function applyConsent(analytics, marketing, preferences) {
         var consent = {
             necessary: true,
-            analytics: true,
-            marketing: true,
-            preferences: true,
+            analytics: analytics,
+            marketing: marketing,
+            preferences: preferences,
         };
         saveConsent(consent);
         hideBanner();
         hideModal();
+    }
+
+    function acceptAll() {
+        applyConsent(true, true, true);
     }
 
     function refuseAll() {
-        var consent = {
-            necessary: true,
-            analytics: false,
-            marketing: false,
-            preferences: false,
-        };
-        saveConsent(consent);
-        hideBanner();
-        hideModal();
+        applyConsent(false, false, false);
     }
 
     function saveCustom() {
-        var consent = {
-            necessary: true,
-            analytics: !!document.getElementById("cookieAnalytics").checked,
-            marketing: !!document.getElementById("cookieMarketing").checked,
-            preferences: !!document.getElementById("cookiePreferences").checked,
-        };
-        saveConsent(consent);
-        hideBanner();
-        hideModal();
+        applyConsent(
+            !!document.getElementById("cookieAnalytics").checked,
+            !!document.getElementById("cookieMarketing").checked,
+            !!document.getElementById("cookiePreferences").checked,
+        );
     }
 
     // ─── Init ────────────────────────────────────────────────
