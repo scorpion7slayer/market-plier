@@ -365,9 +365,18 @@ body {
         height: 40px;
     }
 
+    .search-form {
+        flex: 1;
+        min-width: 0;
+    }
+
     .search-bar {
         height: 38px;
-        font-size: 13px;
+        font-size: 14px;
+        width: 100%;
+        min-width: 0;
+        padding: 0 14px;
+        box-sizing: border-box;
     }
 
     .profile-photo-container {

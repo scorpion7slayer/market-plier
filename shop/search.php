@@ -96,7 +96,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
   ?>
 
   <main class="search-main">
-    <!-- Category filters -->
+    <!-- Category filters (desktop) -->
     <div class="category-filters">
       <a href="?<?= $query !== '' ? 'q=' . urlencode($query) : '' ?>"
         class="category-chip <?= $category === '' ? 'active' : '' ?>">
@@ -109,6 +109,34 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <?= htmlspecialchars($categoryLabels[$cat], ENT_QUOTES, 'UTF-8') ?>
         </a>
       <?php endforeach; ?>
+    </div>
+
+    <!-- Category dropdown (mobile) -->
+    <div class="category-dropdown">
+      <button class="category-dropdown-toggle <?= $category !== '' ? 'active' : '' ?>" id="categoryDropdownToggle">
+        <span>
+          <?php if ($category !== '' && isset($categoryLabels[$category])): ?>
+            <i class="fa-solid <?= $categoryIcons[$category] ?>"></i>
+            <?= htmlspecialchars($categoryLabels[$category], ENT_QUOTES, 'UTF-8') ?>
+          <?php else: ?>
+            <i class="fa-solid fa-border-all"></i> Toutes les catégories
+          <?php endif; ?>
+        </span>
+        <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+      </button>
+      <div class="category-dropdown-menu" id="categoryDropdownMenu">
+        <a href="?<?= $query !== '' ? 'q=' . urlencode($query) : '' ?>"
+          class="category-dropdown-item <?= $category === '' ? 'active' : '' ?>">
+          <i class="fa-solid fa-border-all"></i> Tout
+        </a>
+        <?php foreach ($allowedCategories as $cat): ?>
+          <a href="?<?= $query !== '' ? 'q=' . urlencode($query) . '&' : '' ?>category=<?= $cat ?>"
+            class="category-dropdown-item <?= $category === $cat ? 'active' : '' ?>">
+            <i class="fa-solid <?= $categoryIcons[$cat] ?>"></i>
+            <?= htmlspecialchars($categoryLabels[$cat], ENT_QUOTES, 'UTF-8') ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
     </div>
 
     <!-- Search info -->
@@ -178,6 +206,32 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </main>
 
   <script src="../styles/theme.js"></script>
+  <script>
+    // Category dropdown (mobile)
+    (function() {
+      var toggle = document.getElementById('categoryDropdownToggle');
+      var menu = document.getElementById('categoryDropdownMenu');
+      if (!toggle || !menu) return;
+
+      toggle.addEventListener('click', function() {
+        var isOpen = menu.classList.contains('open');
+        if (isOpen) {
+          menu.classList.remove('open');
+          toggle.classList.remove('open');
+        } else {
+          menu.classList.add('open');
+          toggle.classList.add('open');
+        }
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.remove('open');
+          toggle.classList.remove('open');
+        }
+      });
+    })();
+  </script>
   <script>
     (function() {
       var currentPage = 1;
