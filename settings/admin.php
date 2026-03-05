@@ -371,14 +371,12 @@ $stats = $adminData['stats'];
                   <td class="admin-username"><?= htmlspecialchars($l['username'], ENT_QUOTES, 'UTF-8') ?></td>
                   <td class="admin-date"><?= date('d/m/Y', strtotime($l['created_at'])) ?></td>
                   <td>
-                    <form method="POST" style="display:inline;"
-                      onsubmit="return confirm('Supprimer cette annonce ?');">
-                      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="listing_id" value="<?= (int) $l['id'] ?>">
-                      <button type="submit" name="delete_listing" class="admin-action-btn admin-action-delete" title="Supprimer">
-                        <i class="fas fa-trash-alt"></i>
-                      </button>
-                    </form>
+                    <button type="button" class="admin-action-btn admin-action-delete" title="Supprimer"
+                      data-open-delete-listing
+                      data-listing-id="<?= (int) $l['id'] ?>"
+                      data-listing-title="<?= htmlspecialchars($l['title'], ENT_QUOTES, 'UTF-8') ?>">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -451,11 +449,33 @@ $stats = $adminData['stats'];
     </div>
   </div>
 
+  <!-- Modal suppression annonce -->
+  <div class="admin-modal-overlay" id="deleteListingOverlay">
+    <div class="admin-modal">
+      <div class="admin-modal-icon">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <h3 class="admin-modal-title">Supprimer cette annonce ?</h3>
+      <p class="admin-modal-text">
+        L'annonce « <strong id="deleteListingName"></strong> » sera supprimée définitivement.
+      </p>
+      <form method="POST" class="admin-modal-actions">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+        <input type="hidden" name="listing_id" id="deleteListingId" value="">
+        <button type="button" class="settings-btn admin-modal-btn-cancel" id="deleteListingCancel">Annuler</button>
+        <button type="submit" name="delete_listing" class="settings-btn settings-btn-danger">
+          <i class="fas fa-trash-alt"></i> Supprimer
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script>
     (function() {
-      var overlay = document.getElementById('deleteUserOverlay');
+      // Modal suppression utilisateur
+      var userOverlay = document.getElementById('deleteUserOverlay');
       var tokenInput = document.getElementById('deleteUserToken');
       var nameEl = document.getElementById('deleteUserName');
 
@@ -463,20 +483,47 @@ $stats = $adminData['stats'];
         btn.addEventListener('click', function() {
           tokenInput.value = btn.getAttribute('data-token');
           nameEl.textContent = btn.getAttribute('data-username');
-          overlay.classList.add('visible');
+          userOverlay.classList.add('visible');
         });
       });
 
-      function close() {
-        overlay.classList.remove('visible');
+      function closeUser() {
+        userOverlay.classList.remove('visible');
       }
 
-      document.getElementById('deleteUserCancel').addEventListener('click', close);
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) close();
+      document.getElementById('deleteUserCancel').addEventListener('click', closeUser);
+      userOverlay.addEventListener('click', function(e) {
+        if (e.target === userOverlay) closeUser();
       });
+
+      // Modal suppression annonce
+      var listingOverlay = document.getElementById('deleteListingOverlay');
+      var listingIdInput = document.getElementById('deleteListingId');
+      var listingNameEl = document.getElementById('deleteListingName');
+
+      document.querySelectorAll('[data-open-delete-listing]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          listingIdInput.value = btn.getAttribute('data-listing-id');
+          listingNameEl.textContent = btn.getAttribute('data-listing-title');
+          listingOverlay.classList.add('visible');
+        });
+      });
+
+      function closeListing() {
+        listingOverlay.classList.remove('visible');
+      }
+
+      document.getElementById('deleteListingCancel').addEventListener('click', closeListing);
+      listingOverlay.addEventListener('click', function(e) {
+        if (e.target === listingOverlay) closeListing();
+      });
+
+      // Escape ferme le modal visible
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape') {
+          closeUser();
+          closeListing();
+        }
       });
     })();
   </script>

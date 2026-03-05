@@ -136,8 +136,8 @@ header {
 
 @media (max-width: 992px) {
     .search-form {
-        margin-left: 10px;
-        margin-right: 10px;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     .search-bar {

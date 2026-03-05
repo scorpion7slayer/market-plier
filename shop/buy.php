@@ -200,10 +200,9 @@ $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item
             <a href="edit_listing.php?id=<?= (int) $listing['id'] ?>" class="buy-btn buy-btn-primary">
               <i class="fa-solid fa-pen"></i> Modifier l'annonce
             </a>
-            <a href="delete_listing.php?id=<?= (int) $listing['id'] ?>" class="buy-btn buy-btn-danger"
-              onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');">
+            <button type="button" class="buy-btn buy-btn-danger" id="openDeleteListingModal">
               <i class="fa-solid fa-trash"></i> Supprimer
-            </a>
+            </button>
           <?php else: ?>
             <button class="buy-btn buy-btn-primary" id="contactSellerBtn" type="button">
               <i class="fa-solid fa-envelope"></i> Contacter le vendeur
@@ -248,6 +247,39 @@ $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item
       </div>
     </div>
   </main>
+
+  <?php if ($isOwner): ?>
+  <!-- Modal suppression annonce -->
+  <div class="confirm-modal-overlay" id="deleteListingOverlay">
+    <div class="confirm-modal">
+      <div class="confirm-modal-icon">
+        <i class="fa-solid fa-trash-alt"></i>
+      </div>
+      <h3 class="confirm-modal-title">Supprimer cette annonce ?</h3>
+      <p class="confirm-modal-text">
+        L'annonce « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> » sera supprimée définitivement.
+      </p>
+      <div class="confirm-modal-actions">
+        <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="deleteListingCancel">Annuler</button>
+        <a href="delete_listing.php?id=<?= (int) $listing['id'] ?>" class="confirm-modal-btn confirm-modal-btn-danger">
+          <i class="fa-solid fa-trash-alt"></i> Supprimer
+        </a>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      var overlay = document.getElementById('deleteListingOverlay');
+      document.getElementById('openDeleteListingModal').addEventListener('click', function() {
+        overlay.classList.add('visible');
+      });
+      function close() { overlay.classList.remove('visible'); }
+      document.getElementById('deleteListingCancel').addEventListener('click', close);
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+    })();
+  </script>
+  <?php endif; ?>
 
   <script src="../styles/theme.js"></script>
   <script>

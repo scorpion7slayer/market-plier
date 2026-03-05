@@ -152,8 +152,21 @@ header {
 
 @media (max-width: 992px) {
     .search-form {
-        margin-left: 10px;
-        margin-right: 10px;
+        margin-left: 0;
+        margin-right: 0;
+        position: static;
+    }
+
+    .header-top {
+        position: relative;
+    }
+
+    .autocomplete-dropdown {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        margin-top: 6px;
     }
 
     .search-bar {
