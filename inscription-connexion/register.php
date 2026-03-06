@@ -29,6 +29,7 @@ if (!isset($_SESSION['csrf_token'])) {
 </head>
 
 <body>
+  <?php include '../includes/toast.php'; ?>
   <div class="logo">
     <img src="../assets/images/logo.svg" alt="" class="auth-logo-img">
     <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; Retour à l'accueil</a></p>
@@ -43,13 +44,6 @@ if (!isset($_SESSION['csrf_token'])) {
 
     <main class="form-container">
       <h2 class="title">S'inscrire</h2>
-
-      <?php if (!empty($_GET['error'])): ?>
-        <div class="alert alert-error"><?php echo htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?></div>
-      <?php endif; ?>
-      <?php if (!empty($_GET['success'])): ?>
-        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success'], ENT_QUOTES, 'UTF-8'); ?></div>
-      <?php endif; ?>
 
       <form class="signup-form" action="handle_register.php" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -120,6 +114,7 @@ if (!isset($_SESSION['csrf_token'])) {
       <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
     </main>
   </div>
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script src="../styles/form-validation.js"></script>
 </body>

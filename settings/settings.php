@@ -111,19 +111,11 @@ extract($state);
   <main class="settings-container">
     <h1 class="settings-title">Paramètres</h1>
 
-    <!-- Messages -->
-    <?php if ($successMessage): ?>
-      <div class="settings-alert settings-alert-success">
-        <i class="fas fa-check-circle"></i>
-        <?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?>
-      </div>
-    <?php endif; ?>
-    <?php if ($errorMessage): ?>
-      <div class="settings-alert settings-alert-error">
-        <i class="fas fa-exclamation-circle"></i>
-        <?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?>
-      </div>
-    <?php endif; ?>
+    <?php
+    $toastSuccess = $successMessage;
+    $toastError = $errorMessage;
+    include '../includes/toast.php';
+    ?>
 
     <!-- Mon compte -->
     <section class="settings-section">
@@ -524,6 +516,22 @@ extract($state);
       new MutationObserver(update).observe(document.documentElement, {
         attributes: true,
         attributeFilter: ['data-bs-theme']
+      });
+    })();
+  </script>
+  <script>
+    // Preserve scroll position across form submissions
+    (function() {
+      var key = 'mp-scroll-settings';
+      var saved = sessionStorage.getItem(key);
+      if (saved) {
+        sessionStorage.removeItem(key);
+        window.scrollTo(0, parseInt(saved, 10));
+      }
+      document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() {
+          sessionStorage.setItem(key, window.scrollY);
+        });
       });
     })();
   </script>

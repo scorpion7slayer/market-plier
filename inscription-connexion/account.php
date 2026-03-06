@@ -55,8 +55,32 @@ if (!$user) {
     exit();
 }
 
-$successMessage = isset($_GET['success']) && $_GET['success'] === 'description' ? "Description mise à jour avec succès !" : '';
+$successMessage = '';
 $errorMessage = '';
+
+if (isset($_GET['success'])) {
+    switch ($_GET['success']) {
+        case 'description':
+            $successMessage = "Description mise à jour avec succès !";
+            break;
+        case 'deleted':
+            $successMessage = "Annonce supprimée.";
+            break;
+        default:
+            $successMessage = $_GET['success'];
+            break;
+    }
+}
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'delete_failed':
+            $errorMessage = "Erreur lors de la suppression de l'annonce.";
+            break;
+        default:
+            $errorMessage = $_GET['error'];
+            break;
+    }
+}
 
 // Traitement POST : mise à jour de la description
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])) {
@@ -146,32 +170,10 @@ try {
     <?php
     $headerBasePath = '../';
     $headerUser = $user;
+    $toastSuccess = $successMessage;
+    $toastError = $errorMessage;
     include '../header.php';
     ?>
-
-    <!-- Toasts -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-        <?php if ($successMessage): ?>
-            <div id="toastSuccess" class="toast align-items-center text-white border-0" role="alert" style="background-color: #7fb885;">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fa-solid fa-check me-2"></i><?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        <?php endif; ?>
-        <?php if ($errorMessage): ?>
-            <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fa-solid fa-circle-exclamation me-2"></i><?= htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8') ?>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
 
     <!-- Main Content -->
     <div class="container-fluid">
@@ -267,7 +269,7 @@ try {
                                 ];
                                 $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item_condition'];
                                 ?>
-                                <div class="article-card">
+                                <div class="article-card" data-listing-id="<?= $listing['id'] ?>">
                                     <div class="article-image">
                                         <?php if (count($listing['all_images']) > 1): ?>
                                             <div id="carousel-<?= $listing['id'] ?>" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
@@ -347,6 +349,7 @@ try {
     <script src="../styles/theme.js"></script>
     <script>
         var listingIdToDelete = null;
+        var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
 
         function openDeleteModal(id) {
             listingIdToDelete = id;
@@ -358,11 +361,57 @@ try {
             document.getElementById('deleteModal').classList.remove('active');
         }
 
-        // Confirmer la suppression
+        // Confirmer la suppression (AJAX, pas de rechargement)
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-            if (listingIdToDelete) {
-                window.location.href = '../shop/delete_listing.php?id=' + listingIdToDelete;
-            }
+            if (!listingIdToDelete) return;
+            var id = listingIdToDelete;
+            var btn = this;
+            btn.disabled = true;
+
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('csrf_token', csrfToken);
+
+            fetch('../shop/delete_listing.php', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(function(r) {
+                    return r.json().then(function(d) {
+                        return {
+                            ok: r.ok,
+                            data: d
+                        };
+                    });
+                })
+                .then(function(res) {
+                    closeDeleteModal();
+                    btn.disabled = false;
+                    if (res.ok && res.data.success) {
+                        // Retirer la carte de l'annonce du DOM
+                        var card = document.querySelector('[data-listing-id="' + id + '"]');
+                        if (card) {
+                            card.style.transition = 'opacity 0.3s, transform 0.3s';
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.95)';
+                            setTimeout(function() {
+                                card.remove();
+                            }, 300);
+                        }
+                        mpShowToast(res.data.message || 'Annonce supprimée.', 'success');
+                    } else {
+                        mpShowToast(res.data.error || 'Erreur lors de la suppression.', 'error');
+                    }
+                })
+                .catch(function() {
+                    closeDeleteModal();
+                    btn.disabled = false;
+                    mpShowToast('Erreur réseau. Veuillez réessayer.', 'error');
+                });
         });
 
         // Fermer le modal en cliquant sur l'overlay
@@ -377,15 +426,6 @@ try {
             if (e.key === 'Escape') {
                 closeDeleteModal();
             }
-        });
-
-        // Afficher les toasts automatiquement
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.toast').forEach(function(el) {
-                new bootstrap.Toast(el, {
-                    delay: 3000
-                }).show();
-            });
         });
 
         function toggleDescriptionEdit() {

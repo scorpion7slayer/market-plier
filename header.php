@@ -17,7 +17,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     <form class="search-form" action="<?= $headerBasePath ?>shop/search.php" method="GET" autocomplete="off">
       <input class="search-bar" type="text" name="q" placeholder="Rechercher"
         value="<?= htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-        id="searchInput" />
+        id="searchInput" aria-label="Rechercher" />
       <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
     </form>
     <div class="header-divider"></div>
@@ -236,6 +236,8 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     var debounceTimer = null;
     var activeIndex = -1;
     var currentItems = [];
+    var activeController = null;
+    var requestSequence = 0;
 
     var categoryIcons = {
       vetements: 'fa-shirt',
@@ -258,6 +260,12 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       activeIndex = -1;
     }
 
+    function resetDropdown() {
+      dropdown.innerHTML = '';
+      currentItems = [];
+      hide();
+    }
+
     function show() {
       if (dropdown.children.length > 0) dropdown.classList.add('visible');
     }
@@ -276,9 +284,14 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       activeIndex = idx;
     }
 
-    function createCategoryLink(cat) {
+    function createCategoryLink(cat, q) {
       var a = document.createElement('a');
-      a.href = basePath + 'shop/search.php?category=' + cat.key;
+      var params = new URLSearchParams();
+      params.set('category', cat.key);
+      if (cat.preserve_query && q) {
+        params.set('q', q);
+      }
+      a.href = basePath + 'shop/search.php?' + params.toString();
       a.className = 'ac-item ac-category';
       a.innerHTML =
         '<i class="fa-solid ' + (categoryIcons[cat.key] || 'fa-tag') + ' ac-icon"></i>' +
@@ -333,50 +346,82 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
     function doSearch(q) {
       if (q.length < 2) {
-        hide();
-        dropdown.innerHTML = '';
+        if (activeController) {
+          activeController.abort();
+          activeController = null;
+        }
+        resetDropdown();
         return;
       }
 
-      fetch(basePath + 'api/autocomplete.php?q=' + encodeURIComponent(q))
+      requestSequence += 1;
+      var requestId = requestSequence;
+
+      if (activeController) {
+        activeController.abort();
+      }
+
+      activeController = typeof AbortController !== 'undefined' ? new AbortController() : null;
+
+      var fetchOptions = {};
+      if (activeController) {
+        fetchOptions.signal = activeController.signal;
+      }
+
+      fetch(basePath + 'api/autocomplete.php?q=' + encodeURIComponent(q), fetchOptions)
         .then(function(r) {
+          if (!r.ok) {
+            throw new Error('Autocomplete request failed');
+          }
           return r.json();
         })
         .then(function(data) {
-          dropdown.innerHTML = '';
-          currentItems = [];
-          activeIndex = -1;
+          if (requestId !== requestSequence || input.value.trim() !== q) {
+            return;
+          }
 
-          if (data.categories && data.categories.length > 0) {
-            data.categories.forEach(function(cat) {
-              var a = createCategoryLink(cat);
+          var categories = Array.isArray(data.categories) ? data.categories : [];
+          var suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+
+          resetDropdown();
+
+          if (categories.length > 0) {
+            categories.forEach(function(cat) {
+              var a = createCategoryLink(cat, q);
               dropdown.appendChild(a);
               currentItems.push(a);
             });
           }
 
-          if (data.suggestions && data.suggestions.length > 0) {
-            if (data.categories && data.categories.length > 0) appendSeparator();
+          if (suggestions.length > 0) {
+            if (categories.length > 0) appendSeparator();
 
-            data.suggestions.forEach(function(item) {
+            suggestions.forEach(function(item) {
               var a = createListingLink(item);
               dropdown.appendChild(a);
               currentItems.push(a);
             });
           }
 
-          if (data.suggestions.length > 0 || data.categories.length > 0) {
+          if (currentItems.length > 0) {
             appendSeparator();
-            var allLink = createSearchAllLink(q);
-            dropdown.appendChild(allLink);
-            currentItems.push(allLink);
           }
+
+          var allLink = createSearchAllLink(q);
+          dropdown.appendChild(allLink);
+          currentItems.push(allLink);
 
           if (currentItems.length > 0) show();
           else hide();
         })
-        .catch(function() {
-          hide();
+        .catch(function(error) {
+          if (error && error.name === 'AbortError') {
+            return;
+          }
+
+          if (requestId === requestSequence) {
+            resetDropdown();
+          }
         });
     }
 
@@ -414,3 +459,5 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     });
   })();
 </script>
+
+<?php include __DIR__ . '/includes/toast.php'; ?>

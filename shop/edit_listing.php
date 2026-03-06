@@ -81,19 +81,6 @@ $user = [
     <main>
         <h1 class="page-title">Modifier l'annonce</h1>
 
-        <?php if (!empty($_GET['error'])): ?>
-            <div class="sell-alert sell-alert-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <?php echo htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-        <?php endif; ?>
-        <?php if (!empty($_GET['success'])): ?>
-            <div class="sell-alert sell-alert-success">
-                <i class="fas fa-check-circle"></i>
-                <?php echo htmlspecialchars($_GET['success'], ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-        <?php endif; ?>
-
         <form action="handle_edit_listing.php" method="POST" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token"
                 value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -674,6 +661,7 @@ $user = [
             });
         })();
     </script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../styles/theme.js"></script>
     <script src="../styles/form-validation.js"></script>
 </body>
