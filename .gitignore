@@ -13,7 +13,7 @@ uploads/listings/*
 .env.production
 
 # Node modules
-node_modules/
+node_modules/ 
 
 # Composer dependencies
 vendor/
