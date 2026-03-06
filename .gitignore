@@ -22,3 +22,5 @@ vendor/
 google/google_oauth.php
 google/cacert.pem
 google/client_secret_*.json
+# ddev
+.ddev/
