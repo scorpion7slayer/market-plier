@@ -1,17 +1,5 @@
 <?php
 
-/**
- * Toast notification system — include this file after Bootstrap CSS/JS is available.
- *
- * Reads messages from:
- *   - URL params: ?success=...  and  ?error=...
- *   - PHP variables: $toastSuccess  and  $toastError  (set before including this file)
- *
- * Also exposes a JS function mpShowToast(message, type) for dynamic toasts.
- *
- * Usage: include 'includes/toast.php';  (adjust path as needed)
- */
-
 $_toastSuccessMsg = '';
 $_toastErrorMsg   = '';
 
