@@ -1,0 +1,247 @@
+/* ═══ FAVORIS ═════════════════════════════════════════════ */
+.fav-main {
+    padding: 30px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.fav-container {
+    background: var(--mp-card-bg);
+    border-radius: 20px;
+    box-shadow: 0 2px 14px var(--mp-card-shadow);
+    padding: 28px;
+}
+
+.fav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.fav-title {
+    font-family: "Archivo", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--mp-text);
+    margin: 0;
+}
+
+.fav-title i {
+    color: #ef4444;
+    margin-right: 8px;
+}
+
+.fav-count {
+    font-family: "Archivo", sans-serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--mp-text-muted);
+    background: var(--mp-bg-tertiary);
+    padding: 4px 12px;
+    border-radius: 50px;
+}
+
+/* Grille de favoris */
+.fav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.fav-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--mp-bg);
+    border: 1px solid var(--mp-border-light);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+}
+
+.fav-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--mp-card-shadow);
+}
+
+.fav-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.fav-card-img {
+    position: relative;
+    aspect-ratio: 1;
+    background: var(--mp-bg-tertiary);
+    overflow: hidden;
+}
+
+.fav-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fav-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mp-border);
+    font-size: 32px;
+}
+
+.fav-card-condition {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(127, 184, 133, 0.9);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 50px;
+}
+
+.fav-card-body {
+    padding: 12px 14px;
+}
+
+.fav-card-price {
+    font-family: "Archivo", sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--mp-text);
+    margin-bottom: 2px;
+}
+
+.fav-card-title {
+    font-size: 14px;
+    color: var(--mp-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 6px;
+}
+
+.fav-card-seller,
+.fav-card-location {
+    font-size: 12px;
+    color: var(--mp-text-muted);
+    margin-bottom: 2px;
+}
+
+.fav-card-seller i,
+.fav-card-location i {
+    width: 14px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+/* Bouton retirer */
+.fav-remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    color: #ef4444;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+    z-index: 2;
+}
+
+.fav-card:hover .fav-remove-btn {
+    opacity: 1;
+}
+
+.fav-remove-btn:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* État vide */
+.fav-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--mp-text-muted);
+}
+
+.fav-empty i {
+    font-size: 48px;
+    color: var(--mp-border);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.fav-empty p {
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--mp-text);
+    margin-bottom: 8px;
+}
+
+.fav-empty span {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.fav-browse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: var(--mp-green);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.fav-browse-btn:hover {
+    background: var(--mp-green-hover);
+    color: #fff;
+}
+
+/* ═══ RESPONSIVE ═════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .fav-main {
+        padding: 15px 10px;
+    }
+
+    .fav-container {
+        padding: 18px;
+    }
+
+    .fav-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .fav-remove-btn {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .fav-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -89,6 +89,50 @@ $isOwner = $user && $user['auth_token'] === $listing['auth_token'];
 $categoryLabel = $categoryLabels[$listing['category']] ?? $listing['category'];
 $categoryIcon  = $categoryIcons[$listing['category']] ?? 'fa-tag';
 $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item_condition'];
+
+// Vérifier si en favori
+$isFavorited = false;
+if ($user) {
+  $favStmt = $pdo->prepare("SELECT id FROM favorites WHERE auth_token = ? AND listing_id = ?");
+  $favStmt->execute([$user['auth_token'], $listingId]);
+  $isFavorited = (bool) $favStmt->fetch();
+}
+
+// Compter les favoris de cette annonce
+$favCountStmt = $pdo->prepare("SELECT COUNT(*) FROM favorites WHERE listing_id = ?");
+$favCountStmt->execute([$listingId]);
+$favoriteCount = (int) $favCountStmt->fetchColumn();
+
+// Avis sur le vendeur
+$reviewsStmt = $pdo->prepare("
+    SELECT r.*, u.username, u.profile_photo
+    FROM reviews r
+    JOIN users u ON u.auth_token = r.reviewer_token
+    WHERE r.seller_token = ?
+    ORDER BY r.created_at DESC
+    LIMIT 10
+");
+$reviewsStmt->execute([$listing['auth_token']]);
+$reviews = $reviewsStmt->fetchAll();
+
+$avgRatingStmt = $pdo->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS cnt FROM reviews WHERE seller_token = ?");
+$avgRatingStmt->execute([$listing['auth_token']]);
+$ratingStats = $avgRatingStmt->fetch();
+$avgRating = $ratingStats['cnt'] > 0 ? round((float) $ratingStats['avg_rating'], 1) : 0;
+$reviewCount = (int) $ratingStats['cnt'];
+
+// Vérifier si l'utilisateur a déjà laissé un avis sur ce vendeur pour cette annonce
+$hasReviewed = false;
+if ($user && !$isOwner) {
+  $revCheckStmt = $pdo->prepare("SELECT id FROM reviews WHERE reviewer_token = ? AND seller_token = ? AND listing_id = ?");
+  $revCheckStmt->execute([$user['auth_token'], $listing['auth_token'], $listingId]);
+  $hasReviewed = (bool) $revCheckStmt->fetch();
+}
+
+// CSRF token
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -207,6 +251,15 @@ $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item
             <button class="buy-btn buy-btn-primary" id="contactSellerBtn" type="button">
               <i class="fa-solid fa-envelope"></i> Contacter le vendeur
             </button>
+            <?php if ($user): ?>
+              <button class="buy-btn buy-btn-fav <?= $isFavorited ? 'buy-btn-fav-active' : '' ?>" id="favBtn" type="button">
+                <i class="fa-<?= $isFavorited ? 'solid' : 'regular' ?> fa-heart"></i>
+                <span id="favText"><?= $isFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris' ?></span>
+                <?php if ($favoriteCount > 0): ?>
+                  <span class="buy-fav-count" id="favCount"><?= $favoriteCount ?></span>
+                <?php endif; ?>
+              </button>
+            <?php endif; ?>
           <?php endif; ?>
         </div>
 
@@ -243,10 +296,111 @@ $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item
           <?php if ($sellerDescription): ?>
             <p class="seller-bio"><?= nl2br(htmlspecialchars($sellerDescription, ENT_QUOTES, 'UTF-8')) ?></p>
           <?php endif; ?>
+          <?php if ($reviewCount > 0): ?>
+            <div class="seller-rating">
+              <span class="seller-stars">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <i class="fa-<?= $i <= round($avgRating) ? 'solid' : 'regular' ?> fa-star"></i>
+                <?php endfor; ?>
+              </span>
+              <span class="seller-rating-text"><?= $avgRating ?>/5 (<?= $reviewCount ?> avis)</span>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <!-- Avis -->
+        <div class="buy-card buy-card-reviews">
+          <h2 class="buy-section-title">
+            Avis sur le vendeur
+            <?php if ($reviewCount > 0): ?>
+              <span class="buy-review-avg"><?= $avgRating ?>/5</span>
+            <?php endif; ?>
+          </h2>
+
+          <?php if ($user && !$isOwner && !$hasReviewed): ?>
+            <form class="review-form" id="reviewForm">
+              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+              <input type="hidden" name="seller_token" value="<?= htmlspecialchars($listing['auth_token'], ENT_QUOTES, 'UTF-8') ?>">
+              <input type="hidden" name="listing_id" value="<?= (int) $listingId ?>">
+              <div class="review-stars-input" id="starsInput">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <button type="button" class="review-star-btn" data-rating="<?= $i ?>">
+                    <i class="fa-regular fa-star"></i>
+                  </button>
+                <?php endfor; ?>
+                <input type="hidden" name="rating" id="ratingInput" value="0">
+              </div>
+              <textarea name="comment" class="review-textarea" placeholder="Votre commentaire (optionnel)" maxlength="1000"></textarea>
+              <button type="submit" class="review-submit-btn" id="reviewSubmitBtn" disabled>
+                <i class="fa-solid fa-paper-plane"></i> Envoyer l'avis
+              </button>
+            </form>
+          <?php endif; ?>
+
+          <?php if (empty($reviews)): ?>
+            <p class="review-empty">Aucun avis pour le moment.</p>
+          <?php else: ?>
+            <div class="review-list">
+              <?php foreach ($reviews as $rev): ?>
+                <div class="review-item">
+                  <div class="review-header">
+                    <div class="review-author">
+                      <div class="review-author-avatar">
+                        <?php if ($rev['profile_photo'] && file_exists('../uploads/profiles/' . $rev['profile_photo'])): ?>
+                          <img src="../uploads/profiles/<?= htmlspecialchars($rev['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
+                        <?php else: ?>
+                          <img src="../assets/images/default-avatar.svg" alt="">
+                        <?php endif; ?>
+                      </div>
+                      <span class="review-author-name"><?= htmlspecialchars($rev['username'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="review-meta">
+                      <span class="review-stars-display">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                          <i class="fa-<?= $i <= $rev['rating'] ? 'solid' : 'regular' ?> fa-star"></i>
+                        <?php endfor; ?>
+                      </span>
+                      <span class="review-date"><?= date('d/m/Y', strtotime($rev['created_at'])) ?></span>
+                    </div>
+                  </div>
+                  <?php if ($rev['comment']): ?>
+                    <p class="review-comment"><?= nl2br(htmlspecialchars($rev['comment'], ENT_QUOTES, 'UTF-8')) ?></p>
+                  <?php endif; ?>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
   </main>
+
+  <?php if ($user && !$isOwner): ?>
+  <!-- Modal contacter le vendeur -->
+  <div class="confirm-modal-overlay" id="contactOverlay">
+    <div class="confirm-modal" style="max-width: 480px;">
+      <div class="confirm-modal-icon" style="background: rgba(127, 184, 133, 0.1);">
+        <i class="fa-solid fa-envelope" style="color: #7fb885;"></i>
+      </div>
+      <h3 class="confirm-modal-title">Contacter <?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?></h3>
+      <p class="confirm-modal-text" style="margin-bottom: 12px;">
+        À propos de « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> »
+      </p>
+      <form id="contactForm">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+        <input type="hidden" name="seller_token" value="<?= htmlspecialchars($listing['auth_token'], ENT_QUOTES, 'UTF-8') ?>">
+        <input type="hidden" name="listing_id" value="<?= (int) $listingId ?>">
+        <textarea name="message" class="contact-textarea" placeholder="Bonjour, votre annonce m'intéresse..." rows="4" maxlength="2000" required></textarea>
+        <div class="confirm-modal-actions">
+          <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="contactCancel">Annuler</button>
+          <button type="submit" class="confirm-modal-btn" style="background:#7fb885;color:#fff;" id="contactSend">
+            <i class="fa-solid fa-paper-plane"></i> Envoyer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <?php if ($isOwner): ?>
   <!-- Modal suppression annonce -->
@@ -325,6 +479,130 @@ $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item
       });
     })();
   </script>
+
+  <?php if ($user && !$isOwner): ?>
+  <script>
+    (function() {
+      var basePath = '../';
+      var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
+
+      // ═══ CONTACT SELLER ════════════════════════════════
+      var contactBtn = document.getElementById('contactSellerBtn');
+      var contactOverlay = document.getElementById('contactOverlay');
+      var contactForm = document.getElementById('contactForm');
+      var contactCancel = document.getElementById('contactCancel');
+
+      if (contactBtn && contactOverlay) {
+        contactBtn.addEventListener('click', function() {
+          contactOverlay.classList.add('visible');
+        });
+        function closeContact() { contactOverlay.classList.remove('visible'); }
+        contactCancel.addEventListener('click', closeContact);
+        contactOverlay.addEventListener('click', function(e) { if (e.target === contactOverlay) closeContact(); });
+
+        contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var sendBtn = document.getElementById('contactSend');
+          sendBtn.disabled = true;
+
+          fetch(basePath + 'api/start_conversation.php', {
+              method: 'POST',
+              body: new FormData(contactForm),
+              credentials: 'same-origin'
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.success) {
+                window.location.href = basePath + 'messagerie/conversation.php?id=' + data.conversation_id;
+              } else {
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || 'Erreur', 'error');
+                sendBtn.disabled = false;
+              }
+            })
+            .catch(function() {
+              sendBtn.disabled = false;
+            });
+        });
+      }
+
+      // ═══ FAVORITE TOGGLE ═══════════════════════════════
+      var favBtn = document.getElementById('favBtn');
+      if (favBtn) {
+        favBtn.addEventListener('click', function() {
+          favBtn.disabled = true;
+          var fd = new FormData();
+          fd.append('csrf_token', csrfToken);
+          fd.append('listing_id', <?= (int) $listingId ?>);
+
+          fetch(basePath + 'api/toggle_favorite.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.success) {
+                var icon = favBtn.querySelector('i');
+                var text = document.getElementById('favText');
+                if (data.favorited) {
+                  favBtn.classList.add('buy-btn-fav-active');
+                  icon.className = 'fa-solid fa-heart';
+                  text.textContent = 'Retirer des favoris';
+                  if (typeof mpShowToast === 'function') mpShowToast('Ajouté aux favoris !', 'success');
+                } else {
+                  favBtn.classList.remove('buy-btn-fav-active');
+                  icon.className = 'fa-regular fa-heart';
+                  text.textContent = 'Ajouter aux favoris';
+                  if (typeof mpShowToast === 'function') mpShowToast('Retiré des favoris', 'success');
+                }
+              }
+            })
+            .finally(function() { favBtn.disabled = false; });
+        });
+      }
+
+      // ═══ REVIEW STARS ══════════════════════════════════
+      var starsInput = document.getElementById('starsInput');
+      var ratingInput = document.getElementById('ratingInput');
+      var reviewForm = document.getElementById('reviewForm');
+      var submitBtn = document.getElementById('reviewSubmitBtn');
+
+      if (starsInput) {
+        var starBtns = starsInput.querySelectorAll('.review-star-btn');
+        starBtns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var rating = parseInt(this.getAttribute('data-rating'));
+            ratingInput.value = rating;
+            submitBtn.disabled = false;
+            starBtns.forEach(function(b, idx) {
+              var icon = b.querySelector('i');
+              icon.className = idx < rating ? 'fa-solid fa-star' : 'fa-regular fa-star';
+            });
+          });
+        });
+
+        reviewForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          if (ratingInput.value === '0') return;
+          submitBtn.disabled = true;
+
+          fetch(basePath + 'api/submit_review.php', {
+              method: 'POST',
+              body: new FormData(reviewForm),
+              credentials: 'same-origin'
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.success) {
+                if (typeof mpShowToast === 'function') mpShowToast('Avis envoyé !', 'success');
+                reviewForm.style.display = 'none';
+              } else {
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || 'Erreur', 'error');
+                submitBtn.disabled = false;
+              }
+            })
+            .catch(function() { submitBtn.disabled = false; });
+        });
+      }
+    })();
+  </script>
+  <?php endif; ?>
 </body>
 
 </html>

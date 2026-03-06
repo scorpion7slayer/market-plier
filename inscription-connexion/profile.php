@@ -98,6 +98,24 @@ try {
 $listingCount = count($userListings);
 $username = htmlspecialchars($profileUser['username'], ENT_QUOTES, 'UTF-8');
 $memberSince = date('m/Y', strtotime($profileUser['created_at']));
+
+// Avis sur cet utilisateur
+$avgRatingStmt = $pdo->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS cnt FROM reviews WHERE seller_token = ?");
+$avgRatingStmt->execute([$profileUser['auth_token']]);
+$ratingStats = $avgRatingStmt->fetch();
+$avgRating = $ratingStats['cnt'] > 0 ? round((float) $ratingStats['avg_rating'], 1) : 0;
+$reviewCount = (int) $ratingStats['cnt'];
+
+$reviewsStmt = $pdo->prepare("
+    SELECT r.*, u.username, u.profile_photo
+    FROM reviews r
+    JOIN users u ON u.auth_token = r.reviewer_token
+    WHERE r.seller_token = ?
+    ORDER BY r.created_at DESC
+    LIMIT 20
+");
+$reviewsStmt->execute([$profileUser['auth_token']]);
+$reviews = $reviewsStmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -148,6 +166,16 @@ $memberSince = date('m/Y', strtotime($profileUser['created_at']));
             <i class="fa-regular fa-calendar"></i>
             Membre depuis <?= $memberSince ?>
           </span>
+          <?php if ($reviewCount > 0): ?>
+            <span class="profile-stat">
+              <span class="profile-stars">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <i class="fa-<?= $i <= round($avgRating) ? 'solid' : 'regular' ?> fa-star"></i>
+                <?php endfor; ?>
+              </span>
+              <?= $avgRating ?>/5 (<?= $reviewCount ?> avis)
+            </span>
+          <?php endif; ?>
         </div>
         <?php if ($profileDescription): ?>
           <p class="profile-hero-bio"><?= nl2br(htmlspecialchars($profileDescription, ENT_QUOTES, 'UTF-8')) ?></p>
@@ -203,6 +231,46 @@ $memberSince = date('m/Y', strtotime($profileUser['created_at']));
         </div>
       <?php endif; ?>
     </section>
+
+    <!-- Section Avis -->
+    <?php if (!empty($reviews)): ?>
+      <section class="profile-reviews-section">
+        <h2 class="profile-section-title">
+          <i class="fa-solid fa-star"></i>
+          Avis
+          <span class="profile-section-count"><?= $reviewCount ?></span>
+        </h2>
+        <div class="profile-reviews-list">
+          <?php foreach ($reviews as $rev): ?>
+            <div class="profile-review-item">
+              <div class="profile-review-header">
+                <div class="profile-review-author">
+                  <div class="profile-review-avatar">
+                    <?php if ($rev['profile_photo'] && file_exists('../uploads/profiles/' . $rev['profile_photo'])): ?>
+                      <img src="../uploads/profiles/<?= htmlspecialchars($rev['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
+                    <?php else: ?>
+                      <img src="../assets/images/default-avatar.svg" alt="">
+                    <?php endif; ?>
+                  </div>
+                  <span class="profile-review-name"><?= htmlspecialchars($rev['username'], ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
+                <div class="profile-review-meta">
+                  <span class="profile-review-stars">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                      <i class="fa-<?= $i <= $rev['rating'] ? 'solid' : 'regular' ?> fa-star"></i>
+                    <?php endfor; ?>
+                  </span>
+                  <span class="profile-review-date"><?= date('d/m/Y', strtotime($rev['created_at'])) ?></span>
+                </div>
+              </div>
+              <?php if ($rev['comment']): ?>
+                <p class="profile-review-comment"><?= nl2br(htmlspecialchars($rev['comment'], ENT_QUOTES, 'UTF-8')) ?></p>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
   </main>
 
   <script src="../styles/theme.js"></script>

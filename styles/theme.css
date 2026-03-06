@@ -84,6 +84,70 @@ body {
         color 0.3s ease;
 }
 
+/* ═══ HEADER ICONS (favoris, messagerie, notifications) ══ */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.header-icon-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.header-icon-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .header-icon-link {
+    color: var(--mp-text);
+}
+
+[data-bs-theme="dark"] .header-icon-link:hover {
+    background: rgba(127, 184, 133, 0.15);
+}
+
+.header-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    border: 2px solid var(--mp-header-bg);
+}
+
+[data-bs-theme="dark"] .header-badge {
+    border-color: var(--mp-header-bg);
+}
+
+@media (max-width: 768px) {
+    .header-icons {
+        display: none;
+    }
+}
+
 /* BOUTON DE BASCULEMENT DU THÈME */
 .theme-toggle {
     background: none;
@@ -162,6 +226,7 @@ body {
 /* MENU HAMBURGER */
 .hamburger-btn {
     display: none;
+    position: relative;
     background: none;
     border: none;
     cursor: pointer;
@@ -246,6 +311,8 @@ body {
 }
 
 .mobile-menu nav a {
+    display: flex;
+    align-items: center;
     color: var(--mp-text);
     font-family: "Archivo", sans-serif;
     font-style: italic;
@@ -255,6 +322,30 @@ body {
     padding: 14px 0;
     border-bottom: 1px solid var(--mp-border-light);
     transition: color 0.2s ease;
+}
+
+.mobile-menu nav a .header-badge {
+    position: static;
+    margin-left: auto;
+    border: none;
+    flex-shrink: 0;
+}
+
+.mobile-menu-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
 }
 
 .mobile-menu nav a:hover {

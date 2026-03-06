@@ -21,6 +21,23 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
     </form>
     <div class="header-divider"></div>
+    <?php if (isset($_SESSION['auth_token'])): ?>
+      <!-- Icônes header : favoris, messagerie, notifications -->
+      <div class="header-icons">
+        <a href="<?= $headerBasePath ?>favoris/" class="header-icon-link" title="Favoris">
+          <i class="fa-solid fa-heart"></i>
+        </a>
+        <a href="<?= $headerBasePath ?>messagerie/inbox.php" class="header-icon-link" title="Messagerie">
+          <i class="fa-solid fa-envelope"></i>
+          <span class="header-badge header-badge-msg" id="badgeMsg" style="display:none;"></span>
+        </a>
+        <a href="<?= $headerBasePath ?>notifications/" class="header-icon-link" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="header-badge header-badge-notif" id="badgeNotif" style="display:none;"></span>
+        </a>
+      </div>
+    <?php endif; ?>
+
     <a class="profile-photo-container" href="<?= $headerBasePath ?><?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>">
       <img src="<?= $profilePhotoExists ? $headerBasePath . 'uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : $headerBasePath . 'assets/images/default-avatar.svg' ?>"
         alt="Photo de profil"
@@ -36,6 +53,9 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     <!-- Hamburger mobile -->
     <button class="hamburger-btn" aria-label="Menu">
       <i class="fa-solid fa-bars"></i>
+      <?php if (isset($_SESSION['auth_token'])): ?>
+        <span class="header-badge" id="badgeHamburger" style="display:none;"></span>
+      <?php endif; ?>
     </button>
   </div>
 
@@ -58,7 +78,11 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
   </div>
   <nav>
     <a href="<?= $headerBasePath ?>shop/sell.php"><i class="fa-solid fa-tag"></i>&nbsp; Vendre</a>
-    <a href="#"><i class="fa-solid fa-language"></i>&nbsp; Langue</a>
+    <?php if (isset($_SESSION['auth_token'])): ?>
+      <a href="<?= $headerBasePath ?>messagerie/inbox.php"><i class="fa-solid fa-envelope"></i>&nbsp; Messagerie<span class="mobile-menu-badge" id="badgeMsgMobile" style="display:none;"></span></a>
+      <a href="<?= $headerBasePath ?>favoris/"><i class="fa-solid fa-heart"></i>&nbsp; Favoris</a>
+      <a href="<?= $headerBasePath ?>notifications/"><i class="fa-solid fa-bell"></i>&nbsp; Notifications<span class="mobile-menu-badge" id="badgeNotifMobile" style="display:none;"></span></a>
+    <?php endif; ?>
     <a href="<?= $headerBasePath ?>settings/settings.php"><i class="fa-solid fa-gear"></i>&nbsp; Paramètres</a>
     <a href="#"><i class="fa-solid fa-circle-question"></i>&nbsp; Aide</a>
     <?php if (isset($_SESSION['auth_token'])): ?>
@@ -224,6 +248,81 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
 <link rel="stylesheet" href="<?= $headerBasePath ?>styles/cookie-banner.css" />
 <script src="<?= $headerBasePath ?>styles/cookie-banner.js"></script>
+
+<?php if (isset($_SESSION['auth_token'])): ?>
+  <!-- ═══ BADGES TEMPS RÉEL ══════════════════════════════════ -->
+  <script>
+    (function() {
+      var basePath = <?= json_encode($headerBasePath) ?>;
+      var _notifCount = 0,
+        _msgCount = 0;
+
+      function updateHamburger() {
+        var total = _notifCount + _msgCount;
+        var badge = document.getElementById('badgeHamburger');
+        if (!badge) return;
+        if (total > 0) {
+          badge.textContent = total > 99 ? '99+' : total;
+          badge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      function updateBadges() {
+        // Notifications count
+        fetch(basePath + 'api/notifications.php?action=count', {
+            credentials: 'same-origin'
+          })
+          .then(function(r) {
+            return r.json();
+          })
+          .then(function(data) {
+            _notifCount = data.unread_count || 0;
+            var count = _notifCount > 0 ? (_notifCount > 99 ? '99+' : _notifCount) : null;
+            ['badgeNotif', 'badgeNotifMobile'].forEach(function(id) {
+              var badge = document.getElementById(id);
+              if (!badge) return;
+              if (count) {
+                badge.textContent = count;
+                badge.style.display = '';
+              } else {
+                badge.style.display = 'none';
+              }
+            });
+            updateHamburger();
+          })
+          .catch(function() {});
+
+        // Unread messages count
+        fetch(basePath + 'api/unread_messages.php', {
+            credentials: 'same-origin'
+          })
+          .then(function(r) {
+            return r.json();
+          })
+          .then(function(data) {
+            _msgCount = data.unread_count || 0;
+            var count = _msgCount > 0 ? (_msgCount > 99 ? '99+' : _msgCount) : null;
+            ['badgeMsg', 'badgeMsgMobile'].forEach(function(id) {
+              var badge = document.getElementById(id);
+              if (!badge) return;
+              if (count) {
+                badge.textContent = count;
+                badge.style.display = '';
+              } else {
+                badge.style.display = 'none';
+              }
+            });
+            updateHamburger();
+          })
+          .catch(function() {});
+      }
+      updateBadges();
+      setInterval(updateBadges, 15000);
+    })();
+  </script>
+<?php endif; ?>
 
 <!-- ═══ AUTOCOMPLETE ════════════════════════════════════════ -->
 <script>

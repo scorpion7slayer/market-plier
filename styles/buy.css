@@ -398,6 +398,240 @@
     border-top: 1px solid var(--mp-border-light);
 }
 
+/* Seller rating */
+.seller-rating {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--mp-border-light);
+}
+
+.seller-stars {
+    color: #f59e0b;
+    font-size: 14px;
+    display: flex;
+    gap: 2px;
+}
+
+.seller-rating-text {
+    font-size: 13px;
+    color: var(--mp-text-muted);
+    font-style: italic;
+}
+
+/* Favori button */
+.buy-btn-fav {
+    background: transparent;
+    color: var(--mp-text-secondary);
+    border-color: var(--mp-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.buy-btn-fav:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.buy-btn-fav-active {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.buy-fav-count {
+    background: var(--mp-bg-tertiary);
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-weight: 700;
+}
+
+/* Contact textarea */
+.contact-textarea {
+    width: 100%;
+    border: 2px solid var(--mp-border-light);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: "Archivo", sans-serif;
+    font-size: 14px;
+    color: var(--mp-text);
+    background: var(--mp-input-bg);
+    resize: vertical;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+
+.contact-textarea:focus {
+    border-color: var(--mp-green);
+}
+
+/* ═══ REVIEWS ═════════════════════════════════════════════ */
+.buy-card-reviews {
+    border-top: 2px solid var(--mp-border-light);
+}
+
+.buy-review-avg {
+    font-size: 0.85rem;
+    color: #f59e0b;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* Review form */
+.review-form {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--mp-bg);
+    border-radius: 12px;
+}
+
+.review-stars-input {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.review-star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: #f59e0b;
+    padding: 2px;
+    transition: transform 0.15s;
+}
+
+.review-star-btn:hover {
+    transform: scale(1.2);
+}
+
+.review-textarea {
+    width: 100%;
+    border: 2px solid var(--mp-border-light);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: "Archivo", sans-serif;
+    font-size: 13px;
+    color: var(--mp-text);
+    background: var(--mp-card-bg);
+    resize: vertical;
+    outline: none;
+    min-height: 60px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+}
+
+.review-textarea:focus {
+    border-color: var(--mp-green);
+}
+
+.review-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: none;
+    background: var(--mp-green);
+    color: #fff;
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.review-submit-btn:hover:not(:disabled) {
+    background: var(--mp-green-hover);
+}
+
+.review-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Review list */
+.review-empty {
+    font-size: 14px;
+    color: var(--mp-text-muted);
+    font-style: italic;
+}
+
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.review-item {
+    padding: 14px;
+    background: var(--mp-bg);
+    border-radius: 12px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.review-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.review-author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.review-author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-author-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--mp-text);
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-stars-display {
+    color: #f59e0b;
+    font-size: 13px;
+    display: flex;
+    gap: 1px;
+}
+
+.review-date {
+    font-size: 12px;
+    color: var(--mp-text-muted);
+}
+
+.review-comment {
+    font-size: 13px;
+    color: var(--mp-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
 /* RESPONSIVE */
 
 /* Tablette */

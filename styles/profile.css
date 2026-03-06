@@ -304,6 +304,85 @@
     }
 }
 
+/* ═══ REVIEWS ON PROFILE ═════════════════════════════════ */
+.profile-stars {
+    color: #f59e0b;
+    font-size: 13px;
+}
+
+.profile-reviews-section {
+    margin-top: 32px;
+}
+
+.profile-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-review-item {
+    padding: 16px;
+    background: var(--mp-card-bg);
+    border-radius: 14px;
+    box-shadow: 0 1px 6px var(--mp-card-shadow);
+}
+
+.profile-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.profile-review-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-review-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-review-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--mp-text);
+}
+
+.profile-review-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-review-stars {
+    color: #f59e0b;
+    font-size: 13px;
+}
+
+.profile-review-date {
+    font-size: 12px;
+    color: var(--mp-text-muted);
+}
+
+.profile-review-comment {
+    font-size: 13px;
+    color: var(--mp-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
 /* MODE SOMBRE */
 [data-bs-theme="dark"] .profile-listing-condition {
     background: rgba(127, 184, 133, 0.85);
