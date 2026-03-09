@@ -124,22 +124,21 @@ try {
     // Pour chaque annonce, récupérer toutes les images
     foreach ($listings as $listing) {
         $imagesStmt = $pdo->prepare("
-            SELECT image_path FROM listing_images 
-            WHERE listing_id = ? 
+            SELECT id, image_path FROM listing_images
+            WHERE listing_id = ?
             ORDER BY sort_order ASC
         ");
         $imagesStmt->execute([$listing['id']]);
-        $additionalImages = $imagesStmt->fetchAll(PDO::FETCH_COLUMN);
+        $imageRows = $imagesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Construire le tableau d'images (image principale + images additionnelles)
+        // Construire le tableau d'images avec URLs API
         $allImages = [];
-        if (!empty($listing['image'])) {
-            $allImages[] = $listing['image'];
+        foreach ($imageRows as $imgRow) {
+            $allImages[] = '../api/image.php?id=' . (int)$imgRow['id'];
         }
-        foreach ($additionalImages as $img) {
-            if ($img !== $listing['image']) {
-                $allImages[] = $img;
-            }
+        // Fallback sur l'image principale
+        if (empty($allImages) && !empty($listing['image'])) {
+            $allImages[] = '../uploads/listings/' . $listing['image'];
         }
 
         $listing['all_images'] = $allImages;
@@ -256,9 +255,7 @@ try {
                         <div class="articles-grid">
                             <?php foreach ($userListings as $listing): ?>
                                 <?php
-                                // Déterminer l'image à afficher
-                                $displayImage = $listing['image'] ?? $listing['additional_image'];
-                                $imageUrl = $displayImage ? '../uploads/listings/' . htmlspecialchars($displayImage, ENT_QUOTES, 'UTF-8') : '../assets/images/no-image.svg';
+                                $imageUrl = !empty($listing['all_images']) ? $listing['all_images'][0] : '../assets/images/no-image.svg';
                                 $price = number_format($listing['price'], 2, ',', ' ');
                                 $conditionLabels = [
                                     'neuf' => 'Neuf',
@@ -276,9 +273,9 @@ try {
                                                 <div class="carousel-inner">
                                                     <?php foreach ($listing['all_images'] as $index => $img): ?>
                                                         <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-                                                            <img src="../uploads/listings/<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>"
+                                                            <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>"
                                                                 class="d-block w-100"
-                                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+                                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                                                         </div>
                                                     <?php endforeach; ?>
                                                 </div>
@@ -292,8 +289,8 @@ try {
                                                 </button>
                                             </div>
                                         <?php elseif (!empty($listing['all_images'])): ?>
-                                            <img src="../uploads/listings/<?= htmlspecialchars($listing['all_images'][0], ENT_QUOTES, 'UTF-8') ?>"
-                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <img src="<?= htmlspecialchars($listing['all_images'][0], ENT_QUOTES, 'UTF-8') ?>"
+                                                alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                                         <?php else: ?>
                                             <div class="no-image-placeholder">
                                                 <i class="fa-solid fa-image"></i>

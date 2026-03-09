@@ -33,8 +33,8 @@ $categoryIcons = [
   'autre'        => 'fa-ellipsis',
 ];
 
-// Server-side search for initial page load
-$where = [];
+// Server-side search for initial page load — only show active listings
+$where = ["l.status = 'active'"];
 $params = [];
 
 if ($query !== '') {
@@ -48,23 +48,65 @@ if ($category !== '' && in_array($category, $allowedCategories, true)) {
   $params[] = $category;
 }
 
+// Filtres avancés (doivent s'appliquer avant le calcul du total)
+$priceMin = trim($_GET['price_min'] ?? '');
+$priceMax = trim($_GET['price_max'] ?? '');
+$condition = trim($_GET['condition'] ?? '');
+$sort = trim($_GET['sort'] ?? 'newest');
+
+$allowedConditions = ['neuf', 'tres_bon_etat', 'bon_etat', 'etat_correct', 'pour_pieces'];
+$allowedSorts = ['newest', 'oldest', 'cheapest', 'expensive'];
+
+if ($priceMin !== '' && is_numeric($priceMin) && (float)$priceMin >= 0) {
+  $where[] = 'l.price >= ?';
+  $params[] = (float)$priceMin;
+}
+if ($priceMax !== '' && is_numeric($priceMax) && (float)$priceMax > 0) {
+  $where[] = 'l.price <= ?';
+  $params[] = (float)$priceMax;
+}
+if ($condition !== '' && in_array($condition, $allowedConditions, true)) {
+  $where[] = 'l.item_condition = ?';
+  $params[] = $condition;
+}
+
+// construire la clause WHERE après avoir ajouté toutes les conditions
 $whereSQL = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
 
+// total des annonces correspondant aux critères
 $countStmt = $pdo->prepare("SELECT COUNT(*) FROM listings l $whereSQL");
 $countStmt->execute($params);
 $total = (int) $countStmt->fetchColumn();
 
+if (!in_array($sort, $allowedSorts, true)) $sort = 'newest';
+
+$orderBy = match ($sort) {
+  'oldest'    => 'l.created_at ASC',
+  'cheapest'  => 'l.price ASC, l.created_at DESC',
+  'expensive' => 'l.price DESC, l.created_at DESC',
+  default     => 'l.created_at DESC',
+};
+
+$conditionLabels = [
+  'neuf'          => 'Neuf',
+  'tres_bon_etat' => 'Très bon état',
+  'bon_etat'      => 'Bon état',
+  'etat_correct'  => 'État correct',
+  'pour_pieces'   => 'Pour pièces',
+];
+
 $perPage = 20;
 $sql = "SELECT l.id, l.title, l.price, l.category, l.item_condition, l.location, l.created_at,
+               (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
                COALESCE(
                    (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
                    l.image
-               ) AS image,
+               ) AS image_path,
                u.username
         FROM listings l
         LEFT JOIN users u ON u.auth_token = l.auth_token
         $whereSQL
-        ORDER BY l.created_at DESC
+        ORDER BY $orderBy
         LIMIT ? OFFSET 0";
 
 $stmtParams = array_merge($params, [$perPage]);
@@ -139,6 +181,43 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
 
+    <!-- Filtres avancés -->
+    <div class="search-filters">
+      <form method="GET" class="filters-form" id="filtersForm">
+        <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
+        <?php if ($category !== ''): ?><input type="hidden" name="category" value="<?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
+        <div class="filter-group">
+          <label class="filter-label">Prix</label>
+          <div class="filter-price-row">
+            <input type="number" name="price_min" class="filter-input" placeholder="Min" min="0" step="0.01"
+              value="<?= htmlspecialchars($priceMin, ENT_QUOTES, 'UTF-8') ?>">
+            <span class="filter-sep">—</span>
+            <input type="number" name="price_max" class="filter-input" placeholder="Max" min="0" step="0.01"
+              value="<?= htmlspecialchars($priceMax, ENT_QUOTES, 'UTF-8') ?>">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">État</label>
+          <select name="condition" class="filter-select">
+            <option value="">Tous</option>
+            <?php foreach ($conditionLabels as $ck => $cl): ?>
+              <option value="<?= $ck ?>" <?= $condition === $ck ? 'selected' : '' ?>><?= $cl ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Trier par</label>
+          <select name="sort" class="filter-select">
+            <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Plus récents</option>
+            <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Plus anciens</option>
+            <option value="cheapest" <?= $sort === 'cheapest' ? 'selected' : '' ?>>Moins chers</option>
+            <option value="expensive" <?= $sort === 'expensive' ? 'selected' : '' ?>>Plus chers</option>
+          </select>
+        </div>
+        <button type="submit" class="filter-btn"><i class="fa-solid fa-filter"></i> Filtrer</button>
+      </form>
+    </div>
+
     <!-- Search info -->
     <div class="search-info">
       <?php if ($query !== '' || $category !== ''): ?>
@@ -168,9 +247,12 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php foreach ($listings as $listing): ?>
           <a href="../shop/buy.php?id=<?= (int) $listing['id'] ?>" class="listing-card">
             <div class="listing-card-img">
-              <?php if ($listing['image']): ?>
-                <img src="../uploads/listings/<?= htmlspecialchars($listing['image'], ENT_QUOTES, 'UTF-8') ?>"
-                  alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+              <?php if ($listing['image_id']): ?>
+                <img src="../api/image.php?id=<?= (int) $listing['image_id'] ?>"
+                  alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+              <?php elseif ($listing['image_path']): ?>
+                <img src="../uploads/listings/<?= htmlspecialchars($listing['image_path'], ENT_QUOTES, 'UTF-8') ?>"
+                  alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
               <?php else: ?>
                 <div class="listing-card-placeholder">
                   <i class="fa-solid fa-image"></i>
@@ -238,6 +320,10 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
       var totalPages = <?= (int) ceil($total / $perPage) ?>;
       var query = <?= json_encode($query) ?>;
       var category = <?= json_encode($category) ?>;
+      var priceMin = <?= json_encode($priceMin) ?>;
+      var priceMax = <?= json_encode($priceMax) ?>;
+      var condition = <?= json_encode($condition) ?>;
+      var sort = <?= json_encode($sort) ?>;
       var loadMoreBtn = document.getElementById('loadMoreBtn');
       var loadMoreContainer = document.getElementById('loadMoreContainer');
       var resultsContainer = document.getElementById('searchResults');
@@ -254,6 +340,10 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
           var params = new URLSearchParams();
           if (query) params.set('q', query);
           if (category) params.set('category', category);
+          if (priceMin) params.set('price_min', priceMin);
+          if (priceMax) params.set('price_max', priceMax);
+          if (condition) params.set('condition', condition);
+          if (sort) params.set('sort', sort);
           params.set('page', currentPage);
 
           fetch('../api/search.php?' + params.toString())
@@ -268,13 +358,25 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 var imgDiv = document.createElement('div');
                 imgDiv.className = 'listing-card-img';
-                if (listing.image) {
+                if (listing.image_id) {
                   var img = document.createElement('img');
-                  img.src = '../uploads/listings/' + listing.image;
+                  img.src = '../api/image.php?id=' + listing.image_id;
                   img.alt = listing.title;
+                  img.loading = 'lazy';
+                  imgDiv.appendChild(img);
+                } else if (listing.image_path) {
+                  var img = document.createElement('img');
+                  img.src = '../uploads/listings/' + listing.image_path;
+                  img.alt = listing.title;
+                  img.loading = 'lazy';
                   imgDiv.appendChild(img);
                 } else {
-                  imgDiv.innerHTML = '<div class="listing-card-placeholder"><i class="fa-solid fa-image"></i></div>';
+                  var ph = document.createElement('div');
+                  ph.className = 'listing-card-placeholder';
+                  var icon = document.createElement('i');
+                  icon.className = 'fa-solid fa-image';
+                  ph.appendChild(icon);
+                  imgDiv.appendChild(ph);
                 }
 
                 var body = document.createElement('div');

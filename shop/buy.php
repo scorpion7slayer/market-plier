@@ -33,18 +33,40 @@ if (!$listing) {
   exit();
 }
 
+// Block access to pending listings for non-owners and non-admins
+if (isset($listing['status']) && $listing['status'] === 'pending') {
+  $isOwner = (isset($_SESSION['auth_token']) && $_SESSION['auth_token'] === $listing['auth_token']);
+  $isAdminView = false;
+  if (isset($_SESSION['auth_token'])) {
+    $adCheck = $pdo->prepare("SELECT is_admin FROM users WHERE auth_token = ?");
+    $adCheck->execute([$_SESSION['auth_token']]);
+    $adRow = $adCheck->fetch();
+    $isAdminView = ($adRow && $adRow['is_admin'] == 1);
+  }
+  if (!$isOwner && !$isAdminView) {
+    header('Location: search.php');
+    exit();
+  }
+}
+
 // Récupérer toutes les images de l'annonce
 $imgStmt = $pdo->prepare("
-    SELECT image_path FROM listing_images
+    SELECT id, image_path FROM listing_images
     WHERE listing_id = ?
     ORDER BY sort_order ASC
 ");
 $imgStmt->execute([$listingId]);
-$images = $imgStmt->fetchAll(PDO::FETCH_COLUMN);
+$imageRows = $imgStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Build image URLs: prefer api/image.php?id=X, fallback to file path
+$images = [];
+foreach ($imageRows as $imgRow) {
+  $images[] = ['url' => '../api/image.php?id=' . (int)$imgRow['id'], 'id' => (int)$imgRow['id']];
+}
 
 // Fallback sur l'image principale si pas d'images dans listing_images
 if (empty($images) && !empty($listing['image'])) {
-  $images = [$listing['image']];
+  $images[] = ['url' => '../uploads/listings/' . $listing['image'], 'id' => null];
 }
 
 // Compter le nombre d'annonces du vendeur
@@ -170,7 +192,7 @@ if (empty($_SESSION['csrf_token'])) {
           <!-- Image principale -->
           <div class="gallery-main" id="galleryMain">
             <img
-              src="../uploads/listings/<?= htmlspecialchars($images[0], ENT_QUOTES, 'UTF-8') ?>"
+              src="<?= htmlspecialchars($images[0]['url'], ENT_QUOTES, 'UTF-8') ?>"
               alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>"
               id="mainImage">
             <?php if (count($images) > 1): ?>
@@ -193,7 +215,7 @@ if (empty($_SESSION['csrf_token'])) {
                   data-index="<?= $i ?>"
                   type="button">
                   <img
-                    src="../uploads/listings/<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>"
+                    src="<?= htmlspecialchars($img['url'], ENT_QUOTES, 'UTF-8') ?>"
                     alt="Photo <?= $i + 1 ?>">
                 </button>
               <?php endforeach; ?>
@@ -439,7 +461,7 @@ if (empty($_SESSION['csrf_token'])) {
   <script>
     (function() {
       var images = <?= json_encode(array_map(function ($img) {
-                      return '../uploads/listings/' . $img;
+                      return $img['url'];
                     }, $images)) ?>;
       var currentIndex = 0;
       var mainImg = document.getElementById('mainImage');

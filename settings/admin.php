@@ -8,6 +8,7 @@ try {
   die("Erreur de connexion à la base de données.");
 }
 require_once '../includes/remember_me.php';
+require_once '../includes/site_settings.php';
 
 // --- FONCTIONS ---
 
@@ -39,14 +40,16 @@ function checkIsAdmin($pdo, $token)
 
 function fetchAdminData($pdo)
 {
-  $data = ['users' => [], 'listings' => [], 'stats' => ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0]];
+  $data = ['users' => [], 'listings' => [], 'pending_listings' => [], 'stats' => ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0, 'pending' => 0]];
   try {
     $data['stats']['users'] = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    $data['stats']['listings'] = $pdo->query("SELECT COUNT(*) FROM listings")->fetchColumn();
+    $data['stats']['listings'] = $pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'active'")->fetchColumn();
     $data['stats']['admins'] = $pdo->query("SELECT COUNT(*) FROM users WHERE is_admin = 1")->fetchColumn();
     $data['stats']['new_month'] = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
+    $data['stats']['pending'] = $pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'pending'")->fetchColumn();
     $data['users'] = $pdo->query("SELECT username, email, auth_provider, is_admin, created_at, auth_token, profile_photo FROM users ORDER BY created_at DESC")->fetchAll();
-    $data['listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT 20")->fetchAll();
+    $data['listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, l.status, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT 20")->fetchAll();
+    $data['pending_listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token WHERE l.status = 'pending' ORDER BY l.created_at ASC")->fetchAll();
   } catch (PDOException $ex) {
     error_log("Error fetching admin data: " . $ex->getMessage());
   }
@@ -177,6 +180,32 @@ function handleDeleteListing($pdo, &$successMessage, &$errorMessage)
   }
 }
 
+/**
+ * Handle approve listing action
+ */
+function handleApproveListing($pdo, &$successMessage, &$errorMessage)
+{
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['approve_listing'])) {
+    return;
+  }
+
+  if (!validateCsrfToken()) {
+    $errorMessage = "Token CSRF invalide.";
+    return;
+  }
+
+  $listingId = (int) ($_POST['listing_id'] ?? 0);
+  if ($listingId <= 0) return;
+
+  try {
+    $pdo->prepare("UPDATE listings SET status = 'active' WHERE id = ? AND status = 'pending'")->execute([$listingId]);
+    $successMessage = "Annonce approuvée et publiée.";
+  } catch (PDOException $ex) {
+    $errorMessage = "Erreur lors de l'approbation.";
+    error_log("Error approving listing: " . $ex->getMessage());
+  }
+}
+
 // --- INITIALISATION ---
 $currentToken = initAdminPage($pdo);
 $successMessage = '';
@@ -186,12 +215,15 @@ $errorMessage = '';
 handleToggleAdmin($pdo, $currentToken, $successMessage, $errorMessage);
 handleDeleteUser($pdo, $currentToken, $successMessage, $errorMessage);
 handleDeleteListing($pdo, $successMessage, $errorMessage);
+handleApproveListing($pdo, $successMessage, $errorMessage);
 
 // Fetch data
 $adminData = fetchAdminData($pdo);
 $users = $adminData['users'];
 $listings = $adminData['listings'];
+$pendingListings = $adminData['pending_listings'];
 $stats = $adminData['stats'];
+$siteSettings = getSiteSettings($pdo);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -338,6 +370,55 @@ $stats = $adminData['stats'];
       </div>
     </section>
 
+    <!-- Annonces en attente de modération -->
+    <?php if (!empty($pendingListings)): ?>
+    <section class="settings-section">
+      <h2 class="settings-section-title"><i class="fas fa-hourglass-half" style="color: #f0c040;"></i> Annonces en attente (<?= count($pendingListings) ?>)</h2>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Prix</th>
+              <th>Catégorie</th>
+              <th>Auteur</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($pendingListings as $pl): ?>
+              <tr>
+                <td class="admin-listing-title"><?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td><span class="admin-price"><?= number_format($pl['price'], 2, ',', ' ') ?> €</span></td>
+                <td class="admin-category"><?= htmlspecialchars($pl['category'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td class="admin-username"><?= htmlspecialchars($pl['username'], ENT_QUOTES, 'UTF-8') ?></td>
+                <td class="admin-date"><?= date('d/m/Y', strtotime($pl['created_at'])) ?></td>
+                <td>
+                  <div class="admin-actions-cell">
+                    <form method="POST" style="display:inline;">
+                      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                      <input type="hidden" name="listing_id" value="<?= (int) $pl['id'] ?>">
+                      <button type="submit" name="approve_listing" class="admin-action-btn admin-action-toggle" title="Approuver">
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </form>
+                    <button type="button" class="admin-action-btn admin-action-delete" title="Supprimer"
+                      data-open-delete-listing
+                      data-listing-id="<?= (int) $pl['id'] ?>"
+                      data-listing-title="<?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?>">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <?php endif; ?>
+
     <!-- Annonces -->
     <section class="settings-section">
       <h2 class="settings-section-title"><i class="fas fa-clipboard-list"></i> Annonces récentes</h2>
@@ -388,35 +469,35 @@ $stats = $adminData['stats'];
           <span class="toggle-label">Mode maintenance</span>
           <span class="toggle-desc">Désactive temporairement l'accès public au site</span>
         </div>
-        <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" data-setting="maintenance_mode" <?= $siteSettings['maintenance_mode'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label>
       </div>
       <div class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-label">Inscriptions ouvertes</span>
           <span class="toggle-desc">Autoriser les nouveaux utilisateurs à s'inscrire</span>
         </div>
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" data-setting="registration_open" <?= $siteSettings['registration_open'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label>
       </div>
       <div class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-label">Modération des annonces</span>
           <span class="toggle-desc">Valider manuellement chaque nouvelle annonce avant publication</span>
         </div>
-        <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" data-setting="moderation_enabled" <?= $siteSettings['moderation_enabled'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label>
       </div>
       <div class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-label">Limite d'annonces par utilisateur</span>
           <span class="toggle-desc">Limiter le nombre maximum d'annonces actives par utilisateur</span>
         </div>
-        <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" data-setting="listing_limit" <?= $siteSettings['listing_limit'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label>
       </div>
       <div class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-label">Connexion Google</span>
           <span class="toggle-desc">Autoriser la connexion via Google OAuth</span>
         </div>
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><input type="checkbox" data-setting="google_login" <?= $siteSettings['google_login'] === '1' ? 'checked' : '' ?>><span class="toggle-slider"></span></label>
       </div>
     </section>
   </main>
@@ -518,6 +599,37 @@ $stats = $adminData['stats'];
           closeUser();
           closeListing();
         }
+      });
+    })();
+  </script>
+  <script>
+    // Site settings toggles (AJAX)
+    (function() {
+      var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
+
+      document.querySelectorAll('[data-setting]').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+          var key = this.getAttribute('data-setting');
+          var value = this.checked ? '1' : '0';
+          var cb = this;
+
+          fetch('handle_site_settings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: key, value: value, csrf_token: csrfToken })
+          })
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (!data.success) {
+              cb.checked = !cb.checked;
+              alert('Erreur : ' + (data.message || 'Impossible de sauvegarder'));
+            }
+          })
+          .catch(function() {
+            cb.checked = !cb.checked;
+            alert('Erreur réseau. Veuillez réessayer.');
+          });
+        });
       });
     })();
   </script>

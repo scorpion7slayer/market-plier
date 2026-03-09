@@ -29,12 +29,13 @@ if (empty($_SESSION['csrf_token'])) {
 $stmt = $pdo->prepare("
     SELECT f.id AS fav_id, f.created_at AS fav_date,
            l.id AS listing_id, l.title, l.price, l.category, l.item_condition, l.location,
+           (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
            COALESCE(
                (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
                l.image
-           ) AS image,
+           ) AS image_path,
            u.username AS seller_name
-    FROM favorites f
+    FROM favorites f 
     JOIN listings l ON l.id = f.listing_id
     JOIN users u ON u.auth_token = l.auth_token
     WHERE f.auth_token = ?
@@ -44,12 +45,20 @@ $stmt->execute([$myToken]);
 $favorites = $stmt->fetchAll();
 
 $categoryLabels = [
-  'vetements' => 'Vêtements', 'electronique' => 'Électronique', 'livres' => 'Livres & Médias',
-  'maison' => 'Maison & Jardin', 'sport' => 'Sport & Loisirs', 'vehicules' => 'Véhicules', 'autre' => 'Autre',
+  'vetements' => 'Vêtements',
+  'electronique' => 'Électronique',
+  'livres' => 'Livres & Médias',
+  'maison' => 'Maison & Jardin',
+  'sport' => 'Sport & Loisirs',
+  'vehicules' => 'Véhicules',
+  'autre' => 'Autre',
 ];
 $conditionLabels = [
-  'neuf' => 'Neuf', 'tres_bon_etat' => 'Très bon état', 'bon_etat' => 'Bon état',
-  'etat_correct' => 'État correct', 'pour_pieces' => 'Pour pièces',
+  'neuf' => 'Neuf',
+  'tres_bon_etat' => 'Très bon état',
+  'bon_etat' => 'Bon état',
+  'etat_correct' => 'État correct',
+  'pour_pieces' => 'Pour pièces',
 ];
 ?>
 <!DOCTYPE html>
@@ -99,9 +108,12 @@ $conditionLabels = [
             <div class="fav-card" data-fav-id="<?= (int) $fav['fav_id'] ?>" data-listing-id="<?= (int) $fav['listing_id'] ?>">
               <a href="../shop/buy.php?id=<?= (int) $fav['listing_id'] ?>" class="fav-card-link">
                 <div class="fav-card-img">
-                  <?php if ($fav['image']): ?>
-                    <img src="../uploads/listings/<?= htmlspecialchars($fav['image'], ENT_QUOTES, 'UTF-8') ?>"
-                      alt="<?= htmlspecialchars($fav['title'], ENT_QUOTES, 'UTF-8') ?>">
+                  <?php if ($fav['image_id']): ?>
+                    <img src="../api/image.php?id=<?= (int) $fav['image_id'] ?>"
+                      alt="<?= htmlspecialchars($fav['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                  <?php elseif ($fav['image_path']): ?>
+                    <img src="../uploads/listings/<?= htmlspecialchars($fav['image_path'], ENT_QUOTES, 'UTF-8') ?>"
+                      alt="<?= htmlspecialchars($fav['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                   <?php else: ?>
                     <div class="fav-card-placeholder"><i class="fa-solid fa-image"></i></div>
                   <?php endif; ?>
@@ -147,13 +159,21 @@ $conditionLabels = [
           fd.append('csrf_token', csrfToken);
           fd.append('listing_id', listingId);
 
-          fetch('../api/toggle_favorite.php', { method: 'POST', body: fd, credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
+          fetch('../api/toggle_favorite.php', {
+              method: 'POST',
+              body: fd,
+              credentials: 'same-origin'
+            })
+            .then(function(r) {
+              return r.json();
+            })
             .then(function(data) {
               if (data.success && !data.favorited) {
                 card.style.opacity = '0';
                 card.style.transform = 'scale(0.9)';
-                setTimeout(function() { card.remove(); }, 300);
+                setTimeout(function() {
+                  card.remove();
+                }, 300);
                 if (typeof mpShowToast === 'function') {
                   mpShowToast('Retiré des favoris', 'success');
                 }

@@ -217,12 +217,16 @@ try {
         }
     }
 
-    // 3. Insérer les nouvelles images
+    // 3. Insérer les nouvelles images (avec BLOB en DB)
     if (!empty($uploadedImages)) {
-        $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order) VALUES (?, ?, ?)");
+        $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order, image_data, mime_type) VALUES (?, ?, ?, ?, ?)");
         $sortStart = $currentKeptCount;
+        $uploadDir = __DIR__ . '/../uploads/listings/';
         foreach ($uploadedImages as $index => $imgName) {
-            $stmtImg->execute([$listingId, $imgName, $sortStart + $index]);
+            $filePath = $uploadDir . $imgName;
+            $imageData = file_exists($filePath) ? file_get_contents($filePath) : null;
+            $mimeType = file_exists($filePath) ? (mime_content_type($filePath) ?: 'image/jpeg') : 'image/jpeg';
+            $stmtImg->execute([$listingId, $imgName, $sortStart + $index, $imageData, $mimeType]);
         }
     }
 

@@ -2,10 +2,9 @@
 session_start();
 require_once 'database/db.php';
 require_once 'includes/remember_me.php';
+require_once 'includes/maintenance_check.php';
 
 // Générer un token CSRF uniquement s'il n'existe pas encore.
-// Régénérer inconditionnellement écrasait le token des formulaires ouverts
-// dans d'autres onglets ou pages (ex. sell.php), causant des erreurs CSRF.
 if (!isset($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -34,7 +33,6 @@ if (isset($_SESSION['auth_token'])) {
     exit();
   }
 }
-// Vérifier si l'utilisateur est admin
 $user = $user ?? null;
 $isAdmin = false;
 if ($user) {
@@ -46,6 +44,75 @@ if ($user) {
   } catch (PDOException $ex) {
     $isAdmin = false;
   }
+}
+
+// --- Données pour la page d'accueil ---
+
+$categoryLabels = [
+  'vetements'    => 'Vêtements',
+  'electronique' => 'Électronique',
+  'livres'       => 'Livres & Médias',
+  'maison'       => 'Maison & Jardin',
+  'sport'        => 'Sport & Loisirs',
+  'vehicules'    => 'Véhicules',
+  'autre'        => 'Autre',
+];
+$categoryIcons = [
+  'vetements'    => 'fa-shirt',
+  'electronique' => 'fa-laptop',
+  'livres'       => 'fa-book',
+  'maison'       => 'fa-house',
+  'sport'        => 'fa-futbol',
+  'vehicules'    => 'fa-car',
+  'autre'        => 'fa-ellipsis',
+];
+
+// Articles tendances : les plus mis en favoris
+$trendingStmt = $pdo->query("
+    SELECT l.id, l.title, l.price, l.category,
+           (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
+           COALESCE(
+               (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
+               l.image
+           ) AS image_path,
+           COUNT(f.id) AS fav_count
+    FROM listings l
+    LEFT JOIN favorites f ON f.listing_id = l.id
+    WHERE l.status = 'active'
+    GROUP BY l.id
+    ORDER BY fav_count DESC, l.created_at DESC
+    LIMIT 8
+");
+$trending = $trendingStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Dernières annonces
+$recentStmt = $pdo->query("
+    SELECT l.id, l.title, l.price, l.category, l.item_condition, l.location, l.created_at,
+           (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
+           COALESCE(
+               (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
+               l.image
+           ) AS image_path,
+           u.username
+    FROM listings l
+    LEFT JOIN users u ON u.auth_token = l.auth_token
+    WHERE l.status = 'active'
+    ORDER BY l.created_at DESC
+    LIMIT 12
+");
+$recent = $recentStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Nombre d'annonces par catégorie
+$catCountStmt = $pdo->query("
+    SELECT category, COUNT(*) AS cnt
+    FROM listings
+    WHERE status = 'active'
+    GROUP BY category
+    ORDER BY cnt DESC
+");
+$categoryCounts = [];
+foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+  $categoryCounts[$row['category']] = (int) $row['cnt'];
 }
 ?>
 <!DOCTYPE html>
@@ -59,18 +126,18 @@ if ($user) {
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
   <link rel="stylesheet" href="styles/index.css" />
+  <link rel="stylesheet" href="styles/search.css" />
   <link rel="stylesheet" href="styles/theme.css" />
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" />
 </head>
 
 <body>
-  <!-- Header partagé -->
   <?php
   $headerBasePath = './';
   $headerUser = $user;
   include 'header.php';
   ?>
-  <!-- Message compte supprimé par admin -->
+
   <?php if (isset($_GET['account_deleted']) && $_GET['account_deleted'] === '1'): ?>
     <div style="max-width: 500px; margin: 40px auto; padding: 32px; background: var(--mp-card-bg, #fff); border-radius: 18px; box-shadow: 0 8px 32px var(--mp-card-shadow, rgba(0,0,0,0.08)); text-align: center; font-family: 'Archivo', sans-serif;">
       <div style="width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); display: flex; align-items: center; justify-content: center;">
@@ -83,39 +150,106 @@ if ($user) {
     </div>
   <?php endif; ?>
 
+  <main class="home-main">
+    <?php if ($user): ?>
+      <div class="greeting">Bonjour, <?= htmlspecialchars($user['username']) ?></div>
+    <?php else: ?>
+      <div class="greeting">Bienvenue sur Market Plier</div>
+    <?php endif; ?>
 
-
-  <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
-  <main>
-    <div class="greeting">Bonjour, <?php echo htmlspecialchars($user['username'] ?? ''); ?></div>
-
-    <!-- Trending section -->
+    <!-- Catégories -->
     <section>
-      <div class="section-title">Articles tendances</div>
-      <div class="cards-row">
-        <div class="trending-cards">
-          <div class="circle-card"><img src="https://picsum.photos/seed/t1/200/200" alt=""></div>
-          <div class="circle-card"><img src="https://picsum.photos/seed/t2/200/200" alt=""></div>
-          <div class="circle-card"><img src="https://picsum.photos/seed/t3/200/200" alt=""></div>
-          <div class="circle-card"><img src="https://picsum.photos/seed/t4/200/200" alt=""></div>
-        </div>
-        <i class="fa-solid fa-caret-right chevron"></i>
+      <div class="section-title">Catégories</div>
+      <div class="category-filters">
+        <?php foreach ($categoryLabels as $catKey => $catLabel): ?>
+          <a href="shop/search.php?category=<?= $catKey ?>" class="category-chip">
+            <i class="fa-solid <?= $categoryIcons[$catKey] ?>"></i>
+            <?= htmlspecialchars($catLabel, ENT_QUOTES, 'UTF-8') ?>
+            <?php if (isset($categoryCounts[$catKey])): ?>
+              <span class="cat-count">(<?= $categoryCounts[$catKey] ?>)</span>
+            <?php endif; ?>
+          </a>
+        <?php endforeach; ?>
       </div>
     </section>
 
-    <!-- Recently viewed section -->
-    <section>
-      <div class="section-title">Achats consulté dernierement</div>
-      <div class="cards-row">
-        <div class="recent-cards">
-          <div class="rect-card"><img src="https://picsum.photos/seed/r1/200/160" alt=""></div>
-          <div class="rect-card"><img src="https://picsum.photos/seed/r2/200/160" alt=""></div>
-          <div class="rect-card"><img src="https://picsum.photos/seed/r3/200/160" alt=""></div>
-          <div class="rect-card"><img src="https://picsum.photos/seed/r4/200/160" alt=""></div>
+    <!-- Articles tendances -->
+    <?php if (!empty($trending)): ?>
+      <section>
+        <div class="section-title">Articles tendances</div>
+        <div class="home-scroll-row">
+          <?php foreach ($trending as $t): ?>
+            <a href="shop/buy.php?id=<?= (int) $t['id'] ?>" class="home-trending-card">
+              <div class="home-trending-img">
+                <?php if ($t['image_id']): ?>
+                  <img src="api/image.php?id=<?= (int) $t['image_id'] ?>" alt="<?= htmlspecialchars($t['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                <?php elseif ($t['image_path']): ?>
+                  <img src="uploads/listings/<?= htmlspecialchars($t['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($t['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                <?php else: ?>
+                  <div class="listing-card-placeholder"><i class="fa-solid fa-image"></i></div>
+                <?php endif; ?>
+              </div>
+              <div class="home-trending-info">
+                <span class="home-trending-price"><?= number_format((float)$t['price'], 2, ',', ' ') ?> €</span>
+                <span class="home-trending-title"><?= htmlspecialchars($t['title'], ENT_QUOTES, 'UTF-8') ?></span>
+              </div>
+            </a>
+          <?php endforeach; ?>
         </div>
-        <i class="fa-solid fa-caret-right chevron"></i>
-      </div>
-    </section>
+      </section>
+    <?php endif; ?>
+
+    <!-- Dernières annonces -->
+    <?php if (!empty($recent)): ?>
+      <section>
+        <div class="section-title">Dernières annonces</div>
+        <div class="search-results">
+          <?php foreach ($recent as $listing): ?>
+            <a href="shop/buy.php?id=<?= (int) $listing['id'] ?>" class="listing-card">
+              <div class="listing-card-img">
+                <?php if ($listing['image_id']): ?>
+                  <img src="api/image.php?id=<?= (int) $listing['image_id'] ?>" alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                <?php elseif ($listing['image_path']): ?>
+                  <img src="uploads/listings/<?= htmlspecialchars($listing['image_path'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                <?php else: ?>
+                  <div class="listing-card-placeholder"><i class="fa-solid fa-image"></i></div>
+                <?php endif; ?>
+              </div>
+              <div class="listing-card-body">
+                <div class="listing-card-price"><?= number_format((float) $listing['price'], 2, ',', ' ') ?> €</div>
+                <div class="listing-card-title"><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="listing-card-meta">
+                  <?php if ($listing['location']): ?>
+                    <span><i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($listing['location'], ENT_QUOTES, 'UTF-8') ?></span>
+                  <?php endif; ?>
+                  <span class="listing-card-category">
+                    <i class="fa-solid <?= $categoryIcons[$listing['category']] ?? 'fa-tag' ?>"></i>
+                    <?= htmlspecialchars($categoryLabels[$listing['category']] ?? $listing['category'], ENT_QUOTES, 'UTF-8') ?>
+                  </span>
+                </div>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+        <div class="home-see-all">
+          <a href="shop/search.php" class="load-more-btn">
+            <i class="fa-solid fa-arrow-right"></i> Voir toutes les annonces
+          </a>
+        </div>
+      </section>
+    <?php else: ?>
+      <section>
+        <div class="section-title">Annonces</div>
+        <div class="no-results">
+          <i class="fa-solid fa-store"></i>
+          <p>Aucune annonce pour le moment</p>
+          <span>Soyez le premier à publier !</span>
+          <div style="margin-top: 16px;">
+            <a href="shop/sell.php" class="load-more-btn"><i class="fa-solid fa-plus"></i> Poster une annonce</a>
+          </div>
+        </div>
+      </section>
+    <?php endif; ?>
   </main>
 
   <script src="styles/theme.js"></script>

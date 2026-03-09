@@ -408,8 +408,10 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       a.className = 'ac-item ac-listing';
 
       var imgHtml = '';
-      if (item.image) {
-        imgHtml = '<img class="ac-thumb" src="' + basePath + 'uploads/listings/' + escapeHtml(item.image) + '" alt="">';
+      if (item.image_id) {
+        imgHtml = '<img class="ac-thumb" src="' + basePath + 'api/image.php?id=' + item.image_id + '" alt="">';
+      } else if (item.image_path) {
+        imgHtml = '<img class="ac-thumb" src="' + basePath + 'uploads/listings/' + escapeHtml(item.image_path) + '" alt="">';
       } else {
         imgHtml = '<div class="ac-thumb ac-thumb-empty"><i class="fa-solid fa-image"></i></div>';
       }

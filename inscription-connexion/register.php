@@ -2,11 +2,15 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/site_settings.php';
 
 if (isset($_SESSION['auth_token'])) {
   header('Location: ../index.php');
   exit();
 }
+
+$registrationClosed = (getSiteSetting($pdo, 'registration_open') === '0');
+$googleLoginEnabled = (getSiteSetting($pdo, 'google_login') === '1');
 
 // Générer un token CSRF s'il n'existe pas encore (token par session)
 if (!isset($_SESSION['csrf_token'])) {
@@ -44,6 +48,14 @@ if (!isset($_SESSION['csrf_token'])) {
 
     <main class="form-container">
       <h2 class="title">S'inscrire</h2>
+
+      <?php if ($registrationClosed): ?>
+        <div style="text-align: center; padding: 24px 0;">
+          <i class="fas fa-lock" style="font-size: 2rem; color: var(--mp-text-muted, #888); margin-bottom: 12px;"></i>
+          <p style="color: var(--mp-text-muted, #888); font-style: italic;">Les inscriptions sont actuellement fermées par l'administrateur.</p>
+          <p class="auth-link"><a href="login.php">Se connecter</a> &middot; <a href="../index.php">Retour à l'accueil</a></p>
+        </div>
+      <?php else: ?>
 
       <form class="signup-form" action="handle_register.php" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -101,6 +113,7 @@ if (!isset($_SESSION['csrf_token'])) {
           S'inscrire
         </button>
 
+        <?php if ($googleLoginEnabled): ?>
         <div class="divider">
           <span class="divider-text">ou</span>
         </div>
@@ -109,9 +122,11 @@ if (!isset($_SESSION['csrf_token'])) {
           <img src="https://www.google.com/favicon.ico" alt="" width="18" height="18">
           S'inscrire avec Google
         </a>
+        <?php endif; ?>
       </form>
 
       <p class="auth-link">Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
+      <?php endif; ?>
     </main>
   </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

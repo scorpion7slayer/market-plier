@@ -9,6 +9,14 @@ try {
   exit;
 }
 
+require_once '../includes/site_settings.php';
+
+// Vérifier si les inscriptions sont ouvertes
+if (getSiteSetting($pdo, 'registration_open') === '0') {
+  header("Location: register.php?error=" . urlencode("Les inscriptions sont actuellement fermées."));
+  exit;
+}
+
 // Vérification CSRF
 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
   header("Location: register.php?error=" . urlencode("Token de sécurité invalide. Veuillez réessayer."));

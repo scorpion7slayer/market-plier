@@ -6,6 +6,14 @@ if (isset($_SESSION['auth_token'])) {
     exit();
 }
 
+require_once '../database/db.php';
+require_once '../includes/site_settings.php';
+
+if (getSiteSetting($pdo, 'google_login') === '0') {
+    header('Location: ../inscription-connexion/login.php?error=' . urlencode("La connexion via Google est actuellement désactivée."));
+    exit();
+}
+
 require_once 'google_oauth.php';
 
 $client = getGoogleClient();

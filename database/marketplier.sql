@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : ven. 06 mars 2026 à 13:37
+-- Généré le : lun. 09 mars 2026 à 08:26
 -- Version du serveur : 8.0.45-0ubuntu0.24.04.1
 -- Version de PHP : 8.5.3
 
@@ -70,7 +70,9 @@ INSERT INTO `conversations` (`id`, `user1_token`, `user2_token`, `listing_id`, `
 (27, 'test6232a22893c84b98da1b6bcc1080717311a35836463532157c462509368f', 'test896c3d5027d4ef0d700d11edfee6b654a0e93a024bf465e2288ab52d394a', 1356, '2026-03-06 13:36:03', '2026-03-06 13:36:03'),
 (28, 'test10abd0b921542a129c2348c86faac4930098c49bb9c55a0237ad86f3b00f', 'test896c3d5027d4ef0d700d11edfee6b654a0e93a024bf465e2288ab52d394a', 1366, '2026-03-06 13:36:03', '2026-03-06 13:36:03'),
 (29, 'test10abd0b921542a129c2348c86faac4930098c49bb9c55a0237ad86f3b00f', 'test281f27fa02632f095aa8229bcfd99898b06b1ac468f3fcb875cd55598e51', 1376, '2026-03-06 13:36:03', '2026-03-06 13:36:03'),
-(30, 'test281f27fa02632f095aa8229bcfd99898b06b1ac468f3fcb875cd55598e51', 'test411cb41a5a0988e7c31da49d52cc17912f1810be4d0f8a6ede6203624107', 1386, '2026-03-06 13:36:03', '2026-03-06 13:36:03');
+(30, 'test281f27fa02632f095aa8229bcfd99898b06b1ac468f3fcb875cd55598e51', 'test411cb41a5a0988e7c31da49d52cc17912f1810be4d0f8a6ede6203624107', 1386, '2026-03-06 13:36:03', '2026-03-06 13:36:03'),
+(31, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test0913ab70c9eb8ed3505373739a3822f0d6cbd73f54121b45083346e2fdf4', 1508, '2026-03-06 13:38:20', '2026-03-06 13:38:26'),
+(32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', NULL, '2026-03-06 13:52:12', '2026-03-09 07:51:25');
 
 -- --------------------------------------------------------
 
@@ -122,7 +124,6 @@ INSERT INTO `favorites` (`id`, `auth_token`, `listing_id`, `created_at`) VALUES
 (30, 'testf203d6400d25347b71b446493360555c48c39ec992888a53dea5c32c6e29', 1246, '2026-03-06 13:35:48'),
 (31, 'testb07d4572d0edad046acdb67d466dc117ca2e3cfb30d2c6f5f4cbac94e147', 1277, '2026-03-06 13:35:48'),
 (32, 'testb67e4dcce3f3e34788c2eeefa307501b2453024e3fca967173dbb53dcd05', 1139, '2026-03-06 13:35:48'),
-(33, 'testfaae0cbaad6a055feebe7f0534994787f72d29efdac210b1ce74314c881c', 25, '2026-03-06 13:35:48'),
 (34, 'testaaa0c69bb627183b1ad7afe27335ec510998d36c5858e1890b3262c26457', 1502, '2026-03-06 13:35:48'),
 (35, 'testaaa0c69bb627183b1ad7afe27335ec510998d36c5858e1890b3262c26457', 1358, '2026-03-06 13:35:48'),
 (36, 'test6232a22893c84b98da1b6bcc1080717311a35836463532157c462509368f', 1412, '2026-03-06 13:35:49'),
@@ -411,7 +412,6 @@ CREATE TABLE `listings` (
 --
 
 INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `category`, `item_condition`, `image`, `location`, `created_at`) VALUES
-(25, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'ddndjdn', 'd,ld,edzeiodpzekdopzk', 5.00, 'vetements', 'neuf', 'listing_52491ddfb6027520_1772801399_0.jpg', NULL, '2026-03-06 12:49:59'),
 (1026, 'testf203d6400d25347b71b446493360555c48c39ec992888a53dea5c32c6e29', 'Article 1 de test', 'Description de l\'annonce 1 pour l\'utilisateur test.', 27.40, 'vehicules', 'pour_pieces', NULL, 'Ville0', '2026-03-06 13:35:23'),
 (1027, 'testf203d6400d25347b71b446493360555c48c39ec992888a53dea5c32c6e29', 'Article 2 de test', 'Description de l\'annonce 2 pour l\'utilisateur test.', 41.70, 'vetements', 'pour_pieces', NULL, 'Ville0', '2026-03-06 13:35:24'),
 (1028, 'testf203d6400d25347b71b446493360555c48c39ec992888a53dea5c32c6e29', 'Article 3 de test', 'Description de l\'annonce 3 pour l\'utilisateur test.', 26.30, 'maison', 'pour_pieces', NULL, 'Ville0', '2026-03-06 13:35:24'),
@@ -629,9 +629,9 @@ INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `ca
 (1240, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 5 de test21', 'Description de l\'annonce 5 pour l\'utilisateur test21.', 86.00, 'electronique', 'etat_correct', NULL, 'Ville21', '2026-03-06 13:35:31'),
 (1241, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 6 de test21', 'Description de l\'annonce 6 pour l\'utilisateur test21.', 53.30, 'electronique', 'bon_etat', NULL, 'Ville21', '2026-03-06 13:35:31'),
 (1242, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 7 de test21', 'Description de l\'annonce 7 pour l\'utilisateur test21.', 82.10, 'maison', 'tres_bon_etat', NULL, 'Ville21', '2026-03-06 13:35:31'),
-(1243, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 8 de test21', 'Description de l\'annonce 8 pour l\'utilisateur test21.', 47.20, 'vehicules', 'etat_correct', NULL, 'Ville21', '2026-03-06 13:35:31');
+(1243, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 8 de test21', 'Description de l\'annonce 8 pour l\'utilisateur test21.', 47.20, 'vehicules', 'etat_correct', NULL, 'Ville21', '2026-03-06 13:35:31'),
+(1244, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 9 de test21', 'Description de l\'annonce 9 pour l\'utilisateur test21.', 7.70, 'vetements', 'etat_correct', NULL, 'Ville21', '2026-03-06 13:35:31');
 INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `category`, `item_condition`, `image`, `location`, `created_at`) VALUES
-(1244, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 9 de test21', 'Description de l\'annonce 9 pour l\'utilisateur test21.', 7.70, 'vetements', 'etat_correct', NULL, 'Ville21', '2026-03-06 13:35:31'),
 (1245, 'test52625c7dcf9883c0b5ca2f91e1eedc953cdcc7831f0bd864127ff506a7bb', 'Article 10 de test21', 'Description de l\'annonce 10 pour l\'utilisateur test21.', 59.70, 'maison', 'neuf', NULL, 'Ville21', '2026-03-06 13:35:31'),
 (1246, 'test31ee97c8e4e90471ebc6ea33aa7bb68d57b982b793e45fdd7fef42ffc980', 'Article 1 de test22', 'Description de l\'annonce 1 pour l\'utilisateur test22.', 19.10, 'electronique', 'etat_correct', NULL, 'Ville22', '2026-03-06 13:35:31'),
 (1247, 'test31ee97c8e4e90471ebc6ea33aa7bb68d57b982b793e45fdd7fef42ffc980', 'Article 2 de test22', 'Description de l\'annonce 2 pour l\'utilisateur test22.', 57.80, 'livres', 'tres_bon_etat', NULL, 'Ville22', '2026-03-06 13:35:31'),
@@ -848,9 +848,9 @@ INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `ca
 (1458, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 3 de test43', 'Description de l\'annonce 3 pour l\'utilisateur test43.', 52.40, 'sport', 'tres_bon_etat', NULL, 'Ville43', '2026-03-06 13:35:38'),
 (1459, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 4 de test43', 'Description de l\'annonce 4 pour l\'utilisateur test43.', 44.90, 'sport', 'neuf', NULL, 'Ville43', '2026-03-06 13:35:38'),
 (1460, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 5 de test43', 'Description de l\'annonce 5 pour l\'utilisateur test43.', 62.70, 'electronique', 'pour_pieces', NULL, 'Ville43', '2026-03-06 13:35:38'),
-(1461, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 6 de test43', 'Description de l\'annonce 6 pour l\'utilisateur test43.', 45.70, 'vehicules', 'neuf', NULL, 'Ville43', '2026-03-06 13:35:38');
+(1461, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 6 de test43', 'Description de l\'annonce 6 pour l\'utilisateur test43.', 45.70, 'vehicules', 'neuf', NULL, 'Ville43', '2026-03-06 13:35:38'),
+(1462, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 7 de test43', 'Description de l\'annonce 7 pour l\'utilisateur test43.', 88.50, 'autre', 'pour_pieces', NULL, 'Ville43', '2026-03-06 13:35:38');
 INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `category`, `item_condition`, `image`, `location`, `created_at`) VALUES
-(1462, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 7 de test43', 'Description de l\'annonce 7 pour l\'utilisateur test43.', 88.50, 'autre', 'pour_pieces', NULL, 'Ville43', '2026-03-06 13:35:38'),
 (1463, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 8 de test43', 'Description de l\'annonce 8 pour l\'utilisateur test43.', 82.50, 'vehicules', 'neuf', NULL, 'Ville43', '2026-03-06 13:35:38'),
 (1464, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 9 de test43', 'Description de l\'annonce 9 pour l\'utilisateur test43.', 32.80, 'vehicules', 'tres_bon_etat', NULL, 'Ville43', '2026-03-06 13:35:38'),
 (1465, 'teste7d9c5fa75b42d726c8b69ea90362618fb4b6e465af038263e56cd229ebe', 'Article 10 de test43', 'Description de l\'annonce 10 pour l\'utilisateur test43.', 50.90, 'maison', 'etat_correct', NULL, 'Ville43', '2026-03-06 13:35:38'),
@@ -913,7 +913,8 @@ INSERT INTO `listings` (`id`, `auth_token`, `title`, `description`, `price`, `ca
 (1522, 'testefe3e442ba900c11e444bc8114e4961bb626a960a220a3d4bd082e19f201', 'Article 7 de test49', 'Description de l\'annonce 7 pour l\'utilisateur test49.', 29.50, 'livres', 'pour_pieces', NULL, 'Ville49', '2026-03-06 13:35:40'),
 (1523, 'testefe3e442ba900c11e444bc8114e4961bb626a960a220a3d4bd082e19f201', 'Article 8 de test49', 'Description de l\'annonce 8 pour l\'utilisateur test49.', 41.40, 'sport', 'etat_correct', NULL, 'Ville49', '2026-03-06 13:35:40'),
 (1524, 'testefe3e442ba900c11e444bc8114e4961bb626a960a220a3d4bd082e19f201', 'Article 9 de test49', 'Description de l\'annonce 9 pour l\'utilisateur test49.', 25.90, 'sport', 'tres_bon_etat', NULL, 'Ville49', '2026-03-06 13:35:40'),
-(1525, 'testefe3e442ba900c11e444bc8114e4961bb626a960a220a3d4bd082e19f201', 'Article 10 de test49', 'Description de l\'annonce 10 pour l\'utilisateur test49.', 0.20, 'sport', 'etat_correct', NULL, 'Ville49', '2026-03-06 13:35:40');
+(1525, 'testefe3e442ba900c11e444bc8114e4961bb626a960a220a3d4bd082e19f201', 'Article 10 de test49', 'Description de l\'annonce 10 pour l\'utilisateur test49.', 0.20, 'sport', 'etat_correct', NULL, 'Ville49', '2026-03-06 13:35:40'),
+(1526, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Jfyhdhehhr', 'Hjdjjddjdjjdhd', 66.00, 'electronique', 'bon_etat', 'listing_08d7db730877c456_1772806753_0.jpg', NULL, '2026-03-06 14:19:13');
 
 -- --------------------------------------------------------
 
@@ -934,7 +935,7 @@ CREATE TABLE `listing_images` (
 --
 
 INSERT INTO `listing_images` (`id`, `listing_id`, `image_path`, `sort_order`, `created_at`) VALUES
-(67, 25, 'listing_52491ddfb6027520_1772801399_0.jpg', 0, '2026-03-06 12:49:59');
+(68, 1526, 'listing_08d7db730877c456_1772806753_0.jpg', 0, '2026-03-06 14:19:13');
 
 -- --------------------------------------------------------
 
@@ -1092,7 +1093,29 @@ INSERT INTO `messages` (`id`, `conversation_id`, `sender_token`, `content`, `is_
 (134, 30, 'test281f27fa02632f095aa8229bcfd99898b06b1ac468f3fcb875cd55598e51', 'Oui, toujours disponible !', 0, '2026-03-06 13:36:03'),
 (135, 30, 'test411cb41a5a0988e7c31da49d52cc17912f1810be4d0f8a6ede6203624107', 'Quel est votre meilleur prix ?', 0, '2026-03-06 13:36:03'),
 (136, 30, 'test281f27fa02632f095aa8229bcfd99898b06b1ac468f3fcb875cd55598e51', 'Je peux faire un petit geste sur le prix.', 0, '2026-03-06 13:36:04'),
-(137, 30, 'test411cb41a5a0988e7c31da49d52cc17912f1810be4d0f8a6ede6203624107', 'Super, je suis intéressé.', 0, '2026-03-06 13:36:04');
+(137, 30, 'test411cb41a5a0988e7c31da49d52cc17912f1810be4d0f8a6ede6203624107', 'Super, je suis intéressé.', 0, '2026-03-06 13:36:04'),
+(138, 31, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 0, '2026-03-06 13:38:20'),
+(139, 31, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 's', 0, '2026-03-06 13:38:26'),
+(140, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-06 13:52:12'),
+(141, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-06 13:52:29'),
+(142, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'tt', 1, '2026-03-06 13:53:43'),
+(143, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-06 13:59:07'),
+(144, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-06 14:03:14'),
+(145, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-06 14:03:44'),
+(146, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-06 14:06:54'),
+(147, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Trggg', 1, '2026-03-06 14:15:55'),
+(148, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Tttttt', 1, '2026-03-06 14:16:22'),
+(149, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-06 14:16:57'),
+(150, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'salut', 1, '2026-03-06 14:17:29'),
+(151, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'yffyft', 1, '2026-03-06 14:17:42'),
+(152, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Gttg', 1, '2026-03-06 14:17:43'),
+(153, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-06 14:20:36'),
+(154, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Tew', 1, '2026-03-06 14:20:54'),
+(155, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Fhdujdjd', 1, '2026-03-06 14:26:22'),
+(156, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-09 07:49:19'),
+(157, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-09 07:49:29'),
+(158, 32, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'Test', 1, '2026-03-09 07:49:37'),
+(159, 32, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'test', 1, '2026-03-09 07:51:25');
 
 -- --------------------------------------------------------
 
@@ -1165,7 +1188,21 @@ INSERT INTO `notifications` (`id`, `auth_token`, `type`, `title`, `content`, `li
 (47, 'testd83958ac3893aa1eb8cc0f7e3232b9bc9f999654550203a33fd120f8a26f', 'review', 'Nouvel avis reçu ★★★★★', 'Contenu de la notification de test #47', NULL, 0, '2026-03-06 13:36:04'),
 (48, 'testf203d6400d25347b71b446493360555c48c39ec992888a53dea5c32c6e29', 'message', 'Nouveau message', 'Contenu de la notification de test #48', NULL, 0, '2026-03-06 13:36:04'),
 (49, 'testd02470a27d9b3f4dac30dc56dcdfe655ce1e4ecc1fd013592fa5edb3a215', 'system', 'Bienvenue sur Market Plier !', 'Contenu de la notification de test #49', NULL, 0, '2026-03-06 13:36:04'),
-(50, 'test8952f30c22a3988ec2845b3d983e69c8f4afacf197ecee6aef936d136b6a', 'system', 'Bienvenue sur Market Plier !', 'Contenu de la notification de test #50', NULL, 0, '2026-03-06 13:36:04');
+(50, 'test8952f30c22a3988ec2845b3d983e69c8f4afacf197ecee6aef936d136b6a', 'system', 'Bienvenue sur Market Plier !', 'Contenu de la notification de test #50', NULL, 0, '2026-03-06 13:36:04'),
+(51, 'teste2f5d00159cd0007589552fc8b1163cd02b06b1e36c77a5fa38c0588e945', 'favorite', 'theo a ajouté votre annonce en favori', 'Article 4 de test47', 'shop/buy.php?id=1499', 0, '2026-03-06 13:37:55'),
+(52, 'test0913ab70c9eb8ed3505373739a3822f0d6cbd73f54121b45083346e2fdf4', 'message', 'Nouveau message de theo', 'test', 'messagerie/conversation.php?id=31', 0, '2026-03-06 13:38:20'),
+(53, 'test0913ab70c9eb8ed3505373739a3822f0d6cbd73f54121b45083346e2fdf4', 'message', 'Nouveau message de theo', 's', 'messagerie/conversation.php?id=31', 0, '2026-03-06 13:38:26'),
+(54, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'favorite', 'moi a ajouté votre annonce en favori', 'ddndjdn', 'shop/buy.php?id=25', 1, '2026-03-06 13:51:49'),
+(55, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'message', 'Nouveau message de moi', 'Test', 'messagerie/conversation.php?id=32', 1, '2026-03-06 13:52:12'),
+(56, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'message', 'Nouveau message de theo', 'test', 'messagerie/conversation.php?id=32', 1, '2026-03-06 13:52:29'),
+(57, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'message', 'Nouveau message de theo', 'tt', 'messagerie/conversation.php?id=32', 1, '2026-03-06 13:53:43'),
+(58, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'message', 'Nouveau message de moi', 'Test', 'messagerie/conversation.php?id=32', 1, '2026-03-06 13:59:07'),
+(59, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'review', 'moi vous a donné un avis ★★★★☆', NULL, 'inscription-connexion/profile.php?user=theo', 1, '2026-03-06 14:18:05'),
+(60, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 'review', 'theo vous a donné un avis ★★★★★', 'test', 'inscription-connexion/profile.php?user=moi', 1, '2026-03-06 14:19:29'),
+(61, 'teste2f5d00159cd0007589552fc8b1163cd02b06b1e36c77a5fa38c0588e945', 'favorite', 'theo a ajouté votre annonce en favori', 'Article 3 de test47', 'shop/buy.php?id=1498', 0, '2026-03-06 14:21:37'),
+(62, 'teste2f5d00159cd0007589552fc8b1163cd02b06b1e36c77a5fa38c0588e945', 'favorite', 'theo a ajouté votre annonce en favori', 'Article 1 de test47', 'shop/buy.php?id=1496', 0, '2026-03-06 14:23:19'),
+(63, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', 'favorite', 'moi a ajouté votre annonce en favori', 'ddndjdn', 'shop/buy.php?id=25', 1, '2026-03-06 14:23:55'),
+(64, 'test0913ab70c9eb8ed3505373739a3822f0d6cbd73f54121b45083346e2fdf4', 'favorite', 'theo a ajouté votre annonce en favori', 'Article 3 de test48', 'shop/buy.php?id=1508', 0, '2026-03-09 07:50:11');
 
 -- --------------------------------------------------------
 
@@ -1448,7 +1485,9 @@ INSERT INTO `reviews` (`id`, `reviewer_token`, `seller_token`, `listing_id`, `ra
 (189, 'test64bcd5ba323fdbd1131486b0c94e0ac813d5323fb575005947d6698a9d10', 'test7277853ea5fd71cf2610fdd645244a64b99aa97313d071d6e01f96c93c7d', 1055, 4, 'Envoi rapide et bien emballé.', '2026-03-06 13:35:47'),
 (190, 'test896c3d5027d4ef0d700d11edfee6b654a0e93a024bf465e2288ab52d394a', 'test2645b569e157d3f61fe7b4e0e4e6d249da34f1f9165aedfa166a07ba748d', 1120, 4, 'Très bon vendeur, article conforme !', '2026-03-06 13:35:47'),
 (191, 'test31984ce9fb1c82e569096dc7228f671db47c5e34ee7e056d5b627048e627', 'testf81a3f8cda680eeba4a69c047dd8c94f3fcca704c4f437921ca68958c82c', 1313, 4, 'Très bon vendeur, article conforme !', '2026-03-06 13:35:47'),
-(192, 'testdc7aee931ef4b716bd0ac78b2a2f7dbf03681130b5aeb7019600d251f5c7', 'test7277853ea5fd71cf2610fdd645244a64b99aa97313d071d6e01f96c93c7d', 1055, 4, 'Transaction parfaite.', '2026-03-06 13:35:47');
+(192, 'testdc7aee931ef4b716bd0ac78b2a2f7dbf03681130b5aeb7019600d251f5c7', 'test7277853ea5fd71cf2610fdd645244a64b99aa97313d071d6e01f96c93c7d', 1055, 4, 'Transaction parfaite.', '2026-03-06 13:35:47'),
+(193, '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', NULL, 4, NULL, '2026-03-06 14:18:05'),
+(194, '4337b9b2c6d3633fd055c0c878396ef4b2f83de0a572a036356bcfac74d0480d', '16253221b30077cde5a10660affc2375dcef432205f2da72d15e625a447d1dbe', 1526, 5, 'test', '2026-03-06 14:19:29');
 
 -- --------------------------------------------------------
 
@@ -1615,37 +1654,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `conversations`
 --
 ALTER TABLE `conversations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT pour la table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=301;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=307;
 
 --
 -- AUTO_INCREMENT pour la table `listings`
 --
 ALTER TABLE `listings`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1526;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1527;
 
 --
 -- AUTO_INCREMENT pour la table `listing_images`
 --
 ALTER TABLE `listing_images`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT pour la table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=160;
 
 --
 -- AUTO_INCREMENT pour la table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT pour la table `reviews`

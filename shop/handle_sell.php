@@ -2,10 +2,22 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/site_settings.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
     exit();
+}
+
+// Vérifier la limite d'annonces par utilisateur
+if (getSiteSetting($pdo, 'listing_limit') === '1') {
+    $maxListings = 10;
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM listings WHERE auth_token = ? AND status = 'active'");
+    $countStmt->execute([$_SESSION['auth_token']]);
+    if ((int)$countStmt->fetchColumn() >= $maxListings) {
+        header('Location: sell.php?error=' . urlencode("Vous avez atteint la limite de $maxListings annonces actives."));
+        exit();
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -144,14 +156,17 @@ if (!empty($errors)) {
     exit();
 }
 
+// Déterminer le statut de l'annonce
+$listingStatus = (getSiteSetting($pdo, 'moderation_enabled') === '1') ? 'pending' : 'active';
+
 // Insertion en base
 try {
     $pdo->beginTransaction();
 
     // Insertion de l'annonce principale
     $stmt = $pdo->prepare(
-        "INSERT INTO listings (auth_token, title, description, price, category, item_condition, image, location)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO listings (auth_token, title, description, price, category, item_condition, image, location, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $_SESSION['auth_token'],
@@ -162,21 +177,29 @@ try {
         $condition,
         $mainImage,
         $location !== '' ? $location : null,
+        $listingStatus,
     ]);
 
     $listingId = $pdo->lastInsertId();
 
-    // Insertion des images additionnelles
+    // Insertion des images additionnelles (avec BLOB en DB)
     if (!empty($uploadedImages)) {
-        $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order) VALUES (?, ?, ?)");
+        $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order, image_data, mime_type) VALUES (?, ?, ?, ?, ?)");
+        $uploadDir = __DIR__ . '/../uploads/listings/';
         foreach ($uploadedImages as $index => $imgName) {
-            $stmtImg->execute([$listingId, $imgName, $index]);
+            $filePath = $uploadDir . $imgName;
+            $imageData = file_exists($filePath) ? file_get_contents($filePath) : null;
+            $mimeType = file_exists($filePath) ? (mime_content_type($filePath) ?: 'image/jpeg') : 'image/jpeg';
+            $stmtImg->execute([$listingId, $imgName, $index, $imageData, $mimeType]);
         }
     }
 
     $pdo->commit();
 
-    header('Location: sell.php?success=' . urlencode("Votre annonce a été publiée avec succès !"));
+    $successMsg = ($listingStatus === 'pending')
+        ? "Votre annonce a été soumise et sera visible après validation par un administrateur."
+        : "Votre annonce a été publiée avec succès !";
+    header('Location: sell.php?success=' . urlencode($successMsg));
     exit();
 } catch (PDOException $e) {
     $pdo->rollBack();

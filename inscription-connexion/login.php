@@ -2,11 +2,14 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/site_settings.php';
 
 if (isset($_SESSION['auth_token'])) {
   header('Location: ../index.php');
   exit();
 }
+
+$googleLoginEnabled = (getSiteSetting($pdo, 'google_login') === '1');
 
 // Générer un token CSRF s'il n'existe pas encore (token par session)
 if (!isset($_SESSION['csrf_token'])) {
@@ -79,6 +82,7 @@ if (!isset($_SESSION['csrf_token'])) {
           Se connecter
         </button>
 
+        <?php if ($googleLoginEnabled): ?>
         <div class="divider">
           <span class="divider-text">ou</span>
         </div>
@@ -87,6 +91,7 @@ if (!isset($_SESSION['csrf_token'])) {
           <img src="https://www.google.com/favicon.ico" alt="" width="18" height="18">
           Se connecter avec Google
         </a>
+        <?php endif; ?>
       </form>
 
       <p class="auth-link">Pas encore de compte ? <a href="register.php">S'inscrire</a></p>

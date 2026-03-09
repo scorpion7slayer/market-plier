@@ -93,7 +93,7 @@ $user = [
                 <div class="photos-container" id="photos-container">
                     <?php foreach ($existingImages as $index => $img): ?>
                         <div class="photo-preview-wrapper existing-photo" data-image-id="<?php echo $img['id']; ?>" data-index="<?php echo $index; ?>">
-                            <img class="photo-preview-img" src="../uploads/listings/<?php echo htmlspecialchars($img['image_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="Photo existante">
+                            <img class="photo-preview-img" src="../api/image.php?id=<?php echo (int)$img['id']; ?>" alt="Photo existante">
                             <span class="photo-order-badge"><?php echo $index + 1; ?></span>
                             <button type="button" class="photo-main-btn<?php echo $index === 0 ? ' active' : ''; ?>" title="Définir comme image principale">
                                 <i class="fas fa-star"></i>
@@ -232,7 +232,7 @@ $user = [
     <script>
         // Données des images existantes
         var existingImages = <?php echo json_encode(array_map(function ($img) {
-                                    return ['id' => $img['id'], 'path' => $img['image_path']];
+                                    return ['id' => $img['id'], 'path' => $img['image_path'], 'imageId' => $img['id']];
                                 }, $existingImages)); ?>;
 
         var photoInput = document.getElementById('photo-input');
@@ -446,7 +446,7 @@ $user = [
             imgEl.alt = 'Aperçu';
 
             if (type === 'existing') {
-                imgEl.src = '../uploads/listings/' + imgData.path;
+                imgEl.src = imgData.imageId ? ('../api/image.php?id=' + imgData.imageId) : ('../uploads/listings/' + imgData.path);
             } else {
                 var reader = new FileReader();
                 reader.onload = function(e) {

@@ -81,12 +81,13 @@ $userListings = [];
 try {
   $listingsStmt = $pdo->prepare("
         SELECT l.id, l.title, l.price, l.category, l.item_condition, l.location, l.created_at,
+               (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
                COALESCE(
                    (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
                    l.image
-               ) AS image
+               ) AS image_path
         FROM listings l
-        WHERE l.auth_token = ?
+        WHERE l.auth_token = ? AND l.status = 'active'
         ORDER BY l.created_at DESC
     ");
   $listingsStmt->execute([$profileUser['auth_token']]);
@@ -201,9 +202,12 @@ $reviews = $reviewsStmt->fetchAll();
           <?php foreach ($userListings as $listing): ?>
             <a href="../shop/buy.php?id=<?= (int) $listing['id'] ?>" class="profile-listing-card">
               <div class="profile-listing-img">
-                <?php if ($listing['image']): ?>
-                  <img src="../uploads/listings/<?= htmlspecialchars($listing['image'], ENT_QUOTES, 'UTF-8') ?>"
-                    alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>">
+                <?php if ($listing['image_id']): ?>
+                  <img src="../api/image.php?id=<?= (int) $listing['image_id'] ?>"
+                    alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                <?php elseif ($listing['image_path']): ?>
+                  <img src="../uploads/listings/<?= htmlspecialchars($listing['image_path'], ENT_QUOTES, 'UTF-8') ?>"
+                    alt="<?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                 <?php else: ?>
                   <div class="profile-listing-placeholder">
                     <i class="fa-solid fa-image"></i>

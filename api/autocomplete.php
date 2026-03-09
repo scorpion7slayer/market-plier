@@ -40,12 +40,13 @@ $categoryLabels = [
 // Fetch matching listings using the same scope as the full search page.
 $stmt = $pdo->prepare(
   "SELECT l.id, l.title, l.price, l.category,
+            (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
             COALESCE(
                 (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
                 l.image
-            ) AS image 
-     FROM listings l  
-     WHERE l.title LIKE ? OR l.description LIKE ?
+            ) AS image_path
+     FROM listings l
+     WHERE l.status = 'active' AND (l.title LIKE ? OR l.description LIKE ?)
      ORDER BY l.created_at DESC
      LIMIT 6"
 );
@@ -57,7 +58,7 @@ $matchedCategories = [];
 $categoryStmt = $pdo->prepare(
   "SELECT category, COUNT(*) AS count
    FROM listings
-   WHERE title LIKE ? OR description LIKE ?
+   WHERE status = 'active' AND (title LIKE ? OR description LIKE ?)
    GROUP BY category
    ORDER BY count DESC, category ASC
    LIMIT 4"
@@ -82,6 +83,7 @@ foreach ($categoryStmt->fetchAll(PDO::FETCH_ASSOC) as $categoryRow) {
 $countStmt = $pdo->query(
   "SELECT category, COUNT(*) AS count
    FROM listings
+   WHERE status = 'active'
    GROUP BY category"
 );
 $categoryTotals = [];
