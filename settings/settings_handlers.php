@@ -29,6 +29,38 @@ function fetchUserData($pdo)
   return $stmt->fetch();
 }
 
+function loadUserSettings($pdo)
+{
+  $defaults = [
+    'notif_email' => 1,
+    'notif_price_alerts' => 0,
+    'notif_weekly_summary' => 1,
+    'privacy_public_profile' => 1,
+    'privacy_show_email' => 0,
+    'privacy_activity_history' => 1,
+    'language' => 'fr',
+  ];
+
+  try {
+    $pdo->query("SELECT 1 FROM user_settings LIMIT 1");
+  } catch (PDOException $e) {
+    return $defaults;
+  }
+
+  try {
+    $stmt = $pdo->prepare("SELECT * FROM user_settings WHERE auth_token = ?");
+    $stmt->execute([$_SESSION['auth_token']]);
+    $row = $stmt->fetch();
+    if ($row) {
+      return array_merge($defaults, array_intersect_key($row, $defaults));
+    }
+  } catch (PDOException $e) {
+    error_log("Error loading user settings: " . $e->getMessage());
+  }
+
+  return $defaults;
+}
+
 function initPageState($pdo)
 {
   $state = [
@@ -40,6 +72,15 @@ function initPageState($pdo)
     'hasPassword' => false,
     'successMessage' => '',
     'errorMessage' => '',
+    'userSettings' => [
+      'notif_email' => 1,
+      'notif_price_alerts' => 0,
+      'notif_weekly_summary' => 1,
+      'privacy_public_profile' => 1,
+      'privacy_show_email' => 0,
+      'privacy_activity_history' => 1,
+      'language' => 'fr',
+    ],
   ];
 
   if (isset($_GET['success']) && $_GET['success'] === 'photo') {
@@ -59,6 +100,7 @@ function initPageState($pdo)
     $state['profilePhoto'] = $userData['profile_photo'];
     $state['authProvider'] = $userData['auth_provider'] ?? 'local';
     $state['hasPassword'] = !empty($userData['password_hash']);
+    $state['userSettings'] = loadUserSettings($pdo);
   } catch (PDOException $ex) {
     error_log("Error fetching user data: " . $ex->getMessage());
   }

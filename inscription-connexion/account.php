@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['auth_token'])) {
@@ -150,13 +151,13 @@ try {
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include '../includes/theme_init.php'; ?>
-    <title>Market Plier - Profil Utilisateur</title>
+    <title><?= htmlspecialchars(t('account_title'), ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../styles/account.css">
@@ -198,7 +199,7 @@ try {
                         <!-- Description éditable -->
                         <div class="description-section">
                             <h2 class="description-title">
-                                Description
+                                <?= htmlspecialchars(t('account_description'), ENT_QUOTES, 'UTF-8') ?>
                                 <button class="edit-description-btn" onclick="toggleDescriptionEdit()" title="Modifier la description">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
@@ -206,17 +207,17 @@ try {
 
                             <!-- Affichage normal -->
                             <div id="description-display">
-                                <p class="description-text"><?= htmlspecialchars($description ?: 'Aucune description.', ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="description-text"><?= htmlspecialchars($description ?: t('account_no_description'), ENT_QUOTES, 'UTF-8') ?></p>
                             </div>
 
                             <!-- Formulaire d'édition (masqué par défaut) -->
                             <div id="description-edit" style="display: none;">
                                 <form method="POST" class="description-edit-form">
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <textarea name="description" class="form-control mb-2" maxlength="500" rows="3" placeholder="Décrivez-vous en quelques mots..."><?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?></textarea>
+                                    <textarea name="description" class="form-control mb-2" maxlength="500" rows="3" placeholder="<?= htmlspecialchars(t('account_description_placeholder'), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?></textarea>
                                     <div class="d-flex gap-2">
                                         <button type="submit" name="update_description" class="btn btn-sm btn-brand">
-                                            <i class="fa-solid fa-check"></i> Enregistrer
+                                            <i class="fa-solid fa-check"></i> <?= htmlspecialchars(t('account_save'), ENT_QUOTES, 'UTF-8') ?>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleDescriptionEdit()" style="border-radius: 50px;">
                                             Annuler

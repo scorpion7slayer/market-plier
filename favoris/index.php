@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
   header('Location: ../inscription-connexion/login.php');
@@ -45,20 +46,20 @@ $stmt->execute([$myToken]);
 $favorites = $stmt->fetchAll();
 
 $categoryLabels = [
-  'vetements' => 'Vêtements',
-  'electronique' => 'Électronique',
-  'livres' => 'Livres & Médias',
-  'maison' => 'Maison & Jardin',
-  'sport' => 'Sport & Loisirs',
-  'vehicules' => 'Véhicules',
-  'autre' => 'Autre',
+  'vetements' => t('cat_vetements'),
+  'electronique' => t('cat_electronique'),
+  'livres' => t('cat_livres'),
+  'maison' => t('cat_maison'),
+  'sport' => t('cat_sport'),
+  'vehicules' => t('cat_vehicules'),
+  'autre' => t('cat_autre'),
 ];
 $conditionLabels = [
-  'neuf' => 'Neuf',
-  'tres_bon_etat' => 'Très bon état',
-  'bon_etat' => 'Bon état',
-  'etat_correct' => 'État correct',
-  'pour_pieces' => 'Pour pièces',
+  'neuf' => t('condition_neuf'),
+  'tres_bon_etat' => t('condition_tres_bon_etat'),
+  'bon_etat' => t('condition_bon_etat'),
+  'etat_correct' => t('condition_etat_correct'),
+  'pour_pieces' => t('condition_pour_pieces'),
 ];
 ?>
 <!DOCTYPE html>

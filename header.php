@@ -3,6 +3,9 @@
 $headerBasePath = $headerBasePath ?? '';
 $headerUser = $headerUser ?? null;
 
+require_once __DIR__ . '/includes/lang.php';
+
+
 $profilePhoto = $headerUser['profile_photo'] ?? null;
 $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto);
 ?>
@@ -15,7 +18,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     </div>
     <div class="header-divider"></div>
     <form class="search-form" action="<?= $headerBasePath ?>shop/search.php" method="GET" autocomplete="off">
-      <input class="search-bar" type="text" name="q" placeholder="Rechercher"
+      <input class="search-bar" type="text" name="q" placeholder="<?= htmlspecialchars(t('header_search'), ENT_QUOTES, 'UTF-8') ?>"
         value="<?= htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
         id="searchInput" aria-label="Rechercher" />
       <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
@@ -24,14 +27,14 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     <?php if (isset($_SESSION['auth_token'])): ?>
       <!-- Icônes header : favoris, messagerie, notifications -->
       <div class="header-icons">
-        <a href="<?= $headerBasePath ?>favoris/" class="header-icon-link" title="Favoris">
+        <a href="<?= $headerBasePath ?>favoris/" class="header-icon-link" title="<?= htmlspecialchars(t('header_favorites'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-heart"></i>
         </a>
-        <a href="<?= $headerBasePath ?>messagerie/inbox.php" class="header-icon-link" title="Messagerie">
+        <a href="<?= $headerBasePath ?>messagerie/inbox.php" class="header-icon-link" title="<?= htmlspecialchars(t('header_messages'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-envelope"></i>
           <span class="header-badge header-badge-msg" id="badgeMsg" style="display:none;"></span>
         </a>
-        <a href="<?= $headerBasePath ?>notifications/" class="header-icon-link" title="Notifications">
+        <a href="<?= $headerBasePath ?>notifications/" class="header-icon-link" title="<?= htmlspecialchars(t('header_notifications'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-bell"></i>
           <span class="header-badge header-badge-notif" id="badgeNotif" style="display:none;"></span>
         </a>
@@ -61,10 +64,9 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
   <div class="header-bottom">
     <nav>
-      <a href="<?= $headerBasePath ?>shop/sell.php">vendre</a>
-      <a href="#">langue</a>
-      <a href="<?= $headerBasePath ?>settings/settings.php">paramètres</a>
-      <a href="#">aide</a>
+      <a href="<?= $headerBasePath ?>shop/sell.php"><?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?></a>
+      <a href="<?= $headerBasePath ?>settings/settings.php"><?= htmlspecialchars(t('header_settings'), ENT_QUOTES, 'UTF-8') ?></a>
+      <a href="<?= $headerBasePath ?>support/help.php"><?= htmlspecialchars(t('header_help'), ENT_QUOTES, 'UTF-8') ?></a>
     </nav>
   </div>
 </header>
@@ -73,28 +75,28 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 <div class="mobile-menu-overlay"></div>
 <div class="mobile-menu">
   <div class="mobile-menu-header">
-    <span>Menu</span>
+    <span><?= htmlspecialchars(t('header_menu'), ENT_QUOTES, 'UTF-8') ?></span>
     <button class="mobile-menu-close" aria-label="Fermer">&times;</button>
   </div>
   <nav>
-    <a href="<?= $headerBasePath ?>shop/sell.php"><i class="fa-solid fa-tag"></i>&nbsp; Vendre</a>
+    <a href="<?= $headerBasePath ?>shop/sell.php"><i class="fa-solid fa-tag"></i>&nbsp; <?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?></a>
     <?php if (isset($_SESSION['auth_token'])): ?>
-      <a href="<?= $headerBasePath ?>messagerie/inbox.php"><i class="fa-solid fa-envelope"></i>&nbsp; Messagerie<span class="mobile-menu-badge" id="badgeMsgMobile" style="display:none;"></span></a>
-      <a href="<?= $headerBasePath ?>favoris/"><i class="fa-solid fa-heart"></i>&nbsp; Favoris</a>
-      <a href="<?= $headerBasePath ?>notifications/"><i class="fa-solid fa-bell"></i>&nbsp; Notifications<span class="mobile-menu-badge" id="badgeNotifMobile" style="display:none;"></span></a>
+      <a href="<?= $headerBasePath ?>messagerie/inbox.php"><i class="fa-solid fa-envelope"></i>&nbsp; <?= htmlspecialchars(t('header_messages'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeMsgMobile" style="display:none;"></span></a>
+      <a href="<?= $headerBasePath ?>favoris/"><i class="fa-solid fa-heart"></i>&nbsp; <?= htmlspecialchars(t('header_favorites'), ENT_QUOTES, 'UTF-8') ?></a>
+      <a href="<?= $headerBasePath ?>notifications/"><i class="fa-solid fa-bell"></i>&nbsp; <?= htmlspecialchars(t('header_notifications'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeNotifMobile" style="display:none;"></span></a>
     <?php endif; ?>
-    <a href="<?= $headerBasePath ?>settings/settings.php"><i class="fa-solid fa-gear"></i>&nbsp; Paramètres</a>
-    <a href="#"><i class="fa-solid fa-circle-question"></i>&nbsp; Aide</a>
+    <a href="<?= $headerBasePath ?>settings/settings.php"><i class="fa-solid fa-gear"></i>&nbsp; <?= htmlspecialchars(t('header_settings'), ENT_QUOTES, 'UTF-8') ?></a>
+    <a href="<?= $headerBasePath ?>support/help.php"><i class="fa-solid fa-circle-question"></i>&nbsp; <?= htmlspecialchars(t('header_help'), ENT_QUOTES, 'UTF-8') ?></a>
     <?php if (isset($_SESSION['auth_token'])): ?>
-      <a href="<?= $headerBasePath ?>inscription-connexion/account.php"><i class="fa-solid fa-user"></i>&nbsp; Mon profil</a>
+      <a href="<?= $headerBasePath ?>inscription-connexion/account.php"><i class="fa-solid fa-user"></i>&nbsp; <?= htmlspecialchars(t('header_my_profile'), ENT_QUOTES, 'UTF-8') ?></a>
     <?php else: ?>
-      <a href="<?= $headerBasePath ?>inscription-connexion/register.php"><i class="fa-solid fa-user-plus"></i>&nbsp; S'inscrire</a>
+      <a href="<?= $headerBasePath ?>inscription-connexion/register.php"><i class="fa-solid fa-user-plus"></i>&nbsp; <?= htmlspecialchars(t('header_register'), ENT_QUOTES, 'UTF-8') ?></a>
     <?php endif; ?>
   </nav>
   <div class="theme-toggle-mobile">
     <button data-theme-toggle>
       <i class="fa-solid fa-circle-half-stroke"></i>
-      <span class="theme-toggle-label">Mode sombre</span>
+      <span class="theme-toggle-label"><?= htmlspecialchars(t('header_dark_mode'), ENT_QUOTES, 'UTF-8') ?></span>
     </button>
   </div>
 </div>
@@ -106,13 +108,12 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       <div class="deleted-account-icon">
         <i class="fa-solid fa-user-slash"></i>
       </div>
-      <h3 class="deleted-account-title">Compte supprimé</h3>
+      <h3 class="deleted-account-title"><?= htmlspecialchars(t('header_account_deleted'), ENT_QUOTES, 'UTF-8') ?></h3>
       <p class="deleted-account-text">
-        Votre compte a été supprimé par un administrateur.<br>
-        Vous allez être déconnecté automatiquement.
+        <?= htmlspecialchars(t('header_account_deleted_text'), ENT_QUOTES, 'UTF-8') ?>
       </p>
       <button class="deleted-account-btn" onclick="window.location.href='<?= $headerBasePath ?>inscription-connexion/logout.php'">
-        <i class="fa-solid fa-right-from-bracket"></i> Fermer
+        <i class="fa-solid fa-right-from-bracket"></i> <?= htmlspecialchars(t('header_close'), ENT_QUOTES, 'UTF-8') ?>
       </button>
       <div class="deleted-account-countdown" id="deletedCountdown"></div>
     </div>
@@ -176,14 +177,13 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 <div class="cookie-banner" id="cookieBanner">
   <div class="cookie-banner-inner">
     <div class="cookie-banner-text">
-      <strong><i class="fa-solid fa-cookie-bite"></i> Nous utilisons des cookies</strong><br>
-      Ce site utilise des cookies pour améliorer votre expérience, analyser le trafic et personnaliser le contenu.
-      Vous pouvez accepter tous les cookies, les refuser ou personnaliser vos préférences.
+      <strong><i class="fa-solid fa-cookie-bite"></i> <?= htmlspecialchars(t('cookie_title'), ENT_QUOTES, 'UTF-8') ?></strong><br>
+      <?= htmlspecialchars(t('cookie_text'), ENT_QUOTES, 'UTF-8') ?>
     </div>
     <div class="cookie-banner-actions">
-      <button class="cookie-btn cookie-btn-accept" id="cookieAcceptAll">Tout accepter</button>
-      <button class="cookie-btn cookie-btn-refuse" id="cookieRefuseAll">Tout refuser</button>
-      <button class="cookie-btn cookie-btn-settings" id="cookieSettings">Personnaliser</button>
+      <button class="cookie-btn cookie-btn-accept" id="cookieAcceptAll"><?= htmlspecialchars(t('cookie_accept'), ENT_QUOTES, 'UTF-8') ?></button>
+      <button class="cookie-btn cookie-btn-refuse" id="cookieRefuseAll"><?= htmlspecialchars(t('cookie_refuse'), ENT_QUOTES, 'UTF-8') ?></button>
+      <button class="cookie-btn cookie-btn-settings" id="cookieSettings"><?= htmlspecialchars(t('cookie_customize'), ENT_QUOTES, 'UTF-8') ?></button>
     </div>
   </div>
 </div>
@@ -191,13 +191,13 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 <!-- Modal personnalisation cookies -->
 <div class="cookie-modal-overlay" id="cookieModal">
   <div class="cookie-modal">
-    <h3>Paramètres des cookies</h3>
-    <p>Choisissez les types de cookies que vous souhaitez autoriser. Les cookies nécessaires sont toujours actifs car ils sont indispensables au fonctionnement du site.</p>
+    <h3><?= htmlspecialchars(t('cookie_settings_title'), ENT_QUOTES, 'UTF-8') ?></h3>
+    <p><?= htmlspecialchars(t('cookie_settings_text'), ENT_QUOTES, 'UTF-8') ?></p>
 
     <div class="cookie-category">
       <div class="cookie-category-info">
-        <div class="cookie-category-name">Nécessaires</div>
-        <div class="cookie-category-desc">Essentiels au fonctionnement du site (session, sécurité).</div>
+        <div class="cookie-category-name"><?= htmlspecialchars(t('cookie_necessary'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="cookie-category-desc"><?= htmlspecialchars(t('cookie_necessary_desc'), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
       <label class="cookie-toggle">
         <input type="checkbox" id="cookieNecessary" checked disabled>
@@ -207,8 +207,8 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
     <div class="cookie-category">
       <div class="cookie-category-info">
-        <div class="cookie-category-name">Analytiques</div>
-        <div class="cookie-category-desc">Nous aident à comprendre comment les visiteurs utilisent le site.</div>
+        <div class="cookie-category-name"><?= htmlspecialchars(t('cookie_analytics'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="cookie-category-desc"><?= htmlspecialchars(t('cookie_analytics_desc'), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
       <label class="cookie-toggle">
         <input type="checkbox" id="cookieAnalytics">
@@ -218,8 +218,8 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
     <div class="cookie-category">
       <div class="cookie-category-info">
-        <div class="cookie-category-name">Marketing</div>
-        <div class="cookie-category-desc">Utilisés pour afficher des publicités pertinentes.</div>
+        <div class="cookie-category-name"><?= htmlspecialchars(t('cookie_marketing'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="cookie-category-desc"><?= htmlspecialchars(t('cookie_marketing_desc'), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
       <label class="cookie-toggle">
         <input type="checkbox" id="cookieMarketing">
@@ -229,8 +229,8 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
 
     <div class="cookie-category">
       <div class="cookie-category-info">
-        <div class="cookie-category-name">Préférences</div>
-        <div class="cookie-category-desc">Mémorisent vos choix (thème, langue) pour une meilleure expérience.</div>
+        <div class="cookie-category-name"><?= htmlspecialchars(t('cookie_preferences'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="cookie-category-desc"><?= htmlspecialchars(t('cookie_preferences_desc'), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
       <label class="cookie-toggle">
         <input type="checkbox" id="cookiePreferences">
@@ -239,9 +239,9 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
     </div>
 
     <div class="cookie-modal-actions">
-      <button class="cookie-btn cookie-btn-refuse" id="cookieModalClose">Annuler</button>
-      <button class="cookie-btn cookie-btn-accept" id="cookieModalSave">Enregistrer mes choix</button>
-      <button class="cookie-btn cookie-btn-accept" id="cookieModalAccept">Tout accepter</button>
+      <button class="cookie-btn cookie-btn-refuse" id="cookieModalClose"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
+      <button class="cookie-btn cookie-btn-accept" id="cookieModalSave"><?= htmlspecialchars(t('cookie_save_choices'), ENT_QUOTES, 'UTF-8') ?></button>
+      <button class="cookie-btn cookie-btn-accept" id="cookieModalAccept"><?= htmlspecialchars(t('cookie_accept'), ENT_QUOTES, 'UTF-8') ?></button>
     </div>
   </div>
 </div>

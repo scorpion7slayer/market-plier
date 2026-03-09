@@ -3,6 +3,7 @@ session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
 require_once '../includes/site_settings.php';
+require_once '../includes/lang.php';
 
 if (isset($_SESSION['auth_token'])) {
   header('Location: ../index.php');
@@ -17,7 +18,7 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
@@ -28,14 +29,14 @@ if (!isset($_SESSION['csrf_token'])) {
   <link rel="stylesheet" href="../styles/register.css">
   <link rel="stylesheet" href="../styles/theme.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
-  <title>Market Plier - Connexion</title>
+  <title>Market Plier - <?= htmlspecialchars(t('login_title'), ENT_QUOTES, 'UTF-8') ?></title>
 </head>
 
 <body>
   <?php include '../includes/toast.php'; ?>
   <div class="logo">
     <img src="../assets/images/logo.svg" alt="" class="auth-logo-img">
-    <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; Retour à l'accueil</a></p>
+    <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; <?= htmlspecialchars(t('login_back'), ENT_QUOTES, 'UTF-8') ?></a></p>
   </div>
   <!-- Theme toggle flottant -->
   <button class="theme-toggle" data-theme-toggle style="position: fixed; top: 20px; right: 20px; z-index: 1001; color: var(--mp-text-muted); font-size: 20px;" title="Changer le thème">
@@ -46,7 +47,7 @@ if (!isset($_SESSION['csrf_token'])) {
   <div class="register-container">
 
     <main class="form-container">
-      <h2 class="title">Se connecter</h2>
+      <h2 class="title"><?= htmlspecialchars(t('login_title'), ENT_QUOTES, 'UTF-8') ?></h2>
 
       <form class="signup-form" action="handle_login.php" method="POST">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -56,7 +57,7 @@ if (!isset($_SESSION['csrf_token'])) {
           class="email-input"
           name="email"
           id="email"
-          placeholder="adresse email"
+          placeholder="<?= htmlspecialchars(t('login_email_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
           required>
 
         <div class="password-wrapper">
@@ -65,9 +66,9 @@ if (!isset($_SESSION['csrf_token'])) {
             class="email-input"
             name="password"
             id="password"
-            placeholder="mot de passe"
+            placeholder="<?= htmlspecialchars(t('login_password_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
             required>
-          <button type="button" class="password-toggle" aria-label="Afficher le mot de passe">
+          <button type="button" class="password-toggle" aria-label="<?= htmlspecialchars(t('show_password'), ENT_QUOTES, 'UTF-8') ?>">
             <i class="fa-solid fa-eye"></i>
             <i class="fa-solid fa-eye-slash"></i>
           </button>
@@ -75,11 +76,11 @@ if (!isset($_SESSION['csrf_token'])) {
 
         <label class="remember-me">
           <input type="checkbox" name="remember_me" value="1">
-          <span>Rester connecté</span>
+          <span><?= htmlspecialchars(t('login_remember'), ENT_QUOTES, 'UTF-8') ?></span>
         </label>
 
         <button type="submit" class="submit-btn">
-          Se connecter
+          <?= htmlspecialchars(t('login_submit'), ENT_QUOTES, 'UTF-8') ?>
         </button>
 
         <?php if ($googleLoginEnabled): ?>

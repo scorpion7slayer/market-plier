@@ -3,6 +3,7 @@ session_start();
 require_once 'database/db.php';
 require_once 'includes/remember_me.php';
 require_once 'includes/maintenance_check.php';
+require_once 'includes/lang.php';
 
 // Générer un token CSRF uniquement s'il n'existe pas encore.
 if (!isset($_SESSION['csrf_token'])) {
@@ -49,13 +50,13 @@ if ($user) {
 // --- Données pour la page d'accueil ---
 
 $categoryLabels = [
-  'vetements'    => 'Vêtements',
-  'electronique' => 'Électronique',
-  'livres'       => 'Livres & Médias',
-  'maison'       => 'Maison & Jardin',
-  'sport'        => 'Sport & Loisirs',
-  'vehicules'    => 'Véhicules',
-  'autre'        => 'Autre',
+  'vetements'    => t('cat_vetements'),
+  'electronique' => t('cat_electronique'),
+  'livres'       => t('cat_livres'),
+  'maison'       => t('cat_maison'),
+  'sport'        => t('cat_sport'),
+  'vehicules'    => t('cat_vehicules'),
+  'autre'        => t('cat_autre'),
 ];
 $categoryIcons = [
   'vetements'    => 'fa-shirt',
@@ -116,7 +117,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8" />
@@ -143,23 +144,23 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
       <div style="width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); display: flex; align-items: center; justify-content: center;">
         <i class="fa-solid fa-user-slash" style="font-size: 1.3rem; color: #e74c3c;"></i>
       </div>
-      <h3 style="font-weight: 700; font-style: italic; font-size: 1.1rem; color: var(--mp-text, #111); margin-bottom: 8px;">Compte supprimé</h3>
+      <h3 style="font-weight: 700; font-style: italic; font-size: 1.1rem; color: var(--mp-text, #111); margin-bottom: 8px;"><?= htmlspecialchars(t('index_account_deleted'), ENT_QUOTES, 'UTF-8') ?></h3>
       <p style="font-style: italic; font-size: 0.9rem; color: var(--mp-text-muted, #888); line-height: 1.5; margin-bottom: 0;">
-        Votre compte a été supprimé par un administrateur.<br>Merci d'avoir utilisé Market Plier.
+        <?= htmlspecialchars(t('index_account_deleted_text'), ENT_QUOTES, 'UTF-8') ?>
       </p>
     </div>
   <?php endif; ?>
 
   <main class="home-main">
     <?php if ($user): ?>
-      <div class="greeting">Bonjour, <?= htmlspecialchars($user['username']) ?></div>
+      <div class="greeting"><?= htmlspecialchars(t('index_hello'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($user['username']) ?></div>
     <?php else: ?>
-      <div class="greeting">Bienvenue sur Market Plier</div>
+      <div class="greeting"><?= htmlspecialchars(t('index_welcome'), ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 
     <!-- Catégories -->
     <section>
-      <div class="section-title">Catégories</div>
+      <div class="section-title"><?= htmlspecialchars(t('index_categories'), ENT_QUOTES, 'UTF-8') ?></div>
       <div class="category-filters">
         <?php foreach ($categoryLabels as $catKey => $catLabel): ?>
           <a href="shop/search.php?category=<?= $catKey ?>" class="category-chip">
@@ -176,7 +177,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- Articles tendances -->
     <?php if (!empty($trending)): ?>
       <section>
-        <div class="section-title">Articles tendances</div>
+        <div class="section-title"><?= htmlspecialchars(t('index_trending'), ENT_QUOTES, 'UTF-8') ?></div>
         <div class="home-scroll-row">
           <?php foreach ($trending as $t): ?>
             <a href="shop/buy.php?id=<?= (int) $t['id'] ?>" class="home-trending-card">
@@ -202,7 +203,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <!-- Dernières annonces -->
     <?php if (!empty($recent)): ?>
       <section>
-        <div class="section-title">Dernières annonces</div>
+        <div class="section-title"><?= htmlspecialchars(t('index_recent'), ENT_QUOTES, 'UTF-8') ?></div>
         <div class="search-results">
           <?php foreach ($recent as $listing): ?>
             <a href="shop/buy.php?id=<?= (int) $listing['id'] ?>" class="listing-card">
@@ -233,19 +234,19 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         </div>
         <div class="home-see-all">
           <a href="shop/search.php" class="load-more-btn">
-            <i class="fa-solid fa-arrow-right"></i> Voir toutes les annonces
+            <i class="fa-solid fa-arrow-right"></i> <?= htmlspecialchars(t('index_see_all'), ENT_QUOTES, 'UTF-8') ?>
           </a>
         </div>
       </section>
     <?php else: ?>
       <section>
-        <div class="section-title">Annonces</div>
+        <div class="section-title"><?= htmlspecialchars(t('index_listings'), ENT_QUOTES, 'UTF-8') ?></div>
         <div class="no-results">
           <i class="fa-solid fa-store"></i>
-          <p>Aucune annonce pour le moment</p>
-          <span>Soyez le premier à publier !</span>
+          <p><?= htmlspecialchars(t('index_no_listings'), ENT_QUOTES, 'UTF-8') ?></p>
+          <span><?= htmlspecialchars(t('index_be_first'), ENT_QUOTES, 'UTF-8') ?></span>
           <div style="margin-top: 16px;">
-            <a href="shop/sell.php" class="load-more-btn"><i class="fa-solid fa-plus"></i> Poster une annonce</a>
+            <a href="shop/sell.php" class="load-more-btn"><i class="fa-solid fa-plus"></i> <?= htmlspecialchars(t('index_post_listing'), ENT_QUOTES, 'UTF-8') ?></a>
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
   header('Location: ../inscription-connexion/login.php');
@@ -53,13 +54,13 @@ $typeColors = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title>Notifications — Market Plier</title>
+  <title><?= htmlspecialchars(t('notif_page_title'), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -78,17 +79,17 @@ $typeColors = [
   <main class="notif-main">
     <div class="notif-container">
       <div class="notif-header">
-        <h1 class="notif-title"><i class="fa-solid fa-bell"></i> Notifications</h1>
+        <h1 class="notif-title"><i class="fa-solid fa-bell"></i> <?= htmlspecialchars(t('notif_title'), ENT_QUOTES, 'UTF-8') ?></h1>
         <?php if ($unreadCount > 0): ?>
-          <span class="notif-unread-badge"><?= $unreadCount ?> nouvelle<?= $unreadCount > 1 ? 's' : '' ?></span>
+          <span class="notif-unread-badge"><?= $unreadCount ?> <?= htmlspecialchars(t('notif_new'), ENT_QUOTES, 'UTF-8') ?></span>
         <?php endif; ?>
       </div>
 
       <?php if (empty($notifications)): ?>
         <div class="notif-empty">
           <i class="fa-regular fa-bell-slash"></i>
-          <p>Aucune notification.</p>
-          <span>Vos notifications apparaîtront ici.</span>
+          <p><?= htmlspecialchars(t('notif_empty'), ENT_QUOTES, 'UTF-8') ?></p>
+          <span><?= htmlspecialchars(t('notif_empty_sub'), ENT_QUOTES, 'UTF-8') ?></span>
         </div>
       <?php else: ?>
         <div class="notif-list">
@@ -97,7 +98,7 @@ $typeColors = [
             $color = $typeColors[$notif['type']] ?? '#7fb885';
             $isNew = !$notif['is_read'];
             $timeAgo = time() - strtotime($notif['created_at']);
-            if ($timeAgo < 60) $timeLabel = 'À l\'instant';
+            if ($timeAgo < 60) $timeLabel = t('notif_just_now');
             elseif ($timeAgo < 3600) $timeLabel = floor($timeAgo / 60) . ' min';
             elseif ($timeAgo < 86400) $timeLabel = floor($timeAgo / 3600) . ' h';
             elseif ($timeAgo < 604800) $timeLabel = floor($timeAgo / 86400) . ' j';
