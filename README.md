@@ -27,9 +27,8 @@ Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
 1. Convertir tout avec Bootstrap CSS et utiliser la police Archivo
 2. Page admin pour gérer les utilisateurs, les articles et autres paramètres
 
-- Mettre un système de notification pour les messages
 - Mettre un système de notification pour les ventes
 - Mettre un système de notification pour les achats
 - Mettre un système de notification pour les commentaires
-- Mettre un système de notification pour les évaluations
+
   
