@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 $user = null;
 if (isset($_SESSION['auth_token'])) {
@@ -15,13 +16,13 @@ $category = trim($_GET['category'] ?? '');
 
 $allowedCategories = ['vetements', 'electronique', 'livres', 'maison', 'sport', 'vehicules', 'autre'];
 $categoryLabels = [
-  'vetements'    => 'Vêtements',
-  'electronique' => 'Électronique',
-  'livres'       => 'Livres & Médias',
-  'maison'       => 'Maison & Jardin',
-  'sport'        => 'Sport & Loisirs',
-  'vehicules'    => 'Véhicules',
-  'autre'        => 'Autre',
+  'vetements'    => t('cat_vetements'),
+  'electronique' => t('cat_electronique'),
+  'livres'       => t('cat_livres'),
+  'maison'       => t('cat_maison'),
+  'sport'        => t('cat_sport'),
+  'vehicules'    => t('cat_vehicules'),
+  'autre'        => t('cat_autre'),
 ];
 $categoryIcons = [
   'vetements'    => 'fa-shirt',
@@ -88,11 +89,11 @@ $orderBy = match ($sort) {
 };
 
 $conditionLabels = [
-  'neuf'          => 'Neuf',
-  'tres_bon_etat' => 'Très bon état',
-  'bon_etat'      => 'Bon état',
-  'etat_correct'  => 'État correct',
-  'pour_pieces'   => 'Pour pièces',
+  'neuf'          => t('condition_neuf'),
+  'tres_bon_etat' => t('condition_tres_bon_etat'),
+  'bon_etat'      => t('condition_bon_etat'),
+  'etat_correct'  => t('condition_etat_correct'),
+  'pour_pieces'   => t('condition_pour_pieces'),
 ];
 
 $perPage = 20;
@@ -115,13 +116,13 @@ $stmt->execute($stmtParams);
 $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title>Recherche — Market Plier</title>
+  <title><?= htmlspecialchars(t('search_title'), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -142,7 +143,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="category-filters">
       <a href="?<?= $query !== '' ? 'q=' . urlencode($query) : '' ?>"
         class="category-chip <?= $category === '' ? 'active' : '' ?>">
-        <i class="fa-solid fa-border-all"></i> Tout
+        <i class="fa-solid fa-border-all"></i> <?= htmlspecialchars(t('search_filter_all'), ENT_QUOTES, 'UTF-8') ?>
       </a>
       <?php foreach ($allowedCategories as $cat): ?>
         <a href="?<?= $query !== '' ? 'q=' . urlencode($query) . '&' : '' ?>category=<?= $cat ?>"
@@ -161,7 +162,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <i class="fa-solid <?= $categoryIcons[$category] ?>"></i>
             <?= htmlspecialchars($categoryLabels[$category], ENT_QUOTES, 'UTF-8') ?>
           <?php else: ?>
-            <i class="fa-solid fa-border-all"></i> Toutes les catégories
+            <i class="fa-solid fa-border-all"></i> <?= htmlspecialchars(t('search_all_categories'), ENT_QUOTES, 'UTF-8') ?>
           <?php endif; ?>
         </span>
         <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
@@ -169,7 +170,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <div class="category-dropdown-menu" id="categoryDropdownMenu">
         <a href="?<?= $query !== '' ? 'q=' . urlencode($query) : '' ?>"
           class="category-dropdown-item <?= $category === '' ? 'active' : '' ?>">
-          <i class="fa-solid fa-border-all"></i> Tout
+          <i class="fa-solid fa-border-all"></i> <?= htmlspecialchars(t('search_filter_all'), ENT_QUOTES, 'UTF-8') ?>
         </a>
         <?php foreach ($allowedCategories as $cat): ?>
           <a href="?<?= $query !== '' ? 'q=' . urlencode($query) . '&' : '' ?>category=<?= $cat ?>"
@@ -187,34 +188,34 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
         <?php if ($category !== ''): ?><input type="hidden" name="category" value="<?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>"><?php endif; ?>
         <div class="filter-group">
-          <label class="filter-label">Prix</label>
+          <label class="filter-label"><?= htmlspecialchars(t('search_filter_price'), ENT_QUOTES, 'UTF-8') ?></label>
           <div class="filter-price-row">
-            <input type="number" name="price_min" class="filter-input" placeholder="Min" min="0" step="0.01"
+            <input type="number" name="price_min" class="filter-input" placeholder="<?= htmlspecialchars(t('search_price_min'), ENT_QUOTES, 'UTF-8') ?>" min="0" step="0.01"
               value="<?= htmlspecialchars($priceMin, ENT_QUOTES, 'UTF-8') ?>">
             <span class="filter-sep">—</span>
-            <input type="number" name="price_max" class="filter-input" placeholder="Max" min="0" step="0.01"
+            <input type="number" name="price_max" class="filter-input" placeholder="<?= htmlspecialchars(t('search_price_max'), ENT_QUOTES, 'UTF-8') ?>" min="0" step="0.01"
               value="<?= htmlspecialchars($priceMax, ENT_QUOTES, 'UTF-8') ?>">
           </div>
         </div>
         <div class="filter-group">
-          <label class="filter-label">État</label>
+          <label class="filter-label"><?= htmlspecialchars(t('search_filter_condition'), ENT_QUOTES, 'UTF-8') ?></label>
           <select name="condition" class="filter-select">
-            <option value="">Tous</option>
+            <option value=""><?= htmlspecialchars(t('search_filter_all'), ENT_QUOTES, 'UTF-8') ?></option>
             <?php foreach ($conditionLabels as $ck => $cl): ?>
-              <option value="<?= $ck ?>" <?= $condition === $ck ? 'selected' : '' ?>><?= $cl ?></option>
+              <option value="<?= $ck ?>" <?= $condition === $ck ? 'selected' : '' ?>><?= htmlspecialchars($cl, ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
           </select>
         </div>
         <div class="filter-group">
-          <label class="filter-label">Trier par</label>
+          <label class="filter-label"><?= htmlspecialchars(t('search_filter_sort'), ENT_QUOTES, 'UTF-8') ?></label>
           <select name="sort" class="filter-select">
-            <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Plus récents</option>
-            <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Plus anciens</option>
-            <option value="cheapest" <?= $sort === 'cheapest' ? 'selected' : '' ?>>Moins chers</option>
-            <option value="expensive" <?= $sort === 'expensive' ? 'selected' : '' ?>>Plus chers</option>
+            <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>><?= htmlspecialchars(t('search_sort_recent'), ENT_QUOTES, 'UTF-8') ?></option>
+            <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>><?= htmlspecialchars(t('search_sort_oldest'), ENT_QUOTES, 'UTF-8') ?></option>
+            <option value="cheapest" <?= $sort === 'cheapest' ? 'selected' : '' ?>><?= htmlspecialchars(t('search_sort_price_asc'), ENT_QUOTES, 'UTF-8') ?></option>
+            <option value="expensive" <?= $sort === 'expensive' ? 'selected' : '' ?>><?= htmlspecialchars(t('search_sort_price_desc'), ENT_QUOTES, 'UTF-8') ?></option>
           </select>
         </div>
-        <button type="submit" class="filter-btn"><i class="fa-solid fa-filter"></i> Filtrer</button>
+        <button type="submit" class="filter-btn"><i class="fa-solid fa-filter"></i> <?= htmlspecialchars(t('search_filter_apply'), ENT_QUOTES, 'UTF-8') ?></button>
       </form>
     </div>
 
@@ -222,16 +223,16 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="search-info">
       <?php if ($query !== '' || $category !== ''): ?>
         <span class="search-info-text">
-          <?= $total ?> résultat<?= $total > 1 ? 's' : '' ?>
+          <?= $total ?> <?= htmlspecialchars($total > 1 ? t('search_listings_count') : t('search_listing_count'), ENT_QUOTES, 'UTF-8') ?>
           <?php if ($query !== ''): ?>
-            pour « <strong><?= htmlspecialchars($query, ENT_QUOTES, 'UTF-8') ?></strong> »
+            <?= htmlspecialchars(t('search_for'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($query, ENT_QUOTES, 'UTF-8') ?></strong> »
           <?php endif; ?>
           <?php if ($category !== '' && isset($categoryLabels[$category])): ?>
-            dans <strong><?= htmlspecialchars($categoryLabels[$category], ENT_QUOTES, 'UTF-8') ?></strong>
+            <?= htmlspecialchars(t('search_in_category'), ENT_QUOTES, 'UTF-8') ?> <strong><?= htmlspecialchars($categoryLabels[$category], ENT_QUOTES, 'UTF-8') ?></strong>
           <?php endif; ?>
         </span>
       <?php else: ?>
-        <span class="search-info-text">Toutes les annonces (<?= $total ?>)</span>
+        <span class="search-info-text"><?= htmlspecialchars(t('search_all_listings'), ENT_QUOTES, 'UTF-8') ?> (<?= $total ?>)</span>
       <?php endif; ?>
     </div>
 
@@ -240,8 +241,8 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <?php if (empty($listings)): ?>
         <div class="no-results">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <p>Aucun résultat trouvé</p>
-          <span>Essayez avec d'autres mots-clés ou une autre catégorie.</span>
+          <p><?= htmlspecialchars(t('search_no_results'), ENT_QUOTES, 'UTF-8') ?></p>
+          <span><?= htmlspecialchars(t('search_no_results_text'), ENT_QUOTES, 'UTF-8') ?></span>
         </div>
       <?php else: ?>
         <?php foreach ($listings as $listing): ?>
@@ -281,11 +282,13 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php if ($total > $perPage): ?>
       <div class="load-more-container" id="loadMoreContainer">
         <button class="load-more-btn" id="loadMoreBtn">
-          <i class="fa-solid fa-arrow-down"></i> Voir plus
+          <i class="fa-solid fa-arrow-down"></i> <?= htmlspecialchars(t('search_load_more'), ENT_QUOTES, 'UTF-8') ?>
         </button>
       </div>
     <?php endif; ?>
   </main>
+
+  <?php include '../footer.php'; ?>
 
   <script src="../styles/theme.js"></script>
   <script>
@@ -327,6 +330,10 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
       var loadMoreBtn = document.getElementById('loadMoreBtn');
       var loadMoreContainer = document.getElementById('loadMoreContainer');
       var resultsContainer = document.getElementById('searchResults');
+      var locale = <?= json_encode(getUserLocale()) ?>;
+      var i18n = <?= json_encode([
+                    'loading' => t('search_loading'),
+                  ]) ?>;
 
       var categoryIcons = <?= json_encode($categoryIcons) ?>;
       var categoryLabels = <?= json_encode($categoryLabels) ?>;
@@ -335,7 +342,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         loadMoreBtn.addEventListener('click', function() {
           currentPage++;
           loadMoreBtn.disabled = true;
-          loadMoreBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+          loadMoreBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + i18n.loading;
 
           var params = new URLSearchParams();
           if (query) params.set('q', query);
@@ -384,7 +391,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 var price = document.createElement('div');
                 price.className = 'listing-card-price';
-                price.textContent = parseFloat(listing.price).toLocaleString('fr-FR', {
+                price.textContent = parseFloat(listing.price).toLocaleString(locale, {
                   minimumFractionDigits: 2
                 }) + ' €';
 

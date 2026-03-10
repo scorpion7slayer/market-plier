@@ -74,6 +74,19 @@ try {
   // Mettre à jour updated_at
   $pdo->prepare("UPDATE conversations SET updated_at = NOW() WHERE id = ?")->execute([$conversationId]);
 
+  // Notification au destinataire
+  $senderStmt = $pdo->prepare("SELECT username FROM users WHERE auth_token = ?");
+  $senderStmt->execute([$myToken]);
+  $sender = $senderStmt->fetch();
+
+  $pdo->prepare("INSERT INTO notifications (auth_token, type, title, content, link) VALUES (?, 'message', ?, ?, ?)")
+    ->execute([
+      $sellerToken,
+      ($sender['username'] ?? 'Quelqu\'un') . ' vous a envoyé un message',
+      mb_strimwidth($message, 0, 120, '...'),
+      'messagerie/conversation.php?id=' . $conversationId
+    ]);
+
   echo json_encode(['success' => true, 'conversation_id' => $conversationId]);
 } catch (PDOException $e) {
   error_log("start_conversation error: " . $e->getMessage());

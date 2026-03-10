@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -56,13 +57,13 @@ $user = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include '../includes/theme_init.php'; ?>
-    <title>Market Plier - Modifier l'annonce</title>
+    <title><?= htmlspecialchars(t('buy_edit_listing'), ENT_QUOTES, 'UTF-8') ?> - Market Plier</title>
     <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -79,7 +80,7 @@ $user = [
     ?>
 
     <main>
-        <h1 class="page-title">Modifier l'annonce</h1>
+        <h1 class="page-title"><?= htmlspecialchars(t('buy_edit_listing'), ENT_QUOTES, 'UTF-8') ?></h1>
 
         <form action="handle_edit_listing.php" method="POST" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token"
@@ -88,17 +89,17 @@ $user = [
 
             <!-- Photos -->
             <div class="form-section">
-                <span class="section-label">Photos <span class="photo-counter">(<span id="photo-count"><?php echo count($existingImages); ?></span>/5)</span></span>
+                <span class="section-label"><?= htmlspecialchars(t('sell_photos'), ENT_QUOTES, 'UTF-8') ?> <span class="photo-counter">(<span id="photo-count"><?php echo count($existingImages); ?></span>/5)</span></span>
 
                 <div class="photos-container" id="photos-container">
                     <?php foreach ($existingImages as $index => $img): ?>
                         <div class="photo-preview-wrapper existing-photo" data-image-id="<?php echo $img['id']; ?>" data-index="<?php echo $index; ?>">
-                            <img class="photo-preview-img" src="../api/image.php?id=<?php echo (int)$img['id']; ?>" alt="Photo existante">
+                            <img class="photo-preview-img" src="../api/image.php?id=<?php echo (int)$img['id']; ?>" alt="<?= htmlspecialchars(t('edit_existing_photo'), ENT_QUOTES, 'UTF-8') ?>">
                             <span class="photo-order-badge"><?php echo $index + 1; ?></span>
-                            <button type="button" class="photo-main-btn<?php echo $index === 0 ? ' active' : ''; ?>" title="Définir comme image principale">
+                            <button type="button" class="photo-main-btn<?php echo $index === 0 ? ' active' : ''; ?>" title="<?= htmlspecialchars(t('sell_main_image'), ENT_QUOTES, 'UTF-8') ?>">
                                 <i class="fas fa-star"></i>
                             </button>
-                            <button type="button" class="photo-remove-btn" title="Supprimer cette photo">
+                            <button type="button" class="photo-remove-btn" title="<?= htmlspecialchars(t('edit_remove_photo'), ENT_QUOTES, 'UTF-8') ?>">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -111,8 +112,8 @@ $user = [
                             <div class="upload-icon-circle">
                                 <i class="fas fa-camera"></i>
                             </div>
-                            <span class="upload-text">Ajouter des photos</span>
-                            <span class="upload-hint">JPG, PNG ou WEBP &mdash; max 5&nbsp;Mo par image</span>
+                            <span class="upload-text"><?= htmlspecialchars(t('sell_add_photos'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="upload-hint"><?= htmlspecialchars(t('sell_photo_hint'), ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
                     </label>
                 </div>
@@ -125,21 +126,21 @@ $user = [
                 </div>
                 <input type="hidden" name="image_order" id="image-order" value="">
 
-                <p class="photos-help-text">Vous pouvez ajouter jusqu'à 5 photos. Glissez-déposez pour réorganiser.</p>
+                <p class="photos-help-text"><?= htmlspecialchars(t('sell_photos_help'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
             <!-- L'essentiel -->
             <div class="form-section">
-                <span class="section-label">L'essentiel</span>
+                <span class="section-label"><?= htmlspecialchars(t('sell_essentials'), ENT_QUOTES, 'UTF-8') ?></span>
 
                 <div class="field-group">
-                    <label class="field-label" for="title">Titre de l'annonce</label>
+                    <label class="field-label" for="title"><?= htmlspecialchars(t('sell_item_title'), ENT_QUOTES, 'UTF-8') ?></label>
                     <input
                         type="text"
                         class="sell-input"
                         id="title"
                         name="title"
-                        placeholder="Ex : iPhone 14 Pro, Vélo de route Decathlon..."
+                        placeholder="<?= htmlspecialchars(t('sell_title_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         maxlength="100"
                         required
                         value="<?php echo htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -147,34 +148,34 @@ $user = [
 
                 <div class="field-row" style="margin-top: 18px;">
                     <div class="field-group">
-                        <label class="field-label" for="category">Catégorie</label>
+                        <label class="field-label" for="category"><?= htmlspecialchars(t('sell_category'), ENT_QUOTES, 'UTF-8') ?></label>
                         <select class="sell-select" id="category" name="category" required>
-                            <option value="" disabled>Choisir...</option>
-                            <option value="vetements" <?php echo $listing['category'] === 'vetements' ? 'selected' : ''; ?>>Vêtements</option>
-                            <option value="electronique" <?php echo $listing['category'] === 'electronique' ? 'selected' : ''; ?>>Électronique</option>
-                            <option value="livres" <?php echo $listing['category'] === 'livres' ? 'selected' : ''; ?>>Livres &amp; Médias</option>
-                            <option value="maison" <?php echo $listing['category'] === 'maison' ? 'selected' : ''; ?>>Maison &amp; Jardin</option>
-                            <option value="sport" <?php echo $listing['category'] === 'sport' ? 'selected' : ''; ?>>Sport &amp; Loisirs</option>
-                            <option value="vehicules" <?php echo $listing['category'] === 'vehicules' ? 'selected' : ''; ?>>Véhicules</option>
-                            <option value="autre" <?php echo $listing['category'] === 'autre' ? 'selected' : ''; ?>>Autre</option>
+                            <option value="" disabled><?= htmlspecialchars(t('sell_choose'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="vetements" <?php echo $listing['category'] === 'vetements' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_vetements'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="electronique" <?php echo $listing['category'] === 'electronique' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_electronique'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="livres" <?php echo $listing['category'] === 'livres' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_livres'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="maison" <?php echo $listing['category'] === 'maison' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_maison'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="sport" <?php echo $listing['category'] === 'sport' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_sport'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="vehicules" <?php echo $listing['category'] === 'vehicules' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_vehicules'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="autre" <?php echo $listing['category'] === 'autre' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_autre'), ENT_QUOTES, 'UTF-8') ?></option>
                         </select>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label" for="condition">État</label>
+                        <label class="field-label" for="condition"><?= htmlspecialchars(t('sell_condition'), ENT_QUOTES, 'UTF-8') ?></label>
                         <select class="sell-select" id="condition" name="condition" required>
-                            <option value="" disabled>Choisir...</option>
-                            <option value="neuf" <?php echo $listing['item_condition'] === 'neuf' ? 'selected' : ''; ?>>Neuf</option>
-                            <option value="tres_bon_etat" <?php echo $listing['item_condition'] === 'tres_bon_etat' ? 'selected' : ''; ?>>Très bon état</option>
-                            <option value="bon_etat" <?php echo $listing['item_condition'] === 'bon_etat' ? 'selected' : ''; ?>>Bon état</option>
-                            <option value="etat_correct" <?php echo $listing['item_condition'] === 'etat_correct' ? 'selected' : ''; ?>>État correct</option>
-                            <option value="pour_pieces" <?php echo $listing['item_condition'] === 'pour_pieces' ? 'selected' : ''; ?>>Pour pièces</option>
+                            <option value="" disabled><?= htmlspecialchars(t('sell_choose'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="neuf" <?php echo $listing['item_condition'] === 'neuf' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_neuf'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="tres_bon_etat" <?php echo $listing['item_condition'] === 'tres_bon_etat' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_tres_bon_etat'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="bon_etat" <?php echo $listing['item_condition'] === 'bon_etat' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_bon_etat'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="etat_correct" <?php echo $listing['item_condition'] === 'etat_correct' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_etat_correct'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="pour_pieces" <?php echo $listing['item_condition'] === 'pour_pieces' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_pour_pieces'), ENT_QUOTES, 'UTF-8') ?></option>
                         </select>
                     </div>
                 </div>
 
                 <div class="field-group" style="margin-top: 18px;">
-                    <label class="field-label" for="price">Prix</label>
+                    <label class="field-label" for="price"><?= htmlspecialchars(t('sell_price'), ENT_QUOTES, 'UTF-8') ?></label>
                     <div class="price-wrapper">
                         <input
                             type="number"
@@ -194,29 +195,29 @@ $user = [
 
             <!-- Détails -->
             <div class="form-section">
-                <span class="section-label">Détails</span>
+                <span class="section-label"><?= htmlspecialchars(t('buy_details'), ENT_QUOTES, 'UTF-8') ?></span>
 
                 <div class="field-group">
-                    <label class="field-label" for="description">Description</label>
+                    <label class="field-label" for="description"><?= htmlspecialchars(t('sell_description'), ENT_QUOTES, 'UTF-8') ?></label>
                     <textarea
                         class="sell-textarea"
                         id="description"
                         name="description"
-                        placeholder="Décrivez votre article : état, dimensions, raison de la vente..."
+                        placeholder="<?= htmlspecialchars(t('sell_description_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         minlength="10"
                         required><?php echo htmlspecialchars($listing['description'], ENT_QUOTES, 'UTF-8'); ?></textarea>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" for="location">
-                        Lieu <span style="font-weight:400; color:#bbb;">(facultatif)</span>
+                        <?= htmlspecialchars(t('sell_location'), ENT_QUOTES, 'UTF-8') ?> <span style="font-weight:400; color:#bbb;"><?= htmlspecialchars(t('sell_optional'), ENT_QUOTES, 'UTF-8') ?></span>
                     </label>
                     <input
                         type="text"
                         class="sell-input"
                         id="location"
                         name="location"
-                        placeholder="Ex : Paris, Lyon..."
+                        placeholder="<?= htmlspecialchars(t('sell_location_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         maxlength="100"
                         value="<?php echo htmlspecialchars($listing['location'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
@@ -224,12 +225,21 @@ $user = [
 
             <!-- Enregistrer -->
             <button type="submit" class="publish-btn">
-                <i class="fas fa-save"></i>&nbsp; Enregistrer les modifications
+                <i class="fas fa-save"></i>&nbsp; <?= htmlspecialchars(t('edit_save_changes'), ENT_QUOTES, 'UTF-8') ?>
             </button>
         </form>
     </main>
 
+    <?php include '../footer.php'; ?>
+
     <script>
+        var i18n = <?php echo json_encode([
+                        'sell_preview_alt' => t('sell_preview_alt'),
+                        'sell_main_image' => t('sell_main_image'),
+                        'edit_remove_photo' => t('edit_remove_photo'),
+                        'sell_photo_limit_error' => t('sell_photo_limit_error'),
+                        'sell_choose' => t('sell_choose'),
+                    ]); ?>;
         // Données des images existantes
         var existingImages = <?php echo json_encode(array_map(function ($img) {
                                     return ['id' => $img['id'], 'path' => $img['image_path'], 'imageId' => $img['id']];
@@ -443,7 +453,7 @@ $user = [
 
             var imgEl = document.createElement('img');
             imgEl.className = 'photo-preview-img';
-            imgEl.alt = 'Aperçu';
+            imgEl.alt = i18n.sell_preview_alt;
 
             if (type === 'existing') {
                 imgEl.src = imgData.imageId ? ('../api/image.php?id=' + imgData.imageId) : ('../uploads/listings/' + imgData.path);
@@ -463,13 +473,13 @@ $user = [
             mainBtn.type = 'button';
             mainBtn.className = 'photo-main-btn' + (globalIndex === 0 ? ' active' : '');
             mainBtn.innerHTML = '<i class="fas fa-star"></i>';
-            mainBtn.title = 'Définir comme image principale';
+            mainBtn.title = i18n.sell_main_image;
 
             var removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'photo-remove-btn';
             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-            removeBtn.title = 'Supprimer cette photo';
+            removeBtn.title = i18n.edit_remove_photo;
 
             removeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -506,7 +516,7 @@ $user = [
             var remaining = maxFiles - getTotalCount();
             if (files.length > remaining) {
                 files = files.slice(0, remaining);
-                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+                alert(i18n.sell_photo_limit_error.replace('%d', maxFiles));
             }
             if (files.length === 0) return;
             processAndAddFiles(files, function(compressed) {
@@ -537,7 +547,7 @@ $user = [
             var remaining = maxFiles - getTotalCount();
             if (files.length > remaining) {
                 files = files.slice(0, remaining);
-                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+                alert(i18n.sell_photo_limit_error.replace('%d', maxFiles));
             }
             if (files.length === 0) return;
             processAndAddFiles(files, function(compressed) {
@@ -578,7 +588,7 @@ $user = [
 
                 var selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
                 var hasValue = selectedOpt && selectedOpt.value !== '';
-                textSpan.textContent = hasValue ? selectedOpt.text : 'Choisir...';
+                textSpan.textContent = hasValue ? selectedOpt.text : i18n.sell_choose;
                 if (!hasValue) trigger.classList.add('placeholder');
 
                 Array.from(nativeSelect.options).forEach(function(opt) {

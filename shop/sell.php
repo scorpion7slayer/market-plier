@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
     header('Location: ../inscription-connexion/login.php');
@@ -26,13 +27,13 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include '../includes/theme_init.php'; ?>
-    <title>Market Plier - Poster une annonce</title>
+    <title><?= htmlspecialchars(t('sell_title'), ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -49,7 +50,7 @@ try {
     ?>
 
     <main>
-        <h1 class="page-title">Poster une annonce</h1>
+        <h1 class="page-title"><?= htmlspecialchars(t('sell_heading'), ENT_QUOTES, 'UTF-8') ?></h1>
 
         <form action="handle_sell.php" method="POST" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token"
@@ -57,7 +58,7 @@ try {
 
             <!-- Photos -->
             <div class="form-section">
-                <span class="section-label">Photos <span class="photo-counter">(<span id="photo-count">0</span>/5)</span></span>
+                <span class="section-label"><?= htmlspecialchars(t('sell_photos'), ENT_QUOTES, 'UTF-8') ?> <span class="photo-counter">(<span id="photo-count">0</span>/5)</span></span>
                 <div class="photos-container" id="photos-container">
                     <!-- Zone d'upload principale -->
                     <label class="photo-upload-zone" id="upload-zone">
@@ -66,27 +67,27 @@ try {
                             <div class="upload-icon-circle">
                                 <i class="fas fa-camera"></i>
                             </div>
-                            <span class="upload-text">Ajouter des photos</span>
-                            <span class="upload-hint">JPG, PNG ou WEBP &mdash; max 5&nbsp;Mo par image</span>
+                            <span class="upload-text"><?= htmlspecialchars(t('sell_add_photos'), ENT_QUOTES, 'UTF-8') ?></span>
+                            <span class="upload-hint"><?= htmlspecialchars(t('sell_photo_hint'), ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
                     </label>
                     <!-- Les aperçus des photos seront insérés ici -->
                 </div>
-                <p class="photos-help-text">Vous pouvez ajouter jusqu'à 5 photos. Glissez-déposez pour réorganiser.</p>
+                <p class="photos-help-text"><?= htmlspecialchars(t('sell_photos_help'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
             <!-- L'essentiel -->
             <div class="form-section">
-                <span class="section-label">L'essentiel</span>
+                <span class="section-label"><?= htmlspecialchars(t('sell_essentials'), ENT_QUOTES, 'UTF-8') ?></span>
 
                 <div class="field-group">
-                    <label class="field-label" for="title">Titre de l'annonce</label>
+                    <label class="field-label" for="title"><?= htmlspecialchars(t('sell_item_title'), ENT_QUOTES, 'UTF-8') ?></label>
                     <input
                         type="text"
                         class="sell-input"
                         id="title"
                         name="title"
-                        placeholder="Ex : iPhone 14 Pro, Vélo de route Decathlon..."
+                        placeholder="<?= htmlspecialchars(t('sell_title_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         maxlength="100"
                         required
                         value="<?php echo htmlspecialchars($_POST['title'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -94,34 +95,34 @@ try {
 
                 <div class="field-row" style="margin-top: 18px;">
                     <div class="field-group">
-                        <label class="field-label" for="category">Catégorie</label>
+                        <label class="field-label" for="category"><?= htmlspecialchars(t('sell_category'), ENT_QUOTES, 'UTF-8') ?></label>
                         <select class="sell-select" id="category" name="category" required>
-                            <option value="" disabled <?php echo empty($_POST['category']) ? 'selected' : ''; ?>>Choisir...</option>
-                            <option value="vetements" <?php echo ($_POST['category'] ?? '') === 'vetements'    ? 'selected' : ''; ?>>Vêtements</option>
-                            <option value="electronique" <?php echo ($_POST['category'] ?? '') === 'electronique' ? 'selected' : ''; ?>>Électronique</option>
-                            <option value="livres" <?php echo ($_POST['category'] ?? '') === 'livres'       ? 'selected' : ''; ?>>Livres &amp; Médias</option>
-                            <option value="maison" <?php echo ($_POST['category'] ?? '') === 'maison'       ? 'selected' : ''; ?>>Maison &amp; Jardin</option>
-                            <option value="sport" <?php echo ($_POST['category'] ?? '') === 'sport'        ? 'selected' : ''; ?>>Sport &amp; Loisirs</option>
-                            <option value="vehicules" <?php echo ($_POST['category'] ?? '') === 'vehicules'    ? 'selected' : ''; ?>>Véhicules</option>
-                            <option value="autre" <?php echo ($_POST['category'] ?? '') === 'autre'        ? 'selected' : ''; ?>>Autre</option>
+                            <option value="" disabled <?php echo empty($_POST['category']) ? 'selected' : ''; ?>><?= htmlspecialchars(t('sell_choose'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="vetements" <?php echo ($_POST['category'] ?? '') === 'vetements'    ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_vetements'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="electronique" <?php echo ($_POST['category'] ?? '') === 'electronique' ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_electronique'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="livres" <?php echo ($_POST['category'] ?? '') === 'livres'       ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_livres'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="maison" <?php echo ($_POST['category'] ?? '') === 'maison'       ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_maison'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="sport" <?php echo ($_POST['category'] ?? '') === 'sport'        ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_sport'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="vehicules" <?php echo ($_POST['category'] ?? '') === 'vehicules'    ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_vehicules'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="autre" <?php echo ($_POST['category'] ?? '') === 'autre'        ? 'selected' : ''; ?>><?= htmlspecialchars(t('cat_autre'), ENT_QUOTES, 'UTF-8') ?></option>
                         </select>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label" for="condition">État</label>
+                        <label class="field-label" for="condition"><?= htmlspecialchars(t('sell_condition'), ENT_QUOTES, 'UTF-8') ?></label>
                         <select class="sell-select" id="condition" name="condition" required>
-                            <option value="" disabled <?php echo empty($_POST['condition']) ? 'selected' : ''; ?>>Choisir...</option>
-                            <option value="neuf" <?php echo ($_POST['condition'] ?? '') === 'neuf'          ? 'selected' : ''; ?>>Neuf</option>
-                            <option value="tres_bon_etat" <?php echo ($_POST['condition'] ?? '') === 'tres_bon_etat' ? 'selected' : ''; ?>>Très bon état</option>
-                            <option value="bon_etat" <?php echo ($_POST['condition'] ?? '') === 'bon_etat'      ? 'selected' : ''; ?>>Bon état</option>
-                            <option value="etat_correct" <?php echo ($_POST['condition'] ?? '') === 'etat_correct'  ? 'selected' : ''; ?>>État correct</option>
-                            <option value="pour_pieces" <?php echo ($_POST['condition'] ?? '') === 'pour_pieces'   ? 'selected' : ''; ?>>Pour pièces</option>
+                            <option value="" disabled <?php echo empty($_POST['condition']) ? 'selected' : ''; ?>><?= htmlspecialchars(t('sell_choose'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="neuf" <?php echo ($_POST['condition'] ?? '') === 'neuf'          ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_neuf'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="tres_bon_etat" <?php echo ($_POST['condition'] ?? '') === 'tres_bon_etat' ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_tres_bon_etat'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="bon_etat" <?php echo ($_POST['condition'] ?? '') === 'bon_etat'      ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_bon_etat'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="etat_correct" <?php echo ($_POST['condition'] ?? '') === 'etat_correct'  ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_etat_correct'), ENT_QUOTES, 'UTF-8') ?></option>
+                            <option value="pour_pieces" <?php echo ($_POST['condition'] ?? '') === 'pour_pieces'   ? 'selected' : ''; ?>><?= htmlspecialchars(t('condition_pour_pieces'), ENT_QUOTES, 'UTF-8') ?></option>
                         </select>
                     </div>
                 </div>
 
                 <div class="field-group" style="margin-top: 18px;">
-                    <label class="field-label" for="price">Prix</label>
+                    <label class="field-label" for="price"><?= htmlspecialchars(t('sell_price'), ENT_QUOTES, 'UTF-8') ?></label>
                     <div class="price-wrapper">
                         <input
                             type="number"
@@ -141,29 +142,29 @@ try {
 
             <!-- Détails -->
             <div class="form-section">
-                <span class="section-label">Détails</span>
+                <span class="section-label"><?= htmlspecialchars(t('buy_details'), ENT_QUOTES, 'UTF-8') ?></span>
 
                 <div class="field-group">
-                    <label class="field-label" for="description">Description</label>
+                    <label class="field-label" for="description"><?= htmlspecialchars(t('sell_description'), ENT_QUOTES, 'UTF-8') ?></label>
                     <textarea
                         class="sell-textarea"
                         id="description"
                         name="description"
-                        placeholder="Décrivez votre article : état, dimensions, raison de la vente..."
+                        placeholder="<?= htmlspecialchars(t('sell_description_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         minlength="10"
                         required><?php echo htmlspecialchars($_POST['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" for="location">
-                        Lieu <span style="font-weight:400; color:#bbb;">(facultatif)</span>
+                        <?= htmlspecialchars(t('sell_location'), ENT_QUOTES, 'UTF-8') ?> <span style="font-weight:400; color:#bbb;"><?= htmlspecialchars(t('sell_optional'), ENT_QUOTES, 'UTF-8') ?></span>
                     </label>
                     <input
                         type="text"
                         class="sell-input"
                         id="location"
                         name="location"
-                        placeholder="Ex : Paris, Lyon..."
+                        placeholder="<?= htmlspecialchars(t('sell_location_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         maxlength="100"
                         value="<?php echo htmlspecialchars($_POST['location'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
@@ -171,12 +172,20 @@ try {
 
             <!-- Publier -->
             <button type="submit" class="publish-btn">
-                <i class="fas fa-paper-plane"></i>&nbsp; Publier l'annonce
+                <i class="fas fa-paper-plane"></i>&nbsp; <?= htmlspecialchars(t('sell_submit'), ENT_QUOTES, 'UTF-8') ?>
             </button>
         </form>
     </main>
 
+    <?php include '../footer.php'; ?>
+
     <script>
+        var i18n = <?= json_encode([
+            'sell_photo_limit_error' => t('sell_photo_limit_error'),
+            'sell_preview_alt' => t('sell_preview_alt'),
+            'sell_main_image' => t('sell_main_image'),
+            'sell_choose' => t('sell_choose'),
+        ]) ?>;
         var photoInput = document.getElementById('photo-input');
         var photosContainer = document.getElementById('photos-container');
         var uploadPlaceholder = document.getElementById('upload-placeholder');
@@ -279,7 +288,7 @@ try {
 
             var img = document.createElement('img');
             img.className = 'photo-preview-img';
-            img.alt = 'Aperçu';
+            img.alt = i18n.sell_preview_alt;
 
             var removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -294,7 +303,7 @@ try {
             mainBtn.type = 'button';
             mainBtn.className = 'photo-main-btn' + (index === 0 ? ' active' : '');
             mainBtn.innerHTML = '<i class="fas fa-star"></i>';
-            mainBtn.title = 'Définir comme image principale';
+            mainBtn.title = i18n.sell_main_image;
 
             var mainInput = document.createElement('input');
             mainInput.type = 'hidden';
@@ -372,7 +381,7 @@ try {
 
             if (newFiles.length > remainingSlots) {
                 newFiles = newFiles.slice(0, remainingSlots);
-                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+                alert(i18n.sell_photo_limit_error.replace('%d', maxFiles));
             }
 
             processAndAddFiles(newFiles, function(compressed) {
@@ -409,7 +418,7 @@ try {
             var remainingSlots = maxFiles - selectedFiles.length;
             if (imageFiles.length > remainingSlots) {
                 imageFiles = imageFiles.slice(0, remainingSlots);
-                alert('Vous ne pouvez ajouter que ' + maxFiles + ' photos maximum.');
+                alert(i18n.sell_photo_limit_error.replace('%d', maxFiles));
             }
 
             processAndAddFiles(imageFiles, function(compressed) {
@@ -448,7 +457,7 @@ try {
                 // Texte initial
                 var selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
                 var hasValue = selectedOpt && selectedOpt.value !== '';
-                textSpan.textContent = hasValue ? selectedOpt.text : 'Choisir...';
+                textSpan.textContent = hasValue ? selectedOpt.text : i18n.sell_choose;
                 if (!hasValue) trigger.classList.add('placeholder');
 
                 // Créer les options

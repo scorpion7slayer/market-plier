@@ -5,9 +5,20 @@ $headerUser = $headerUser ?? null;
 
 require_once __DIR__ . '/includes/lang.php';
 
-
 $profilePhoto = $headerUser['profile_photo'] ?? null;
 $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto);
+$headerBrowserNotificationsEnabled = false;
+
+if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
+  try {
+    $stmt = $GLOBALS['pdo']->prepare("SELECT notif_email FROM user_settings WHERE auth_token = ?");
+    $stmt->execute([$_SESSION['auth_token']]);
+    $settingsRow = $stmt->fetch();
+    $headerBrowserNotificationsEnabled = !empty($settingsRow['notif_email']);
+  } catch (\PDOException $e) {
+    $headerBrowserNotificationsEnabled = false;
+  }
+}
 ?>
 <header>
   <div class="header-top">
@@ -254,8 +265,71 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
   <script>
     (function() {
       var basePath = <?= json_encode($headerBasePath) ?>;
+      var browserNotificationsEnabled = <?= json_encode($headerBrowserNotificationsEnabled) ?>;
+      var notificationStorageKey = <?= json_encode('mp-last-notification-id-' . ($_SESSION['auth_token'] ?? 'guest')) ?>;
       var _notifCount = 0,
         _msgCount = 0;
+
+      function rememberLatestNotificationId(notifications) {
+        if (!window.localStorage || !notifications || notifications.length === 0) return 0;
+        var maxId = 0;
+        notifications.forEach(function(notif) {
+          var id = parseInt(notif.id, 10) || 0;
+          if (id > maxId) maxId = id;
+        });
+        localStorage.setItem(notificationStorageKey, String(maxId));
+        return maxId;
+      }
+
+      function showBrowserNotification(notif) {
+        if (!notif || !('Notification' in window) || Notification.permission !== 'granted') return;
+
+        try {
+          var browserNotif = new Notification(notif.title || 'Market Plier', {
+            body: notif.content || '',
+            icon: basePath + 'assets/images/logo.svg'
+          });
+
+          browserNotif.onclick = function() {
+            window.focus();
+            if (notif.link) {
+              window.location.href = new URL(basePath + notif.link, window.location.href).href;
+            }
+            browserNotif.close();
+          };
+
+          setTimeout(function() {
+            browserNotif.close();
+          }, 8000);
+        } catch (e) {}
+      }
+
+      function syncBrowserNotifications(notifications) {
+        if (!browserNotificationsEnabled || !window.localStorage || !notifications || notifications.length === 0) return;
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+        var stored = parseInt(localStorage.getItem(notificationStorageKey) || '0', 10);
+        if (!stored) {
+          rememberLatestNotificationId(notifications);
+          return;
+        }
+
+        var maxId = stored;
+        notifications
+          .slice()
+          .reverse()
+          .forEach(function(notif) {
+            var id = parseInt(notif.id, 10) || 0;
+            if (id > stored && !notif.is_read) {
+              showBrowserNotification(notif);
+            }
+            if (id > maxId) maxId = id;
+          });
+
+        if (maxId > stored) {
+          localStorage.setItem(notificationStorageKey, String(maxId));
+        }
+      }
 
       function updateHamburger() {
         var total = _notifCount + _msgCount;
@@ -270,8 +344,8 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
       }
 
       function updateBadges() {
-        // Notifications count
-        fetch(basePath + 'api/notifications.php?action=count', {
+        // Notifications count + browser notifications
+        fetch(basePath + 'api/notifications.php', {
             credentials: 'same-origin'
           })
           .then(function(r) {
@@ -279,6 +353,7 @@ $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/
           })
           .then(function(data) {
             _notifCount = data.unread_count || 0;
+            syncBrowserNotifications(data.notifications || []);
             var count = _notifCount > 0 ? (_notifCount > 99 ? '99+' : _notifCount) : null;
             ['badgeNotif', 'badgeNotifMobile'].forEach(function(id) {
               var badge = document.getElementById(id);

@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
   header('Location: ../inscription-connexion/login.php');
@@ -66,13 +67,13 @@ if (empty($_SESSION['csrf_token'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title>Conversation avec <?= htmlspecialchars($conversation['other_username'], ENT_QUOTES, 'UTF-8') ?> — Market Plier</title>
+  <title><?= htmlspecialchars(t('conv_title_prefix'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($conversation['other_username'], ENT_QUOTES, 'UTF-8') ?> — Market Plier</title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -92,7 +93,7 @@ if (empty($_SESSION['csrf_token'])) {
     <div class="conv-container">
       <!-- En-tête conversation -->
       <div class="conv-header">
-        <a href="inbox.php" class="conv-back"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="inbox.php" class="conv-back" aria-label="<?= htmlspecialchars(t('conv_back'), ENT_QUOTES, 'UTF-8') ?>"><i class="fa-solid fa-arrow-left"></i></a>
         <a href="../inscription-connexion/profile.php?user=<?= urlencode($conversation['other_username']) ?>" class="conv-user-info">
           <div class="conv-avatar">
             <?php if ($conversation['other_photo'] && file_exists('../uploads/profiles/' . $conversation['other_photo'])): ?>
@@ -118,7 +119,7 @@ if (empty($_SESSION['csrf_token'])) {
         <?php if (empty($messages)): ?>
           <div class="conv-empty">
             <i class="fa-regular fa-comment-dots"></i>
-            <p>Commencez la conversation !</p>
+            <p><?= htmlspecialchars(t('conv_empty'), ENT_QUOTES, 'UTF-8') ?></p>
           </div>
         <?php endif; ?>
 
@@ -151,13 +152,15 @@ if (empty($_SESSION['csrf_token'])) {
       <form class="conv-form" id="sendForm">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="conversation_id" value="<?= (int) $conversationId ?>">
-        <textarea class="conv-input" name="content" id="msgInput" placeholder="Votre message..." rows="1" maxlength="2000" required></textarea>
+        <textarea class="conv-input" name="content" id="msgInput" placeholder="<?= htmlspecialchars(t('msg_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="1" maxlength="2000" required></textarea>
         <button type="submit" class="conv-send" id="sendBtn">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
       </form>
     </div>
   </main>
+
+  <?php include '../footer.php'; ?>
 
   <script src="../styles/theme.js"></script>
   <script>
@@ -169,6 +172,13 @@ if (empty($_SESSION['csrf_token'])) {
       var basePath = '../';
       var myToken = <?= json_encode($myToken) ?>;
       var lastMsgId = <?= !empty($messages) ? (int) end($messages)['id'] : 0 ?>;
+      var locale = <?= json_encode(getUserLocale()) ?>;
+      var i18n = <?= json_encode([
+                    'today' => t('conv_today'),
+                    'yesterday' => t('conv_yesterday'),
+                    'send_error' => t('conv_send_error'),
+                    'network_error' => t('network_error'),
+                  ]) ?>;
 
       // ═══ TIMEZONE : convertir UTC -> heure locale ══════
       function utcToLocal(utcStr) {
@@ -179,16 +189,16 @@ if (empty($_SESSION['csrf_token'])) {
       }
 
       function formatTime(date) {
-        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
       }
 
       function formatDateSep(date) {
         var today = new Date();
-        if (date.toDateString() === today.toDateString()) return "Aujourd'hui";
+        if (date.toDateString() === today.toDateString()) return i18n.today;
         var yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
-        if (date.toDateString() === yesterday.toDateString()) return "Hier";
-        return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        if (date.toDateString() === yesterday.toDateString()) return i18n.yesterday;
+        return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
       }
 
       // Appliquer les heures locales aux messages rendus par PHP
@@ -292,13 +302,13 @@ if (empty($_SESSION['csrf_token'])) {
               if (emptyMsg) emptyMsg.remove();
             } else {
               if (typeof mpShowToast === 'function') {
-                mpShowToast(data.error || "Erreur lors de l'envoi", 'error');
+                mpShowToast(data.error || i18n.send_error, 'error');
               }
             }
           })
           .catch(function() {
             if (typeof mpShowToast === 'function') {
-              mpShowToast('Erreur réseau', 'error');
+              mpShowToast(i18n.network_error, 'error');
             }
           })
           .finally(function() {

@@ -98,6 +98,10 @@ if (!isset($_SESSION['csrf_token'])) {
       <p class="auth-link">Pas encore de compte ? <a href="register.php">S'inscrire</a></p>
     </main>
   </div>
+  <?php
+  $footerBasePath = '../';
+  include '../footer.php';
+  ?>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script src="../styles/form-validation.js"></script>

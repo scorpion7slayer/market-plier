@@ -133,6 +133,8 @@ $typeColors = [
     </div>
   </main>
 
+  <?php include '../footer.php'; ?>
+
   <script src="../styles/theme.js"></script>
 </body>
 

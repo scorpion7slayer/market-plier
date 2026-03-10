@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 if (!isset($_SESSION['auth_token'])) {
   header('Location: ../inscription-connexion/login.php');
@@ -41,13 +42,13 @@ $stmt->execute([$myToken, $myToken, $myToken, $myToken, $myToken]);
 $conversations = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title>Messagerie — Market Plier</title>
+  <title><?= htmlspecialchars(t('msg_inbox_title'), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -66,17 +67,17 @@ $conversations = $stmt->fetchAll();
   <main class="msg-main">
     <div class="msg-container">
       <div class="msg-header">
-        <h1 class="msg-title"><i class="fa-solid fa-envelope"></i> Messagerie</h1>
+        <h1 class="msg-title"><i class="fa-solid fa-envelope"></i> <?= htmlspecialchars(t('msg_inbox_heading'), ENT_QUOTES, 'UTF-8') ?></h1>
         <?php if (!empty($conversations)): ?>
-          <span class="msg-count"><?= count($conversations) ?> conversation<?= count($conversations) > 1 ? 's' : '' ?></span>
+          <span class="msg-count"><?= count($conversations) ?> <?= htmlspecialchars(count($conversations) > 1 ? t('msg_count_plural') : t('msg_count_singular'), ENT_QUOTES, 'UTF-8') ?></span>
         <?php endif; ?>
       </div>
 
       <?php if (empty($conversations)): ?>
         <div class="msg-empty">
           <i class="fa-solid fa-comments"></i>
-          <p>Aucune conversation pour le moment.</p>
-          <span>Contactez un vendeur depuis une annonce pour commencer.</span>
+          <p><?= htmlspecialchars(t('msg_no_conversations'), ENT_QUOTES, 'UTF-8') ?></p>
+          <span><?= htmlspecialchars(t('msg_no_conversations_sub'), ENT_QUOTES, 'UTF-8') ?></span>
         </div>
       <?php else: ?>
         <div class="msg-list">
@@ -104,11 +105,11 @@ $conversations = $stmt->fetchAll();
                 <div class="msg-preview">
                   <?php if ($conv['last_message']): ?>
                     <?php if ($conv['last_sender'] === $myToken): ?>
-                      <span class="msg-you">Vous : </span>
+                      <span class="msg-you"><?= htmlspecialchars(t('msg_you'), ENT_QUOTES, 'UTF-8') ?> </span>
                     <?php endif; ?>
                     <?= htmlspecialchars(mb_strimwidth($conv['last_message'], 0, 80, '...'), ENT_QUOTES, 'UTF-8') ?>
                   <?php else: ?>
-                    <em>Nouvelle conversation</em>
+                    <em><?= htmlspecialchars(t('msg_new_conversation'), ENT_QUOTES, 'UTF-8') ?></em>
                   <?php endif; ?>
                 </div>
               </div>
@@ -122,9 +123,16 @@ $conversations = $stmt->fetchAll();
     </div>
   </main>
 
+  <?php include '../footer.php'; ?>
+
   <script src="../styles/theme.js"></script>
   <script>
     (function() {
+      var locale = <?= json_encode(getUserLocale()) ?>;
+      var i18n = <?= json_encode([
+                    'yesterday' => t('msg_yesterday'),
+                  ]) ?>;
+
       // Convertir les timestamps UTC en heures locales
       function utcToLocal(utcStr) {
         return new Date(utcStr.replace(' ', 'T') + 'Z');
@@ -133,14 +141,14 @@ $conversations = $stmt->fetchAll();
       function formatInboxTime(date) {
         var now = new Date();
         if (date.toDateString() === now.toDateString()) {
-          return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+          return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
         }
         var yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         if (date.toDateString() === yesterday.toDateString()) {
-          return 'Hier';
+          return i18n.yesterday;
         }
-        return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
       }
 
       // Appliquer les heures locales

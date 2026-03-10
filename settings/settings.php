@@ -499,6 +499,16 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
     (function() {
       var themeLight = document.getElementById('theme-light');
       var themeDark = document.getElementById('theme-dark');
+      var themeCookieName = 'mp-theme';
+
+      function persistTheme(theme) {
+        var expires = new Date();
+        expires.setTime(expires.getTime() + 365 * 24 * 60 * 60 * 1000);
+        document.cookie = themeCookieName + '=' + encodeURIComponent(theme) + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
+        try {
+          localStorage.setItem(themeCookieName, theme);
+        } catch (e) {}
+      }
 
       function update() {
         var c = document.documentElement.getAttribute('data-bs-theme') || 'light';
@@ -508,12 +518,12 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
 
       if (themeLight) themeLight.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'light');
-        localStorage.setItem('mp-theme', 'light');
+        persistTheme('light');
         update();
       });
       if (themeDark) themeDark.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'dark');
-        localStorage.setItem('mp-theme', 'dark');
+        persistTheme('dark');
         update();
       });
 
@@ -669,6 +679,10 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
       }
     })();
   </script>
+  <?php
+  $footerBasePath = '../';
+  include '../footer.php';
+  ?>
 </body>
 
 </html>
