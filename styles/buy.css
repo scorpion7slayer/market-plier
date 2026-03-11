@@ -301,6 +301,28 @@
     box-shadow: 0 5px 16px rgba(127, 184, 133, 0.45);
 }
 
+.buy-btn-cart {
+    background: var(--mp-bg-tertiary);
+    color: var(--mp-text);
+    border: 1px solid var(--mp-border);
+}
+
+.buy-btn-cart:hover {
+    background: var(--mp-card-bg);
+    color: var(--mp-text);
+}
+
+.buy-btn-cart-active {
+    background: rgba(127, 184, 133, 0.14);
+    color: var(--mp-green);
+    border: 1px solid rgba(127, 184, 133, 0.35);
+}
+
+.buy-btn-cart-active:hover {
+    background: rgba(127, 184, 133, 0.2);
+    color: var(--mp-green);
+}
+
 .buy-btn-danger {
     background: transparent;
     color: #e74c3c;

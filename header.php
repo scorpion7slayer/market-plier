@@ -4,10 +4,12 @@ $headerBasePath = $headerBasePath ?? '';
 $headerUser = $headerUser ?? null;
 
 require_once __DIR__ . '/includes/lang.php';
+require_once __DIR__ . '/includes/cart.php';
 
 $profilePhoto = $headerUser['profile_photo'] ?? null;
 $profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto);
 $headerBrowserNotificationsEnabled = false;
+$headerCartCount = cart_count();
 
 if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
   try {
@@ -36,8 +38,12 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
     </form>
     <div class="header-divider"></div>
     <?php if (isset($_SESSION['auth_token'])): ?>
-      <!-- Icônes header : favoris, messagerie, notifications -->
+      <!-- Icônes header : panier, favoris, messagerie, notifications -->
       <div class="header-icons">
+        <a href="<?= $headerBasePath ?>panier/" class="header-icon-link" title="<?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?>">
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span class="header-badge header-badge-cart" id="badgeCart" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 99 ? '99+' : $headerCartCount ?></span>
+        </a>
         <a href="<?= $headerBasePath ?>favoris/" class="header-icon-link" title="<?= htmlspecialchars(t('header_favorites'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-heart"></i>
         </a>
@@ -48,6 +54,13 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
         <a href="<?= $headerBasePath ?>notifications/" class="header-icon-link" title="<?= htmlspecialchars(t('header_notifications'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-bell"></i>
           <span class="header-badge header-badge-notif" id="badgeNotif" style="display:none;"></span>
+        </a>
+      </div>
+    <?php else: ?>
+      <div class="header-icons">
+        <a href="<?= $headerBasePath ?>panier/" class="header-icon-link" title="<?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?>">
+          <i class="fa-solid fa-basket-shopping"></i>
+          <span class="header-badge header-badge-cart" id="badgeCart" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 99 ? '99+' : $headerCartCount ?></span>
         </a>
       </div>
     <?php endif; ?>
@@ -91,6 +104,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
   </div>
   <nav>
     <a href="<?= $headerBasePath ?>shop/sell.php"><i class="fa-solid fa-tag"></i>&nbsp; <?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?></a>
+    <a href="<?= $headerBasePath ?>panier/"><i class="fa-solid fa-basket-shopping"></i>&nbsp; <?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeCartMobile" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 99 ? '99+' : $headerCartCount ?></span></a>
     <?php if (isset($_SESSION['auth_token'])): ?>
       <a href="<?= $headerBasePath ?>messagerie/inbox.php"><i class="fa-solid fa-envelope"></i>&nbsp; <?= htmlspecialchars(t('header_messages'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeMsgMobile" style="display:none;"></span></a>
       <a href="<?= $headerBasePath ?>favoris/"><i class="fa-solid fa-heart"></i>&nbsp; <?= htmlspecialchars(t('header_favorites'), ENT_QUOTES, 'UTF-8') ?></a>
@@ -111,6 +125,53 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
     </button>
   </div>
 </div>
+
+<script>
+  (function() {
+    var basePath = <?= json_encode($headerBasePath) ?>;
+
+    function renderCartCount(count) {
+      var safeCount = Math.max(0, parseInt(count, 10) || 0);
+      var label = safeCount > 99 ? '99+' : String(safeCount);
+
+      ['badgeCart', 'badgeCartMobile'].forEach(function(id) {
+        var badge = document.getElementById(id);
+        if (!badge) return;
+        if (safeCount > 0) {
+          badge.textContent = label;
+          badge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+        }
+      });
+
+      window.mpCartCount = safeCount;
+    }
+
+    function refreshCartCount() {
+      fetch(basePath + 'api/cart_count.php', {
+          credentials: 'same-origin'
+        })
+        .then(function(r) {
+          return r.json();
+        })
+        .then(function(data) {
+          renderCartCount(data.count || 0);
+        })
+        .catch(function() {});
+    }
+
+    window.mpUpdateCartBadges = renderCartCount;
+    window.mpRefreshCartBadge = refreshCartCount;
+
+    renderCartCount(<?= (int) $headerCartCount ?>);
+    setInterval(refreshCartCount, 15000);
+
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) refreshCartCount();
+    });
+  })();
+</script>
 
 <?php if (isset($_SESSION['auth_token'])): ?>
   <!-- Modal compte supprimé -->

@@ -28,10 +28,34 @@ body {
     line-height: normal;
 }
 
+body.auth-page {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
 .register-container {
     width: 100%;
     max-width: 1200px;
     padding: 20px;
+}
+
+body.auth-page .register-container {
+    flex: 1;
+    max-width: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 32px;
+}
+
+body.auth-page .form-container {
+    width: 100%;
+}
+
+body.auth-page .mp-footer {
+    width: 100%;
+    margin-top: 0;
 }
 
 .logo {
@@ -344,6 +368,11 @@ body {
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
+    }
+
+    body.auth-page .register-container {
+        display: block;
+        padding: 24px 15px 24px;
     }
 
     .logo {

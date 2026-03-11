@@ -3,6 +3,7 @@ session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
 require_once '../includes/lang.php';
+require_once '../includes/cart.php';
 
 // Utilisateur connecté (pour le header)
 $user = null;
@@ -125,6 +126,7 @@ if ($user) {
 $favCountStmt = $pdo->prepare("SELECT COUNT(*) FROM favorites WHERE listing_id = ?");
 $favCountStmt->execute([$listingId]);
 $favoriteCount = (int) $favCountStmt->fetchColumn();
+$isInCart = cart_has($listingId);
 
 // Avis sur le vendeur
 $reviewsStmt = $pdo->prepare("
@@ -271,6 +273,10 @@ if (empty($_SESSION['csrf_token'])) {
               <i class="fa-solid fa-trash"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
             </button>
           <?php else: ?>
+            <button class="buy-btn buy-btn-cart <?= $isInCart ? 'buy-btn-cart-active' : '' ?>" id="cartBtn" type="button">
+              <i class="fa-solid fa-basket-shopping"></i>
+              <span id="cartText"><?= htmlspecialchars($isInCart ? t('cart_remove') : t('cart_add'), ENT_QUOTES, 'UTF-8') ?></span>
+            </button>
             <button class="buy-btn buy-btn-primary" id="contactSellerBtn" type="button">
               <i class="fa-solid fa-envelope"></i> <?= htmlspecialchars(t('buy_contact_seller'), ENT_QUOTES, 'UTF-8') ?>
             </button>
@@ -505,7 +511,7 @@ if (empty($_SESSION['csrf_token'])) {
     })();
   </script>
 
-  <?php if ($user && !$isOwner): ?>
+  <?php if (!$isOwner): ?>
   <script>
     (function() {
       var basePath = '../';
@@ -515,7 +521,58 @@ if (empty($_SESSION['csrf_token'])) {
                     'favorite_added' => t('buy_favorite_added'),
                     'favorite_removed' => t('buy_favorite_removed'),
                     'review_sent' => t('buy_review_sent'),
+                    'cart_added' => t('cart_added'),
+                    'cart_removed' => t('cart_removed'),
                   ]) ?>;
+
+      // ═══ CART TOGGLE ═══════════════════════════════════
+      var cartBtn = document.getElementById('cartBtn');
+      if (cartBtn) {
+        cartBtn.addEventListener('click', function() {
+          cartBtn.disabled = true;
+
+          var fd = new FormData();
+          fd.append('csrf_token', csrfToken);
+          fd.append('listing_id', <?= (int) $listingId ?>);
+          fd.append('action', 'toggle');
+
+          fetch(basePath + 'api/toggle_cart.php', {
+              method: 'POST',
+              body: fd,
+              credentials: 'same-origin'
+            })
+            .then(function(r) {
+              return r.json();
+            })
+            .then(function(data) {
+              if (!data.success) {
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+                return;
+              }
+
+              var cartText = document.getElementById('cartText');
+              if (data.in_cart) {
+                cartBtn.classList.add('buy-btn-cart-active');
+                cartText.textContent = <?= json_encode(t('cart_remove')) ?>;
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_added, 'success');
+              } else {
+                cartBtn.classList.remove('buy-btn-cart-active');
+                cartText.textContent = <?= json_encode(t('cart_add')) ?>;
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_removed, 'success');
+              }
+
+              if (typeof window.mpUpdateCartBadges === 'function') {
+                window.mpUpdateCartBadges(data.count || 0);
+              }
+            })
+            .catch(function() {
+              if (typeof mpShowToast === 'function') mpShowToast(i18n.error, 'error');
+            })
+            .finally(function() {
+              cartBtn.disabled = false;
+            });
+        });
+      }
 
       // ═══ CONTACT SELLER ════════════════════════════════
       var contactBtn = document.getElementById('contactSellerBtn');

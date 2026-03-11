@@ -33,7 +33,7 @@ if (!isset($_SESSION['csrf_token'])) {
   <title><?= htmlspecialchars(t('register_title') . ' - Market Plier', ENT_QUOTES, 'UTF-8') ?></title>
 </head>
 
-<body>
+<body class="auth-page">
   <?php include '../includes/toast.php'; ?>
   <div class="logo">
     <img src="../assets/images/logo.svg" alt="" class="auth-logo-img">
@@ -132,6 +132,7 @@ if (!isset($_SESSION['csrf_token'])) {
   </div>
   <?php
   $footerBasePath = '../';
+  $footerMinimal = true;
   include '../footer.php';
   ?>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
