@@ -1,0 +1,370 @@
+/* ═══ AIDE.CSS — Centre d'aide Market Plier ══════════════════ */
+/* Dépend de settings.css pour les classes partagées            */
+/* (settings-top-bar, settings-container, settings-section…)   */
+
+/* ═══ BARRE DE RECHERCHE ═════════════════════════════════════ */
+.aide-search-wrapper {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.aide-search-wrapper i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mp-text-muted, #aaa);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.aide-search-input {
+    width: 100%;
+    padding: 16px 20px 16px 48px;
+    font-size: 1rem;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    color: var(--mp-input-text, #333);
+    background: var(--mp-card-bg, #fff);
+    border: 2.5px solid var(--mp-input-border, #d4d0ca);
+    border-radius: 16px;
+    outline: none;
+    box-shadow: 0 2px 14px var(--mp-card-shadow, rgba(0, 0, 0, 0.05));
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.aide-search-input:focus {
+    border-color: #7fb885;
+    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+}
+
+.aide-search-input::placeholder {
+    color: var(--mp-input-placeholder, #bbb);
+}
+
+/* ═══ CATÉGORIES RAPIDES ══════════════════════════════════════ */
+.aide-categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.aide-category-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    background: var(--mp-card-bg, #fff);
+    border: 2.5px solid var(--mp-input-border, #d4d0ca);
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--mp-text, #333);
+    text-decoration: none;
+    box-shadow: 0 2px 10px var(--mp-card-shadow, rgba(0, 0, 0, 0.04));
+    transition: all 0.2s ease;
+}
+
+.aide-category-btn i {
+    font-size: 1.3rem;
+    color: #7fb885;
+    flex-shrink: 0;
+}
+
+.aide-category-btn:hover {
+    border-color: #7fb885;
+    background: rgba(127, 184, 133, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(127, 184, 133, 0.15);
+    color: var(--mp-text, #333);
+}
+
+.aide-category-btn.active {
+    border-color: #7fb885;
+    background: rgba(127, 184, 133, 0.08);
+    color: #7fb885;
+}
+
+.aide-category-btn.active i {
+    color: #7fb885;
+}
+
+/* ═══ FAQ — ACCORDÉON ════════════════════════════════════════ */
+.aide-faq-item {
+    border-bottom: 1px solid var(--mp-border-light, #e8e5df);
+}
+
+.aide-faq-item:last-child {
+    border-bottom: none;
+}
+
+.aide-faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--mp-text, #222);
+    transition: color 0.2s ease;
+}
+
+.aide-faq-question:hover {
+    color: #7fb885;
+}
+
+.aide-faq-question.open {
+    color: #7fb885;
+}
+
+.aide-faq-chevron {
+    color: var(--mp-text-muted, #aaa);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.aide-faq-question.open .aide-faq-chevron {
+    transform: rotate(180deg);
+    color: #7fb885;
+}
+
+.aide-faq-answer {
+    display: none;
+    padding: 0 0 18px 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--mp-text-secondary, #666);
+    line-height: 1.65;
+    animation: aideSlideIn 0.2s ease;
+}
+
+.aide-faq-answer.open {
+    display: block;
+}
+
+.aide-faq-answer a {
+    color: #7fb885;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.aide-faq-answer a:hover {
+    text-decoration: underline;
+}
+
+.aide-faq-answer ul {
+    margin: 8px 0 0 18px;
+    padding: 0;
+}
+
+.aide-faq-answer ul li {
+    margin-bottom: 6px;
+}
+
+@keyframes aideSlideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ BADGE STATUT ═══════════════════════════════════════════ */
+.aide-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.aide-badge-info {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1.5px solid #90caf9;
+}
+
+.aide-badge-warning {
+    background: #fff8e1;
+    color: #f57f17;
+    border: 1.5px solid #ffe082;
+}
+
+.aide-badge-success {
+    background: #e8fde8;
+    color: #27ae60;
+    border: 1.5px solid #7fb885;
+}
+
+/* ═══ DÉLAIS INFO ════════════════════════════════════════════ */
+.aide-delays-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.aide-delay-card {
+    background: var(--mp-input-bg, #f8f6f2);
+    border: 2px solid var(--mp-border-light, #e8e5df);
+    border-radius: 14px;
+    padding: 18px 14px;
+    text-align: center;
+}
+
+.aide-delay-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.aide-delay-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--mp-text-muted, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+}
+
+.aide-delay-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--mp-text, #222);
+}
+
+/* ═══ FORMULAIRE DE CONTACT ══════════════════════════════════ */
+.aide-contact-intro {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: rgba(127, 184, 133, 0.07);
+    border: 1.5px solid rgba(127, 184, 133, 0.3);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--mp-text-secondary, #666);
+}
+
+.aide-contact-intro i {
+    font-size: 1.4rem;
+    color: #7fb885;
+    flex-shrink: 0;
+}
+
+.aide-textarea {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    font-family: "Archivo", Arial, sans-serif;
+    font-style: italic;
+    color: var(--mp-input-text, #333);
+    background: var(--mp-input-bg, #f8f6f2);
+    border: 2.5px solid var(--mp-input-border, #d4d0ca);
+    border-radius: 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.aide-textarea:focus {
+    border-color: #7fb885;
+    background: var(--mp-bg-secondary, #fff);
+    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+}
+
+.aide-textarea::placeholder {
+    color: var(--mp-input-placeholder, #bbb);
+}
+
+/* ═══ SECTION URGENCE ════════════════════════════════════════ */
+.aide-urgency-section {
+    border: 2px solid rgba(231, 76, 60, 0.25);
+}
+
+.aide-urgency-section .settings-section-title {
+    color: #e74c3c;
+}
+
+.aide-urgency-section .settings-section-title i {
+    color: #e74c3c;
+}
+
+/* ═══ AUCUN RÉSULTAT (RECHERCHE) ═════════════════════════════ */
+.aide-no-results {
+    text-align: center;
+    padding: 40px 20px;
+    font-style: italic;
+    color: var(--mp-text-muted, #aaa);
+    display: none;
+}
+
+.aide-no-results i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--mp-border, #d4d0ca);
+}
+
+/* ═══ RESPONSIVE ═════════════════════════════════════════════ */
+@media (max-width: 640px) {
+    .aide-categories {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .aide-category-btn {
+        padding: 14px 14px;
+        font-size: 0.82rem;
+        gap: 8px;
+    }
+
+    .aide-category-btn i {
+        font-size: 1.1rem;
+    }
+
+    .aide-delays-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .aide-delay-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-align: left;
+        padding: 14px 18px;
+    }
+
+    .aide-delay-icon {
+        font-size: 1.3rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 400px) {
+    .aide-categories {
+        grid-template-columns: 1fr;
+    }
+}
