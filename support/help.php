@@ -435,7 +435,7 @@
         <a href="#section-contact" class="settings-btn settings-btn-danger">
           <i class="fas fa-lock"></i> Signaler une fraude
         </a>
-        
+
         </a>
       </div>
     </section>
@@ -512,7 +512,7 @@
 
   <!-- ═══ SCRIPTS ══════════════════════════════════════════════ -->
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+  <script src="../styles/theme.js"></script>
   <script>
     /* ── Thème (identique à settings.php) ── */
     (function () {
@@ -634,10 +634,8 @@
   </script>
 
   <script>
-    /* ── Formulaire de contact (démo front-end, remplacer par fetch PHP) ── */
     document.getElementById('aideContactForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      /* TODO : Remplacer par un fetch vers contact_handler.php avec CSRF */
       document.getElementById('aideContactSuccess').style.display = 'flex';
       this.reset();
       document.getElementById('aideContactSuccess').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
