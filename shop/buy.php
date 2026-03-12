@@ -2,6 +2,8 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
+require_once '../includes/cart.php';
 
 // Utilisateur connecté (pour le header)
 $user = null;
@@ -82,13 +84,13 @@ $sellerDescription = $sellerProfile ? ($sellerProfile['description'] ?? '') : ''
 
 // Labels
 $categoryLabels = [
-  'vetements'    => 'Vêtements',
-  'electronique' => 'Électronique',
-  'livres'       => 'Livres & Médias',
-  'maison'       => 'Maison & Jardin',
-  'sport'        => 'Sport & Loisirs',
-  'vehicules'    => 'Véhicules',
-  'autre'        => 'Autre',
+  'vetements'    => t('cat_vetements'),
+  'electronique' => t('cat_electronique'),
+  'livres'       => t('cat_livres'),
+  'maison'       => t('cat_maison'),
+  'sport'        => t('cat_sport'),
+  'vehicules'    => t('cat_vehicules'),
+  'autre'        => t('cat_autre'),
 ];
 $categoryIcons = [
   'vetements'    => 'fa-shirt',
@@ -100,11 +102,11 @@ $categoryIcons = [
   'autre'        => 'fa-ellipsis',
 ];
 $conditionLabels = [
-  'neuf'          => 'Neuf',
-  'tres_bon_etat' => 'Très bon état',
-  'bon_etat'      => 'Bon état',
-  'etat_correct'  => 'État correct',
-  'pour_pieces'   => 'Pour pièces',
+  'neuf'          => t('condition_neuf'),
+  'tres_bon_etat' => t('condition_tres_bon_etat'),
+  'bon_etat'      => t('condition_bon_etat'),
+  'etat_correct'  => t('condition_etat_correct'),
+  'pour_pieces'   => t('condition_pour_pieces'),
 ];
 
 $isOwner = $user && $user['auth_token'] === $listing['auth_token'];
@@ -124,6 +126,7 @@ if ($user) {
 $favCountStmt = $pdo->prepare("SELECT COUNT(*) FROM favorites WHERE listing_id = ?");
 $favCountStmt->execute([$listingId]);
 $favoriteCount = (int) $favCountStmt->fetchColumn();
+$isInCart = cart_has($listingId);
 
 // Avis sur le vendeur
 $reviewsStmt = $pdo->prepare("
@@ -157,13 +160,13 @@ if (empty($_SESSION['csrf_token'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?> — Market Plier</title>
+  <title><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?> — <?= htmlspecialchars(t('buy_title'), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -182,7 +185,7 @@ if (empty($_SESSION['csrf_token'])) {
   <main class="buy-main">
     <!-- Fil d'Ariane -->
     <nav class="buy-breadcrumb">
-      <a href="search.php"><i class="fa-solid fa-arrow-left"></i> Retour aux résultats</a>
+      <a href="search.php"><i class="fa-solid fa-arrow-left"></i> <?= htmlspecialchars(t('buy_back_to_results'), ENT_QUOTES, 'UTF-8') ?></a>
     </nav>
 
     <div class="buy-layout">
@@ -256,7 +259,7 @@ if (empty($_SESSION['csrf_token'])) {
 
           <div class="buy-date">
             <i class="fa-regular fa-clock"></i>
-            Publiée le <?= date('d/m/Y', strtotime($listing['created_at'])) ?>
+            <?= htmlspecialchars(t('buy_posted_on'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars(formatLocalizedDate($listing['created_at']), ENT_QUOTES, 'UTF-8') ?>
           </div>
         </div>
 
@@ -264,19 +267,23 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="buy-card buy-card-actions">
           <?php if ($isOwner): ?>
             <a href="edit_listing.php?id=<?= (int) $listing['id'] ?>" class="buy-btn buy-btn-primary">
-              <i class="fa-solid fa-pen"></i> Modifier l'annonce
+              <i class="fa-solid fa-pen"></i> <?= htmlspecialchars(t('buy_edit_listing'), ENT_QUOTES, 'UTF-8') ?>
             </a>
             <button type="button" class="buy-btn buy-btn-danger" id="openDeleteListingModal">
-              <i class="fa-solid fa-trash"></i> Supprimer
+              <i class="fa-solid fa-trash"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
             </button>
           <?php else: ?>
+            <button class="buy-btn buy-btn-cart <?= $isInCart ? 'buy-btn-cart-active' : '' ?>" id="cartBtn" type="button">
+              <i class="fa-solid fa-basket-shopping"></i>
+              <span id="cartText"><?= htmlspecialchars($isInCart ? t('cart_remove') : t('cart_add'), ENT_QUOTES, 'UTF-8') ?></span>
+            </button>
             <button class="buy-btn buy-btn-primary" id="contactSellerBtn" type="button">
-              <i class="fa-solid fa-envelope"></i> Contacter le vendeur
+              <i class="fa-solid fa-envelope"></i> <?= htmlspecialchars(t('buy_contact_seller'), ENT_QUOTES, 'UTF-8') ?>
             </button>
             <?php if ($user): ?>
               <button class="buy-btn buy-btn-fav <?= $isFavorited ? 'buy-btn-fav-active' : '' ?>" id="favBtn" type="button">
                 <i class="fa-<?= $isFavorited ? 'solid' : 'regular' ?> fa-heart"></i>
-                <span id="favText"><?= $isFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris' ?></span>
+                <span id="favText"><?= htmlspecialchars($isFavorited ? t('buy_remove_favorite') : t('buy_add_favorite'), ENT_QUOTES, 'UTF-8') ?></span>
                 <?php if ($favoriteCount > 0): ?>
                   <span class="buy-fav-count" id="favCount"><?= $favoriteCount ?></span>
                 <?php endif; ?>
@@ -287,7 +294,7 @@ if (empty($_SESSION['csrf_token'])) {
 
         <!-- Description -->
         <div class="buy-card buy-card-description">
-          <h2 class="buy-section-title">Description</h2>
+          <h2 class="buy-section-title"><?= htmlspecialchars(t('buy_description'), ENT_QUOTES, 'UTF-8') ?></h2>
           <div class="buy-description-text">
             <?= nl2br(htmlspecialchars($listing['description'], ENT_QUOTES, 'UTF-8')) ?>
           </div>
@@ -295,7 +302,7 @@ if (empty($_SESSION['csrf_token'])) {
 
         <!-- Vendeur -->
         <div class="buy-card buy-card-seller">
-          <h2 class="buy-section-title">Vendeur</h2>
+          <h2 class="buy-section-title"><?= htmlspecialchars(t('buy_seller'), ENT_QUOTES, 'UTF-8') ?></h2>
           <a href="../inscription-connexion/profile.php?user=<?= urlencode($listing['username']) ?>" class="seller-info seller-link">
             <div class="seller-avatar">
               <?php if ($listing['profile_photo'] && file_exists('../uploads/profiles/' . $listing['profile_photo'])): ?>
@@ -308,10 +315,10 @@ if (empty($_SESSION['csrf_token'])) {
             <div class="seller-details">
               <span class="seller-name"><?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;opacity:0.5;"></i></span>
               <span class="seller-meta">
-                <i class="fa-solid fa-box-open"></i> <?= $sellerListingCount ?> annonce<?= $sellerListingCount > 1 ? 's' : '' ?>
+                <i class="fa-solid fa-box-open"></i> <?= $sellerListingCount ?> <?= htmlspecialchars($sellerListingCount > 1 ? t('buy_listings_plural') : t('buy_listings_singular'), ENT_QUOTES, 'UTF-8') ?>
               </span>
               <span class="seller-meta">
-                <i class="fa-regular fa-calendar"></i> Membre depuis <?= date('m/Y', strtotime($listing['seller_since'])) ?>
+                <i class="fa-regular fa-calendar"></i> <?= htmlspecialchars(t('buy_member_since'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars(formatLocalizedMonthYear($listing['seller_since']), ENT_QUOTES, 'UTF-8') ?>
               </span>
             </div>
           </a>
@@ -325,7 +332,7 @@ if (empty($_SESSION['csrf_token'])) {
                   <i class="fa-<?= $i <= round($avgRating) ? 'solid' : 'regular' ?> fa-star"></i>
                 <?php endfor; ?>
               </span>
-              <span class="seller-rating-text"><?= $avgRating ?>/5 (<?= $reviewCount ?> avis)</span>
+              <span class="seller-rating-text"><?= $avgRating ?>/5 (<?= $reviewCount ?> <?= htmlspecialchars($reviewCount > 1 ? t('buy_reviews_plural') : t('buy_reviews_singular'), ENT_QUOTES, 'UTF-8') ?>)</span>
             </div>
           <?php endif; ?>
         </div>
@@ -333,7 +340,7 @@ if (empty($_SESSION['csrf_token'])) {
         <!-- Avis -->
         <div class="buy-card buy-card-reviews">
           <h2 class="buy-section-title">
-            Avis sur le vendeur
+            <?= htmlspecialchars(t('buy_reviews'), ENT_QUOTES, 'UTF-8') ?>
             <?php if ($reviewCount > 0): ?>
               <span class="buy-review-avg"><?= $avgRating ?>/5</span>
             <?php endif; ?>
@@ -352,15 +359,15 @@ if (empty($_SESSION['csrf_token'])) {
                 <?php endfor; ?>
                 <input type="hidden" name="rating" id="ratingInput" value="0">
               </div>
-              <textarea name="comment" class="review-textarea" placeholder="Votre commentaire (optionnel)" maxlength="1000"></textarea>
+              <textarea name="comment" class="review-textarea" placeholder="<?= htmlspecialchars(t('buy_review_comment_placeholder'), ENT_QUOTES, 'UTF-8') ?>" maxlength="1000"></textarea>
               <button type="submit" class="review-submit-btn" id="reviewSubmitBtn" disabled>
-                <i class="fa-solid fa-paper-plane"></i> Envoyer l'avis
+                <i class="fa-solid fa-paper-plane"></i> <?= htmlspecialchars(t('buy_submit_review'), ENT_QUOTES, 'UTF-8') ?>
               </button>
             </form>
           <?php endif; ?>
 
           <?php if (empty($reviews)): ?>
-            <p class="review-empty">Aucun avis pour le moment.</p>
+            <p class="review-empty"><?= htmlspecialchars(t('buy_no_reviews'), ENT_QUOTES, 'UTF-8') ?></p>
           <?php else: ?>
             <div class="review-list">
               <?php foreach ($reviews as $rev): ?>
@@ -382,7 +389,7 @@ if (empty($_SESSION['csrf_token'])) {
                           <i class="fa-<?= $i <= $rev['rating'] ? 'solid' : 'regular' ?> fa-star"></i>
                         <?php endfor; ?>
                       </span>
-                      <span class="review-date"><?= date('d/m/Y', strtotime($rev['created_at'])) ?></span>
+                      <span class="review-date"><?= htmlspecialchars(formatLocalizedDate($rev['created_at']), ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
                   </div>
                   <?php if ($rev['comment']): ?>
@@ -397,6 +404,8 @@ if (empty($_SESSION['csrf_token'])) {
     </div>
   </main>
 
+  <?php include '../footer.php'; ?>
+
   <?php if ($user && !$isOwner): ?>
   <!-- Modal contacter le vendeur -->
   <div class="confirm-modal-overlay" id="contactOverlay">
@@ -404,19 +413,19 @@ if (empty($_SESSION['csrf_token'])) {
       <div class="confirm-modal-icon" style="background: rgba(127, 184, 133, 0.1);">
         <i class="fa-solid fa-envelope" style="color: #7fb885;"></i>
       </div>
-      <h3 class="confirm-modal-title">Contacter <?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?></h3>
+      <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_contact_seller'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?></h3>
       <p class="confirm-modal-text" style="margin-bottom: 12px;">
-        À propos de « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> »
+        <?= htmlspecialchars(t('buy_about_listing'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> »
       </p>
       <form id="contactForm">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="seller_token" value="<?= htmlspecialchars($listing['auth_token'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="listing_id" value="<?= (int) $listingId ?>">
-        <textarea name="message" class="contact-textarea" placeholder="Bonjour, votre annonce m'intéresse..." rows="4" maxlength="2000" required></textarea>
+        <textarea name="message" class="contact-textarea" placeholder="<?= htmlspecialchars(t('buy_contact_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="4" maxlength="2000" required></textarea>
         <div class="confirm-modal-actions">
-          <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="contactCancel">Annuler</button>
+          <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="contactCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
           <button type="submit" class="confirm-modal-btn" style="background:#7fb885;color:#fff;" id="contactSend">
-            <i class="fa-solid fa-paper-plane"></i> Envoyer
+            <i class="fa-solid fa-paper-plane"></i> <?= htmlspecialchars(t('msg_send'), ENT_QUOTES, 'UTF-8') ?>
           </button>
         </div>
       </form>
@@ -431,14 +440,14 @@ if (empty($_SESSION['csrf_token'])) {
       <div class="confirm-modal-icon">
         <i class="fa-solid fa-trash-alt"></i>
       </div>
-      <h3 class="confirm-modal-title">Supprimer cette annonce ?</h3>
+      <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_delete_listing_title'), ENT_QUOTES, 'UTF-8') ?></h3>
       <p class="confirm-modal-text">
-        L'annonce « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> » sera supprimée définitivement.
+        <?= htmlspecialchars(t('buy_delete_listing_text'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> ».
       </p>
       <div class="confirm-modal-actions">
-        <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="deleteListingCancel">Annuler</button>
+        <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="deleteListingCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
         <a href="delete_listing.php?id=<?= (int) $listing['id'] ?>" class="confirm-modal-btn confirm-modal-btn-danger">
-          <i class="fa-solid fa-trash-alt"></i> Supprimer
+          <i class="fa-solid fa-trash-alt"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
         </a>
       </div>
     </div>
@@ -502,11 +511,68 @@ if (empty($_SESSION['csrf_token'])) {
     })();
   </script>
 
-  <?php if ($user && !$isOwner): ?>
+  <?php if (!$isOwner): ?>
   <script>
     (function() {
       var basePath = '../';
       var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
+      var i18n = <?= json_encode([
+                    'error' => t('generic_error'),
+                    'favorite_added' => t('buy_favorite_added'),
+                    'favorite_removed' => t('buy_favorite_removed'),
+                    'review_sent' => t('buy_review_sent'),
+                    'cart_added' => t('cart_added'),
+                    'cart_removed' => t('cart_removed'),
+                  ]) ?>;
+
+      // ═══ CART TOGGLE ═══════════════════════════════════
+      var cartBtn = document.getElementById('cartBtn');
+      if (cartBtn) {
+        cartBtn.addEventListener('click', function() {
+          cartBtn.disabled = true;
+
+          var fd = new FormData();
+          fd.append('csrf_token', csrfToken);
+          fd.append('listing_id', <?= (int) $listingId ?>);
+          fd.append('action', 'toggle');
+
+          fetch(basePath + 'api/toggle_cart.php', {
+              method: 'POST',
+              body: fd,
+              credentials: 'same-origin'
+            })
+            .then(function(r) {
+              return r.json();
+            })
+            .then(function(data) {
+              if (!data.success) {
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+                return;
+              }
+
+              var cartText = document.getElementById('cartText');
+              if (data.in_cart) {
+                cartBtn.classList.add('buy-btn-cart-active');
+                cartText.textContent = <?= json_encode(t('cart_remove')) ?>;
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_added, 'success');
+              } else {
+                cartBtn.classList.remove('buy-btn-cart-active');
+                cartText.textContent = <?= json_encode(t('cart_add')) ?>;
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_removed, 'success');
+              }
+
+              if (typeof window.mpUpdateCartBadges === 'function') {
+                window.mpUpdateCartBadges(data.count || 0);
+              }
+            })
+            .catch(function() {
+              if (typeof mpShowToast === 'function') mpShowToast(i18n.error, 'error');
+            })
+            .finally(function() {
+              cartBtn.disabled = false;
+            });
+        });
+      }
 
       // ═══ CONTACT SELLER ════════════════════════════════
       var contactBtn = document.getElementById('contactSellerBtn');
@@ -537,7 +603,7 @@ if (empty($_SESSION['csrf_token'])) {
               if (data.success) {
                 window.location.href = basePath + 'messagerie/conversation.php?id=' + data.conversation_id;
               } else {
-                if (typeof mpShowToast === 'function') mpShowToast(data.error || 'Erreur', 'error');
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
                 sendBtn.disabled = false;
               }
             })
@@ -565,13 +631,13 @@ if (empty($_SESSION['csrf_token'])) {
                 if (data.favorited) {
                   favBtn.classList.add('buy-btn-fav-active');
                   icon.className = 'fa-solid fa-heart';
-                  text.textContent = 'Retirer des favoris';
-                  if (typeof mpShowToast === 'function') mpShowToast('Ajouté aux favoris !', 'success');
+                  text.textContent = <?= json_encode(t('buy_remove_favorite')) ?>;
+                  if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_added, 'success');
                 } else {
                   favBtn.classList.remove('buy-btn-fav-active');
                   icon.className = 'fa-regular fa-heart';
-                  text.textContent = 'Ajouter aux favoris';
-                  if (typeof mpShowToast === 'function') mpShowToast('Retiré des favoris', 'success');
+                  text.textContent = <?= json_encode(t('buy_add_favorite')) ?>;
+                  if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_removed, 'success');
                 }
               }
             })
@@ -612,10 +678,10 @@ if (empty($_SESSION['csrf_token'])) {
             .then(function(r) { return r.json(); })
             .then(function(data) {
               if (data.success) {
-                if (typeof mpShowToast === 'function') mpShowToast('Avis envoyé !', 'success');
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.review_sent, 'success');
                 reviewForm.style.display = 'none';
               } else {
-                if (typeof mpShowToast === 'function') mpShowToast(data.error || 'Erreur', 'error');
+                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
                 submitBtn.disabled = false;
               }
             })

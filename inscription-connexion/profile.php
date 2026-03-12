@@ -2,6 +2,7 @@
 session_start();
 require_once '../database/db.php';
 require_once '../includes/remember_me.php';
+require_once '../includes/lang.php';
 
 // Utilisateur connecté (pour le header)
 $currentUser = null;
@@ -52,13 +53,13 @@ try {
 
 // Annonces de l'utilisateur
 $categoryLabels = [
-  'vetements'    => 'Vêtements',
-  'electronique' => 'Électronique',
-  'livres'       => 'Livres & Médias',
-  'maison'       => 'Maison & Jardin',
-  'sport'        => 'Sport & Loisirs',
-  'vehicules'    => 'Véhicules',
-  'autre'        => 'Autre',
+  'vetements'    => t('cat_vetements'),
+  'electronique' => t('cat_electronique'),
+  'livres'       => t('cat_livres'),
+  'maison'       => t('cat_maison'),
+  'sport'        => t('cat_sport'),
+  'vehicules'    => t('cat_vehicules'),
+  'autre'        => t('cat_autre'),
 ];
 $categoryIcons = [
   'vetements'    => 'fa-shirt',
@@ -70,11 +71,11 @@ $categoryIcons = [
   'autre'        => 'fa-ellipsis',
 ];
 $conditionLabels = [
-  'neuf'          => 'Neuf',
-  'tres_bon_etat' => 'Très bon état',
-  'bon_etat'      => 'Bon état',
-  'etat_correct'  => 'État correct',
-  'pour_pieces'   => 'Pour pièces',
+  'neuf'          => t('condition_neuf'),
+  'tres_bon_etat' => t('condition_tres_bon_etat'),
+  'bon_etat'      => t('condition_bon_etat'),
+  'etat_correct'  => t('condition_etat_correct'),
+  'pour_pieces'   => t('condition_pour_pieces'),
 ];
 
 $userListings = [];
@@ -98,7 +99,7 @@ try {
 
 $listingCount = count($userListings);
 $username = htmlspecialchars($profileUser['username'], ENT_QUOTES, 'UTF-8');
-$memberSince = date('m/Y', strtotime($profileUser['created_at']));
+$memberSince = formatLocalizedMonthYear($profileUser['created_at']);
 
 // Avis sur cet utilisateur
 $avgRatingStmt = $pdo->prepare("SELECT AVG(rating) AS avg_rating, COUNT(*) AS cnt FROM reviews WHERE seller_token = ?");
@@ -119,7 +120,7 @@ $reviewsStmt->execute([$profileUser['auth_token']]);
 $reviews = $reviewsStmt->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
@@ -161,11 +162,11 @@ $reviews = $reviewsStmt->fetchAll();
         <div class="profile-hero-stats">
           <span class="profile-stat">
             <i class="fa-solid fa-box-open"></i>
-            <?= $listingCount ?> annonce<?= $listingCount > 1 ? 's' : '' ?>
+            <?= $listingCount ?> <?= htmlspecialchars($listingCount > 1 ? t('buy_listings_plural') : t('buy_listings_singular'), ENT_QUOTES, 'UTF-8') ?>
           </span>
           <span class="profile-stat">
             <i class="fa-regular fa-calendar"></i>
-            Membre depuis <?= $memberSince ?>
+            <?= htmlspecialchars(t('buy_member_since'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($memberSince, ENT_QUOTES, 'UTF-8') ?>
           </span>
           <?php if ($reviewCount > 0): ?>
             <span class="profile-stat">
@@ -174,7 +175,7 @@ $reviews = $reviewsStmt->fetchAll();
                   <i class="fa-<?= $i <= round($avgRating) ? 'solid' : 'regular' ?> fa-star"></i>
                 <?php endfor; ?>
               </span>
-              <?= $avgRating ?>/5 (<?= $reviewCount ?> avis)
+              <?= $avgRating ?>/5 (<?= $reviewCount ?> <?= htmlspecialchars($reviewCount > 1 ? t('buy_reviews_plural') : t('buy_reviews_singular'), ENT_QUOTES, 'UTF-8') ?>)
             </span>
           <?php endif; ?>
         </div>
@@ -188,14 +189,14 @@ $reviews = $reviewsStmt->fetchAll();
     <section class="profile-listings-section">
       <h2 class="profile-section-title">
         <i class="fa-solid fa-store"></i>
-        Annonces de <?= $username ?>
+        <?= htmlspecialchars(t('profile_listings_of'), ENT_QUOTES, 'UTF-8') ?> <?= $username ?>
         <span class="profile-section-count"><?= $listingCount ?></span>
       </h2>
 
       <?php if (empty($userListings)): ?>
         <div class="profile-no-listings">
           <i class="fa-solid fa-box-open"></i>
-          <p>Cet utilisateur n'a pas encore d'annonces.</p>
+          <p><?= htmlspecialchars(t('profile_no_listings'), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
       <?php else: ?>
         <div class="profile-listings-grid">
@@ -241,7 +242,7 @@ $reviews = $reviewsStmt->fetchAll();
       <section class="profile-reviews-section">
         <h2 class="profile-section-title">
           <i class="fa-solid fa-star"></i>
-          Avis
+          <?= htmlspecialchars(t('buy_reviews'), ENT_QUOTES, 'UTF-8') ?>
           <span class="profile-section-count"><?= $reviewCount ?></span>
         </h2>
         <div class="profile-reviews-list">
@@ -264,7 +265,7 @@ $reviews = $reviewsStmt->fetchAll();
                       <i class="fa-<?= $i <= $rev['rating'] ? 'solid' : 'regular' ?> fa-star"></i>
                     <?php endfor; ?>
                   </span>
-                  <span class="profile-review-date"><?= date('d/m/Y', strtotime($rev['created_at'])) ?></span>
+                  <span class="profile-review-date"><?= htmlspecialchars(formatLocalizedDate($rev['created_at']), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
               </div>
               <?php if ($rev['comment']): ?>
@@ -276,6 +277,8 @@ $reviews = $reviewsStmt->fetchAll();
       </section>
     <?php endif; ?>
   </main>
+
+  <?php include '../footer.php'; ?>
 
   <script src="../styles/theme.js"></script>
 </body>

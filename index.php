@@ -159,7 +159,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     <?php endif; ?>
 
     <!-- Catégories -->
-    <section>
+    <section id="home-categories">
       <div class="section-title"><?= htmlspecialchars(t('index_categories'), ENT_QUOTES, 'UTF-8') ?></div>
       <div class="category-filters">
         <?php foreach ($categoryLabels as $catKey => $catLabel): ?>
@@ -176,7 +176,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
     <!-- Articles tendances -->
     <?php if (!empty($trending)): ?>
-      <section>
+      <section id="home-trending">
         <div class="section-title"><?= htmlspecialchars(t('index_trending'), ENT_QUOTES, 'UTF-8') ?></div>
         <div class="home-scroll-row">
           <?php foreach ($trending as $t): ?>
@@ -202,7 +202,7 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
     <!-- Dernières annonces -->
     <?php if (!empty($recent)): ?>
-      <section>
+      <section id="home-recent">
         <div class="section-title"><?= htmlspecialchars(t('index_recent'), ENT_QUOTES, 'UTF-8') ?></div>
         <div class="search-results">
           <?php foreach ($recent as $listing): ?>
@@ -252,6 +252,8 @@ foreach ($catCountStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
       </section>
     <?php endif; ?>
   </main>
+
+  <?php include 'footer.php'; ?>
 
   <script src="styles/theme.js"></script>
 </body>

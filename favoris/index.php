@@ -63,13 +63,13 @@ $conditionLabels = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= htmlspecialchars(getUserLang(), ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php include '../includes/theme_init.php'; ?>
-  <title>Mes favoris — Market Plier</title>
+  <title><?= htmlspecialchars(t('favorites_title'), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -88,19 +88,19 @@ $conditionLabels = [
   <main class="fav-main">
     <div class="fav-container">
       <div class="fav-header">
-        <h1 class="fav-title"><i class="fa-solid fa-heart"></i> Mes favoris</h1>
+        <h1 class="fav-title"><i class="fa-solid fa-heart"></i> <?= htmlspecialchars(t('favorites_heading'), ENT_QUOTES, 'UTF-8') ?></h1>
         <?php if (!empty($favorites)): ?>
-          <span class="fav-count"><?= count($favorites) ?> article<?= count($favorites) > 1 ? 's' : '' ?></span>
+          <span class="fav-count"><?= count($favorites) ?> <?= htmlspecialchars(count($favorites) > 1 ? t('favorites_items_plural') : t('favorites_items_singular'), ENT_QUOTES, 'UTF-8') ?></span>
         <?php endif; ?>
       </div>
 
       <?php if (empty($favorites)): ?>
         <div class="fav-empty">
           <i class="fa-regular fa-heart"></i>
-          <p>Aucun favori pour le moment.</p>
-          <span>Parcourez les annonces et ajoutez-en à vos favoris !</span>
-          <a href="../shop/search.php" class="fav-browse-btn">
-            <i class="fa-solid fa-magnifying-glass"></i> Parcourir les annonces
+          <p><?= htmlspecialchars(t('favorites_empty'), ENT_QUOTES, 'UTF-8') ?></p>
+          <span><?= htmlspecialchars(t('favorites_empty_sub'), ENT_QUOTES, 'UTF-8') ?></span>
+          <a href="../shop/search.php" class="btn btn-brand btn-sm fav-browse-btn">
+            <i class="fa-solid fa-magnifying-glass"></i> <?= htmlspecialchars(t('favorites_browse'), ENT_QUOTES, 'UTF-8') ?>
           </a>
         </div>
       <?php else: ?>
@@ -135,7 +135,7 @@ $conditionLabels = [
                   <?php endif; ?>
                 </div>
               </a>
-              <button class="fav-remove-btn" data-listing-id="<?= (int) $fav['listing_id'] ?>" title="Retirer des favoris">
+              <button class="fav-remove-btn" data-listing-id="<?= (int) $fav['listing_id'] ?>" title="<?= htmlspecialchars(t('favorites_remove'), ENT_QUOTES, 'UTF-8') ?>">
                 <i class="fa-solid fa-heart-crack"></i>
               </button>
             </div>
@@ -145,10 +145,16 @@ $conditionLabels = [
     </div>
   </main>
 
+  <?php include '../footer.php'; ?>
+
   <script src="../styles/theme.js"></script>
   <script>
     (function() {
       var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
+      var i18n = <?= json_encode([
+                    'favorites_removed' => t('favorites_removed'),
+                  ]) ?>;
+
       document.querySelectorAll('.fav-remove-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -176,7 +182,7 @@ $conditionLabels = [
                   card.remove();
                 }, 300);
                 if (typeof mpShowToast === 'function') {
-                  mpShowToast('Retiré des favoris', 'success');
+                  mpShowToast(i18n.favorites_removed, 'success');
                 }
               }
             })
