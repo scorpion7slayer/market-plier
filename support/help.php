@@ -93,21 +93,21 @@
       <p class="settings-desc">Délais de livraison estimés selon le transporteur :</p>
       <div class="aide-delays-grid">
         <div class="aide-delay-card">
-          <div class="aide-delay-icon">🚚</div>
+          <div class="aide-delay-icon"></div>
           <div>
             <div class="aide-delay-label">Standard</div>
             <div class="aide-delay-value">3 – 5 j</div>
           </div>
         </div>
         <div class="aide-delay-card">
-          <div class="aide-delay-icon">⚡</div>
+          <div class="aide-delay-icon"></div>
           <div>
             <div class="aide-delay-label">Express</div>
             <div class="aide-delay-value">1 – 2 j</div>
           </div>
         </div>
         <div class="aide-delay-card">
-          <div class="aide-delay-icon">🌍</div>
+          <div class="aide-delay-icon"></div>
           <div>
             <div class="aide-delay-label">International</div>
             <div class="aide-delay-value">7 – 14 j</div>
@@ -350,7 +350,7 @@
           Notre équipe sécurité examine chaque signalement sous <strong>24h</strong>. En cas de fraude avérée,
           le compte est suspendu et vous êtes remboursé intégralement.
           <br><br>
-          ⚠️ Ne communiquez jamais de paiement hors de la plateforme Market Plier.
+           Ne communiquez jamais de paiement hors de la plateforme Market Plier.
         </div>
       </div>
 
@@ -362,9 +362,9 @@
         <div class="aide-faq-answer">
           Toute commande payée sur Market Plier bénéficie automatiquement de notre protection :
           <ul>
-            <li>✅ Remboursement si le colis n'arrive pas.</li>
-            <li>✅ Remboursement si l'article ne correspond pas à la description.</li>
-            <li>✅ Médiation gratuite en cas de litige avec un vendeur.</li>
+            <li> Remboursement si le colis n'arrive pas.</li>
+            <li> Remboursement si l'article ne correspond pas à la description.</li>
+            <li> Médiation gratuite en cas de litige avec un vendeur.</li>
           </ul>
           La protection est valable <strong>30 jours</strong> après la date de livraison estimée.
         </div>
