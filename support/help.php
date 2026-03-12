@@ -435,8 +435,7 @@
         <a href="#section-contact" class="settings-btn settings-btn-danger">
           <i class="fas fa-lock"></i> Signaler une fraude
         </a>
-        <a href="#section-contact" class="settings-btn settings-btn-danger-outline">
-          <i class="fas fa-ban"></i> Compte piraté
+        
         </a>
       </div>
     </section>
