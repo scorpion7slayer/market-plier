@@ -26,7 +26,8 @@ google/client_secret_*.json
 # ddev
 .ddev/
 
-# MacOS
+# MacOS/Windows/Linux system files
+Thumbs.db
 .DS_Store
 
 # VS Code
