@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/settings.css">
-  <link rel="stylesheet" href="../styles/aide.css">
+  <link rel="stylesheet" href="../styles/help.css">
   <link rel="stylesheet" href="../styles/theme.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Centre d'aide — Market Plier</title>
