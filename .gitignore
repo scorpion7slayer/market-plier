@@ -1,7 +1,7 @@
 CLAUDE.md
+AGENTS.md
 .grepai/
 .claude/
-AGENTS.md
 # Ignorer les fichiers uploadés, garder les dossiers
 uploads/profiles/*
 !uploads/profiles/.gitkeep
@@ -28,3 +28,6 @@ google/client_secret_*.json
 
 # MacOS
 .DS_Store
+
+# VS Code
+.vscode/
