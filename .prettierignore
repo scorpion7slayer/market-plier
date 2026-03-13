@@ -1,0 +1,27 @@
+# Dependencies, caches and local tooling
+.git
+.grepai
+.claude
+.vscode
+.ddev
+node_modules
+vendor
+
+# Generated content and large binary assets
+uploads/**
+assets/fonts/**
+
+# Lockfiles and dumps
+package-lock.json
+composer.lock
+database/marketplier.sql
+
+# Local secrets and machine-specific files
+.env
+.env.local
+.env.production
+google/google_oauth.php
+google/client_secret_*.json
+
+# Do not run Prettier on PHP files in this project.
+*.php

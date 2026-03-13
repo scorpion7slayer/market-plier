@@ -1,22 +1,23 @@
 <?php
 
-
-$envFile = __DIR__ . '/../.env';
+$envFile = __DIR__ . "/../.env";
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
+        if (strpos(trim($line), "#") === 0) {
+            continue;
+        }
+        if (strpos($line, "=") !== false) {
+            [$key, $value] = explode("=", $line, 2);
             $_ENV[trim($key)] = trim($value);
         }
     }
 }
 
-$dbHost = $_ENV['DB_HOST'];
-$dbName = $_ENV['DB_NAME'];
-$dbUser = $_ENV['DB_USER'];
-$dbPass = $_ENV['DB_PASS'];
+$dbHost = $_ENV["DB_HOST"];
+$dbName = $_ENV["DB_NAME"];
+$dbUser = $_ENV["DB_USER"];
+$dbPass = $_ENV["DB_PASS"];
 
 $dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
@@ -29,5 +30,5 @@ $pdoOptions = [
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, $pdoOptions);
 } catch (PDOException $ex) {
-    throw new PDOException($ex->getMessage(), (int)$ex->getCode());
+    throw new PDOException($ex->getMessage(), (int) $ex->getCode());
 }

@@ -1,7 +1,16 @@
 {
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.2.0",
-    "bootstrap": "^5.3.8",
-    "cropperjs": "^2.1.0"
-  }
+    "name": "market-plier",
+    "version": "1.0.0",
+    "scripts": {
+        "format": "prettier . --write",
+        "format:check": "prettier . --check"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^7.2.0",
+        "bootstrap": "^5.3.8",
+        "cropperjs": "^2.1.0"
+    },
+    "devDependencies": {
+        "prettier": "^3.6.2"
+    }
 }

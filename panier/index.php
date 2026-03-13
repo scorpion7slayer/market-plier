@@ -8,40 +8,40 @@ require_once '../includes/cart.php';
 
 $user = null;
 if (isset($_SESSION['auth_token'])) {
-  $stmt = $pdo->prepare("SELECT username, email, profile_photo, auth_token FROM users WHERE auth_token = ?");
-  $stmt->execute([$_SESSION['auth_token']]);
-  $user = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    $stmt = $pdo->prepare("SELECT username, email, profile_photo, auth_token FROM users WHERE auth_token = ?");
+    $stmt->execute([$_SESSION['auth_token']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 }
 
 if (empty($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $categoryLabels = [
-  'vetements' => t('cat_vetements'),
-  'electronique' => t('cat_electronique'),
-  'livres' => t('cat_livres'),
-  'maison' => t('cat_maison'),
-  'sport' => t('cat_sport'),
-  'vehicules' => t('cat_vehicules'),
-  'autre' => t('cat_autre'),
+    'vetements' => t('cat_vetements'),
+    'electronique' => t('cat_electronique'),
+    'livres' => t('cat_livres'),
+    'maison' => t('cat_maison'),
+    'sport' => t('cat_sport'),
+    'vehicules' => t('cat_vehicules'),
+    'autre' => t('cat_autre'),
 ];
 $conditionLabels = [
-  'neuf' => t('condition_neuf'),
-  'tres_bon_etat' => t('condition_tres_bon_etat'),
-  'bon_etat' => t('condition_bon_etat'),
-  'etat_correct' => t('condition_etat_correct'),
-  'pour_pieces' => t('condition_pour_pieces'),
+    'neuf' => t('condition_neuf'),
+    'tres_bon_etat' => t('condition_tres_bon_etat'),
+    'bon_etat' => t('condition_bon_etat'),
+    'etat_correct' => t('condition_etat_correct'),
+    'pour_pieces' => t('condition_pour_pieces'),
 ];
 
 $cartIds = cart_get_ids();
 $cartItems = [];
 $cartTotal = 0.0;
 
-if (!empty($cartIds)) {
-  $placeholders = implode(',', array_fill(0, count($cartIds), '?'));
+if (! empty($cartIds)) {
+    $placeholders = implode(',', array_fill(0, count($cartIds), '?'));
 
-  $stmt = $pdo->prepare("
+    $stmt = $pdo->prepare("
     SELECT l.id, l.title, l.price, l.category, l.item_condition, l.location, l.auth_token,
            u.username AS seller_name,
            (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
@@ -53,24 +53,24 @@ if (!empty($cartIds)) {
     JOIN users u ON u.auth_token = l.auth_token
     WHERE l.status = 'active' AND l.id IN ($placeholders)
   ");
-  $stmt->execute($cartIds);
-  $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute($cartIds);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  $itemsById = [];
-  foreach ($rows as $row) {
-    $itemsById[(int) $row['id']] = $row;
-  }
-
-  foreach ($cartIds as $cartId) {
-    if (!isset($itemsById[$cartId])) {
-      cart_remove($cartId);
-      continue;
+    $itemsById = [];
+    foreach ($rows as $row) {
+        $itemsById[(int) $row['id']] = $row;
     }
 
-    $item = $itemsById[$cartId];
-    $cartItems[] = $item;
-    $cartTotal += (float) $item['price'];
-  }
+    foreach ($cartIds as $cartId) {
+        if (! isset($itemsById[$cartId])) {
+            cart_remove($cartId);
+            continue;
+        }
+
+        $item = $itemsById[$cartId];
+        $cartItems[] = $item;
+        $cartTotal += (float) $item['price'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -92,9 +92,9 @@ if (!empty($cartIds)) {
 <body>
   <?php
   $headerBasePath = '../';
-  $headerUser = $user;
-  include '../header.php';
-  ?>
+$headerUser = $user;
+include '../header.php';
+?>
 
   <main class="cart-main">
     <div class="cart-shell">
@@ -103,7 +103,7 @@ if (!empty($cartIds)) {
           <h1 class="cart-title"><i class="fa-solid fa-basket-shopping"></i> <?= htmlspecialchars(t('cart_heading'), ENT_QUOTES, 'UTF-8') ?></h1>
           <p class="cart-subtitle"><?= htmlspecialchars(t('cart_subtitle'), ENT_QUOTES, 'UTF-8') ?></p>
         </div>
-        <?php if (!empty($cartItems)): ?>
+        <?php if (! empty($cartItems)): ?>
           <span class="cart-count"><?= count($cartItems) ?> <?= htmlspecialchars(count($cartItems) > 1 ? t('cart_items_plural') : t('cart_items_singular'), ENT_QUOTES, 'UTF-8') ?></span>
         <?php endif; ?>
       </div>
@@ -147,7 +147,7 @@ if (!empty($cartIds)) {
                     <span><i class="fa-solid fa-user"></i> <?= htmlspecialchars($item['seller_name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <span><i class="fa-solid fa-tag"></i> <?= htmlspecialchars($categoryLabels[$item['category']] ?? $item['category'], ENT_QUOTES, 'UTF-8') ?></span>
                     <span><i class="fa-solid fa-circle-info"></i> <?= htmlspecialchars($conditionLabels[$item['item_condition']] ?? $item['item_condition'], ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php if (!empty($item['location'])): ?>
+                    <?php if (! empty($item['location'])): ?>
                       <span><i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($item['location'], ENT_QUOTES, 'UTF-8') ?></span>
                     <?php endif; ?>
                   </div>
@@ -173,7 +173,7 @@ if (!empty($cartIds)) {
               <strong id="cartTotalValue"><?= number_format($cartTotal, 2, ',', ' ') ?> €</strong>
             </div>
             <p class="cart-summary-note"><?= htmlspecialchars(t('cart_summary_note'), ENT_QUOTES, 'UTF-8') ?></p>
-            <?php if (!$user): ?>
+            <?php if (! $user): ?>
               <a href="../inscription-connexion/login.php" class="cart-primary-link">
                 <i class="fa-solid fa-right-to-bracket"></i> <?= htmlspecialchars(t('cart_login_cta'), ENT_QUOTES, 'UTF-8') ?>
               </a>
@@ -204,10 +204,10 @@ if (!empty($cartIds)) {
         de: 'de-DE'
       };
       var i18n = <?= json_encode([
-                    'cart_removed' => t('cart_removed'),
-                    'cart_cleared' => t('cart_cleared'),
-                    'error' => t('generic_error'),
-                  ]) ?>;
+        'cart_removed' => t('cart_removed'),
+        'cart_cleared' => t('cart_cleared'),
+        'error' => t('generic_error'),
+    ]) ?>;
 
       var cartMain = document.querySelector('.cart-main');
       var countNode = document.getElementById('cartItemCount');
