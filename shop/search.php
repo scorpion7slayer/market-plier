@@ -139,6 +139,7 @@ $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
   ?>
 
   <main class="search-main">
+
     <!-- Category filters (desktop) -->
     <div class="category-filters">
       <a href="?<?= $query !== '' ? 'q=' . urlencode($query) : '' ?>"

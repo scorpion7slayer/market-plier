@@ -1,4 +1,4 @@
-/* ═══ RESET & BASE ═══════════════════════════════════════════ */
+/* RESET & BASE */
 * {
     margin: 0;
     padding: 0;
@@ -9,16 +9,14 @@
     font-family: "Archivo";
     font-style: italic;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Archivo";
     font-style: normal;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 body {
@@ -28,7 +26,7 @@ body {
     min-height: 100vh;
 }
 
-/* ═══ TOP BAR ════════════════════════════════════════════════ */
+/* Barre du haut */
 .settings-top-bar {
     display: flex;
     align-items: center;
@@ -66,7 +64,7 @@ body {
     font-size: 18px;
 }
 
-/* ═══ CONTAINER ══════════════════════════════════════════════ */
+/* Conteneur */
 .settings-container {
     max-width: 700px;
     margin: 0 auto;
@@ -81,7 +79,7 @@ body {
     margin-bottom: 28px;
 }
 
-/* ═══ ALERTS ═════════════════════════════════════════════════ */
+/* Alertes */
 .settings-alert {
     display: flex;
     align-items: center;
@@ -117,7 +115,7 @@ body {
     }
 }
 
-/* ═══ SECTIONS ═══════════════════════════════════════════════ */
+/* Sections */
 .settings-section {
     background: var(--mp-card-bg, #fff);
     border-radius: 18px;
@@ -149,7 +147,7 @@ body {
     margin-bottom: 16px;
 }
 
-/* ═══ FORM FIELDS ════════════════════════════════════════════ */
+/* Champs de formulaire */
 .settings-field {
     margin-bottom: 16px;
 }
@@ -246,7 +244,7 @@ body {
     margin-top: 5px;
 }
 
-/* ═══ SELECT ═════════════════════════════════════════════════ */
+/* Sélecteurs */
 .settings-select {
     width: 100%;
     padding: 14px 20px;
@@ -275,7 +273,7 @@ body {
     box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
 }
 
-/* ═══ BUTTONS ════════════════════════════════════════════════ */
+/* Boutons */
 .settings-btn {
     display: inline-flex;
     align-items: center;
@@ -338,7 +336,7 @@ body {
     color: #fff;
 }
 
-/* ═══ PHOTO DE PROFIL ════════════════════════════════════════ */
+/* Photo de profil */
 .settings-dropzone {
     display: flex;
     align-items: center;
@@ -405,7 +403,7 @@ body {
 }
 
 /* \u2550\u2550\u2550 CROP MODAL \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */
-/* ─── Crop modal content ─── */
+/* Contenu du modal de recadrage */
 .crop-modal-content {
     border-radius: 18px;
     overflow: hidden;
@@ -446,7 +444,7 @@ body {
     position: relative;
 }
 
-/* ─── Crop container ─── */
+/* Conteneur de recadrage */
 #cropContainer {
     position: relative;
     width: 100%;
@@ -509,7 +507,7 @@ body {
     color: #fff;
 }
 
-/* ═══ TOGGLE SWITCH ══════════════════════════════════════════ */
+/* Switch (toggle) */
 .toggle-row {
     display: flex;
     align-items: center;
@@ -595,7 +593,7 @@ body {
     transform: translateX(22px);
 }
 
-/* ═══ THEME OPTIONS ══════════════════════════════════════════ */
+/* Options de thème */
 .theme-options {
     display: flex;
     gap: 12px;
@@ -640,7 +638,7 @@ body {
     color: #7fb885;
 }
 
-/* ═══ ADMIN SECTION ══════════════════════════════════════════ */
+/* Section admin */
 .admin-section {
     border: 2px solid #f0c040;
     position: relative;
@@ -735,7 +733,7 @@ body {
     font-size: 0.8rem;
 }
 
-/* ═══ DANGER ZONE ════════════════════════════════════════════ */
+/* Zone dangereuse */
 .danger-section {
     border: 2px solid rgba(231, 76, 60, 0.3);
 }
@@ -754,7 +752,7 @@ body {
     flex-wrap: wrap;
 }
 
-/* ═══ RESPONSIVE ═════════════════════════════════════════════ */
+/* Responsive */
 @media (max-width: 768px) {
     .settings-container {
         padding: 10px 18px 60px;
@@ -846,7 +844,7 @@ body {
     }
 }
 
-/* ═══ MINI TOAST FEEDBACK ════════════════════════════════════ */
+/* Mini toasts */
 .settings-mini-toast {
     position: fixed;
     bottom: 24px;
@@ -859,7 +857,9 @@ body {
     z-index: 9999;
     opacity: 0;
     transform: translateY(12px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
     pointer-events: none;
 }
 

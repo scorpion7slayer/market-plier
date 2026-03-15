@@ -1,9 +1,10 @@
 <?php
+
 /**
- * Site settings helper — reads and writes admin toggle options.
+ * Helper de paramètres du site — lit et écrit les options d'administration.
  *
- * Table `site_settings` stores key/value pairs.
- * Uses a simple in-memory cache so multiple calls in one request don't re-query.
+ * La table `site_settings` stocke des paires clé/valeur.
+ * Utilise un cache mémoire simple pour éviter de relancer des requêtes dans une même requête.
  */
 
 function ensureSiteSettingsTable(PDO $pdo): void
@@ -18,13 +19,13 @@ function ensureSiteSettingsTable(PDO $pdo): void
         `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Add status column to listings if missing (for moderation feature)
+    // Ajouter la colonne status aux annonces si elle manque (pour la modération)
     $cols = $pdo->query("SHOW COLUMNS FROM `listings` LIKE 'status'")->fetchAll();
     if (empty($cols)) {
         $pdo->exec("ALTER TABLE `listings` ADD COLUMN `status` ENUM('active','pending') NOT NULL DEFAULT 'active'");
     }
 
-    // Add image_data BLOB + mime_type to listing_images (store images in DB)
+    // Ajouter image_data (BLOB) + mime_type à listing_images (stocker l'image en DB)
     $imgCols = $pdo->query("SHOW COLUMNS FROM `listing_images` LIKE 'image_data'")->fetchAll();
     if (empty($imgCols)) {
         $pdo->exec("ALTER TABLE `listing_images` ADD COLUMN `image_data` LONGBLOB DEFAULT NULL");

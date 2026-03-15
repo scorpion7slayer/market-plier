@@ -233,7 +233,7 @@
     cursor: not-allowed;
 }
 
-/* ─── Mobile category dropdown ─────────────────────────── */
+/* Dropdown catégories mobile */
 .category-dropdown {
     display: none;
     position: relative;
@@ -379,6 +379,7 @@
 @media (max-width: 768px) {
     .search-main {
         padding: 16px 14px;
+        min-height: auto;
     }
 
     .category-filters {
@@ -454,7 +455,7 @@
     color: #fff;
 }
 
-/* ─── Search filters bar ───────────────────────────────── */
+/* Barre de filtres de recherche */
 .search-filters {
     margin-bottom: 18px;
     padding: 14px 18px;
@@ -581,9 +582,70 @@
     }
 }
 
-/* ─── Header search form ────────────────────────────────── */
+/* Formulaire de recherche en en-tête */
 .search-form {
     flex: 1;
     display: flex;
     position: relative;
+}
+
+/* Barre de recherche inline mobile */
+.search-inline-mobile {
+    display: none;
+    margin-bottom: 16px;
+}
+
+.search-inline-form {
+    display: flex;
+    gap: 8px;
+}
+
+.search-inline-input {
+    flex: 1;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 30px;
+    border: 1.5px solid var(--mp-border, #ccc);
+    background: var(--mp-card-bg, #fff);
+    color: var(--mp-text, #333);
+    font-size: 14px;
+    font-style: italic;
+    outline: none;
+    font-family: "Archivo", sans-serif;
+}
+
+.search-inline-input:focus {
+    border-color: #7fb885;
+}
+
+.search-inline-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: #7fb885;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.search-inline-btn:hover {
+    background: #6aa070;
+}
+
+@media (max-width: 768px) {
+    .search-inline-mobile {
+        display: block;
+    }
+}
+
+[data-bs-theme="dark"] .search-inline-input {
+    background: var(--mp-input-bg, #2a2a2a);
+    border-color: var(--mp-input-border, #444);
+    color: var(--mp-input-text, #eee);
 }

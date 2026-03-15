@@ -107,7 +107,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_description'])
 }
 
 $profilePhoto = $user['profile_photo'] ?? null;
-$profilePhotoExists = $profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto);
+$profilePhotoExists = !empty($profilePhoto);
+$profilePhotoUrl = $profilePhotoExists
+    ? '../api/profile_photo.php?token=' . urlencode($_SESSION['auth_token']) . '&v=' . time()
+    : '../assets/images/default-avatar.svg';
 $username = htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8');
 
 // Récupérer les annonces de l'utilisateur avec toutes leurs images
@@ -185,7 +188,7 @@ try {
                     <aside class="profile-sidebar">
                         <div class="profile-header">
                             <div class="avatar-container">
-                                <img src="<?= $profilePhotoExists ? '../uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : '../assets/images/default-avatar.svg' ?>"
+                                <img src="<?= htmlspecialchars($profilePhotoUrl, ENT_QUOTES, 'UTF-8') ?>"
                                     alt="Photo de profil"
                                     class="avatar"
                                     style="object-fit: cover;">

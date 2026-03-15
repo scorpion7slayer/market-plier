@@ -9,16 +9,14 @@
     font-family: "Archivo";
     font-style: normal;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Archivo";
     font-style: italic;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 html,
@@ -179,7 +177,7 @@ header {
     font-style: italic;
 }
 
-/* ─── Autocomplete dropdown ─────────────────────────────── */
+/* Autocomplete dropdown */
 .autocomplete-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -240,6 +238,10 @@ header {
     justify-content: center;
     color: #ccc;
     font-size: 16px;
+}
+
+.ac-thumb-round {
+    border-radius: 50%;
 }
 
 .ac-text {
@@ -363,6 +365,13 @@ main {
     overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+    main {
+        min-height: auto;
+        padding: 16px 14px 24px;
+    }
+}
+
 main.home-main {
     padding: 24px 30px 40px;
 }
@@ -443,7 +452,7 @@ section + section {
     border-radius: 50%;
 }
 
-/* ─── RECENTLY VIEWED: rounded rectangles ─────────────────── */
+/* Recently viewed : rectangles arrondis */
 .recent-cards {
     display: flex;
     gap: 18px;
@@ -467,7 +476,7 @@ section + section {
     border-radius: 14px;
 }
 
-/* ─── HOME: Trending scroll row ──────────────────────────── */
+/* Accueil : ligne de tendances */
 .home-scroll-row {
     display: flex;
     gap: 16px;

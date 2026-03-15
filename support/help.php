@@ -1,9 +1,14 @@
 <?php
-/* ════════════════════════════════════════════════════════════
-   aide.php — Centre d'aide Market Plier
-   TODO : Ajouter session_start(), require db.php, auth check,
-          traductions i18n, et traitement du formulaire de contact
-   ════════════════════════════════════════════════════════════ */
+session_start();
+
+try {
+  require_once __DIR__ . '/../database/db.php';
+} catch (PDOException $e) {
+  error_log("DB connection error (help): " . $e->getMessage());
+}
+require_once __DIR__ . '/../includes/lang.php';
+
+$footerBasePath = '../';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,7 +16,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?php /* TODO : include '../includes/theme_init.php'; */ ?>
+  <?php include '../includes/theme_init.php'; ?>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/settings.css">
@@ -23,7 +28,7 @@
 
 <body>
 
-  <!-- ═══ BARRE DU HAUT (identique à settings) ════════════════ -->
+  <!-- Barre du haut (identique à settings) -->
   <div class="settings-top-bar">
     <a href="../index.php" class="settings-logo">
       <img src="../assets/images/logo.svg" alt="Market Plier">
@@ -37,11 +42,11 @@
     </button>
   </div>
 
-  <!-- ═══ CONTENU PRINCIPAL ════════════════════════════════════ -->
+  <!-- Contenu principal -->
   <main class="settings-container">
     <h1 class="settings-title">Centre d'aide</h1>
 
-    <!-- ── Barre de recherche ── -->
+    <!-- Barre de recherche -->
     <div class="aide-search-wrapper">
       <i class="fas fa-search"></i>
       <input
@@ -49,11 +54,10 @@
         id="aideSearchInput"
         class="aide-search-input"
         placeholder="Rechercher un problème… ex : colis perdu, remboursement"
-        autocomplete="off"
-      >
+        autocomplete="off">
     </div>
 
-    <!-- ── Catégories rapides ── -->
+    <!-- Catégories rapides -->
     <div class="aide-categories" id="aideCategories">
       <a href="#section-colis" class="aide-category-btn" data-category="colis">
         <i class="fas fa-box"></i> Colis &amp; Livraison
@@ -81,9 +85,7 @@
       Aucun résultat pour cette recherche.
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 1 — Colis & Livraison
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1 — Colis & Livraison -->
     <section class="settings-section" id="section-colis" data-aide-section="colis">
       <h2 class="settings-section-title">
         <i class="fas fa-box"></i> Colis &amp; Livraison
@@ -160,7 +162,7 @@
             <ul>
               <li>Attendez <strong>2 jours ouvrés supplémentaires</strong> au-delà de la date estimée.</li>
               <li>Consultez le suivi : s'il est bloqué depuis plus de 5 jours, signalez le problème
-                  via <a href="#">Mes commandes → Signaler un problème</a>.</li>
+                via <a href="#">Mes commandes → Signaler un problème</a>.</li>
             </ul>
             Notre équipe prend en charge les retards dépassant <strong>10 jours ouvrés</strong> pour la livraison standard.
           </div>
@@ -197,9 +199,7 @@
       </div>
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 2 — Retours & Remboursements
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2 — Retours & Remboursements -->
     <section class="settings-section" id="section-retours" data-aide-section="retours">
       <h2 class="settings-section-title">
         <i class="fas fa-undo-alt"></i> Retours &amp; Remboursements
@@ -263,9 +263,7 @@
 
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 3 — Paiements & Facturation
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3 — Paiements & Facturation -->
     <section class="settings-section" id="section-paiements" data-aide-section="paiements">
       <h2 class="settings-section-title">
         <i class="fas fa-credit-card"></i> Paiements &amp; Facturation
@@ -312,9 +310,7 @@
 
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 4 — Litiges & Protection acheteur
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4 — Litiges & Protection acheteur -->
     <section class="settings-section" id="section-litiges" data-aide-section="litiges">
       <h2 class="settings-section-title">
         <i class="fas fa-shield-alt"></i> Litiges &amp; Protection acheteur
@@ -350,7 +346,7 @@
           Notre équipe sécurité examine chaque signalement sous <strong>24h</strong>. En cas de fraude avérée,
           le compte est suspendu et vous êtes remboursé intégralement.
           <br><br>
-           Ne communiquez jamais de paiement hors de la plateforme Market Plier.
+          Ne communiquez jamais de paiement hors de la plateforme Market Plier.
         </div>
       </div>
 
@@ -372,9 +368,7 @@
 
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 5 — Espace vendeur
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5 — Espace vendeur -->
     <section class="settings-section" id="section-vendeur" data-aide-section="vendeur">
       <h2 class="settings-section-title">
         <i class="fas fa-store"></i> Espace vendeur
@@ -421,9 +415,7 @@
 
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 6 — Urgence
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6 — Urgence -->
     <section class="settings-section aide-urgency-section">
       <h2 class="settings-section-title">
         <i class="fas fa-exclamation-circle"></i> Cas urgents
@@ -435,14 +427,10 @@
         <a href="#section-contact" class="settings-btn settings-btn-danger">
           <i class="fas fa-lock"></i> Signaler une fraude
         </a>
-
-        </a>
       </div>
     </section>
 
-    <!-- ════════════════════════════════════════════════════════
-         SECTION 7 — Contacter le support
-    ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7 — Contacter le support -->
     <section class="settings-section" id="section-contact" data-aide-section="contact">
       <h2 class="settings-section-title">
         <i class="fas fa-headset"></i> Contacter le support
@@ -453,7 +441,7 @@
         <span>Notre équipe répond généralement sous <strong>24h</strong> (du lundi au vendredi, 9h – 18h).</span>
       </div>
 
-      <!-- TODO : Ajouter action="contact_handler.php" method="POST" + CSRF + validation PHP -->
+      <!-- À FAIRE : ajouter action="contact_handler.php" method="POST" + CSRF + validation PHP -->
       <form id="aideContactForm">
 
         <div class="settings-field">
@@ -477,8 +465,7 @@
             class="settings-input"
             id="contact-commande"
             name="commande"
-            placeholder="ex : MP-2024-00123"
-          >
+            placeholder="ex : MP-2024-00123">
         </div>
 
         <div class="settings-field">
@@ -488,8 +475,7 @@
             id="contact-message"
             name="message"
             placeholder="Expliquez votre situation en détail. Plus vous êtes précis, plus nous pouvons vous aider rapidement…"
-            required
-          ></textarea>
+            required></textarea>
           <span class="settings-hint">Minimum 30 caractères. Joignez des informations comme le numéro de suivi ou une capture d'écran si possible.</span>
         </div>
 
@@ -510,46 +496,48 @@
   </main><!-- /.settings-container -->
 
 
-  <!-- ═══ SCRIPTS ══════════════════════════════════════════════ -->
+  <!-- Scripts -->
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../styles/theme.js"></script>
   <script>
-    /* ── Thème (identique à settings.php) ── */
-    (function () {
+    /* Thème (identique à settings.php) */
+    (function() {
       var themeLight = document.getElementById('theme-light');
-      var themeDark  = document.getElementById('theme-dark');
+      var themeDark = document.getElementById('theme-dark');
+
       function update() {
         var c = document.documentElement.getAttribute('data-bs-theme') || 'light';
         if (themeLight) themeLight.classList.toggle('active', c === 'light');
-        if (themeDark)  themeDark.classList.toggle('active',  c === 'dark');
+        if (themeDark) themeDark.classList.toggle('active', c === 'dark');
       }
-      if (themeLight) themeLight.addEventListener('click', function () {
+      if (themeLight) themeLight.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'light');
         localStorage.setItem('mp-theme', 'light');
         update();
       });
-      if (themeDark) themeDark.addEventListener('click', function () {
+      if (themeDark) themeDark.addEventListener('click', function() {
         document.documentElement.setAttribute('data-bs-theme', 'dark');
         localStorage.setItem('mp-theme', 'dark');
         update();
       });
       update();
       new MutationObserver(update).observe(document.documentElement, {
-        attributes: true, attributeFilter: ['data-bs-theme']
+        attributes: true,
+        attributeFilter: ['data-bs-theme']
       });
     })();
   </script>
 
   <script>
-    /* ── Accordéon FAQ ── */
-    document.querySelectorAll('.aide-faq-question').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var answer  = btn.nextElementSibling;
-        var isOpen  = btn.classList.contains('open');
+    /* Accordéon FAQ */
+    document.querySelectorAll('.aide-faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var answer = btn.nextElementSibling;
+        var isOpen = btn.classList.contains('open');
 
         /* Fermer tous les autres items du même parent */
         var section = btn.closest('.settings-section');
-        section.querySelectorAll('.aide-faq-question.open').forEach(function (other) {
+        section.querySelectorAll('.aide-faq-question.open').forEach(function(other) {
           if (other !== btn) {
             other.classList.remove('open');
             other.nextElementSibling.classList.remove('open');
@@ -564,38 +552,45 @@
   </script>
 
   <script>
-    /* ── Catégories rapides — scroll fluide + highlight ── */
-    document.querySelectorAll('.aide-category-btn').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
+    /* Catégories rapides — scroll fluide + highlight */
+    document.querySelectorAll('.aide-category-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
         e.preventDefault();
         var target = document.querySelector(btn.getAttribute('href'));
         if (!target) return;
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
 
         /* Highlight temporaire de la section */
         target.style.transition = 'box-shadow 0.3s ease';
-        target.style.boxShadow  = '0 0 0 3px rgba(127,184,133,0.35)';
-        setTimeout(function () { target.style.boxShadow = ''; }, 1200);
+        target.style.boxShadow = '0 0 0 3px rgba(127,184,133,0.35)';
+        setTimeout(function() {
+          target.style.boxShadow = '';
+        }, 1200);
       });
     });
   </script>
 
   <script>
-    /* ── Recherche FAQ ── */
-    var searchInput  = document.getElementById('aideSearchInput');
-    var noResults    = document.getElementById('aideNoResults');
-    var allSections  = document.querySelectorAll('[data-aide-section]');
-    var categories   = document.getElementById('aideCategories');
+    /* Recherche FAQ */
+    var searchInput = document.getElementById('aideSearchInput');
+    var noResults = document.getElementById('aideNoResults');
+    var allSections = document.querySelectorAll('[data-aide-section]');
+    var categories = document.getElementById('aideCategories');
 
-    searchInput.addEventListener('input', function () {
+    searchInput.addEventListener('input', function() {
       var query = searchInput.value.trim().toLowerCase();
 
       if (!query) {
         /* Réafficher tout */
-        allSections.forEach(function (s) { s.style.display = ''; });
+        allSections.forEach(function(s) {
+          s.style.display = '';
+        });
         categories.style.display = '';
         noResults.style.display = 'none';
-        document.querySelectorAll('.aide-faq-item').forEach(function (item) {
+        document.querySelectorAll('.aide-faq-item').forEach(function(item) {
           item.style.display = '';
         });
         return;
@@ -606,15 +601,15 @@
 
       var totalVisible = 0;
 
-      allSections.forEach(function (section) {
-        var items   = section.querySelectorAll('.aide-faq-item');
+      allSections.forEach(function(section) {
+        var items = section.querySelectorAll('.aide-faq-item');
         var visible = 0;
 
-        items.forEach(function (item) {
+        items.forEach(function(item) {
           var keywords = (item.getAttribute('data-keywords') || '').toLowerCase();
           var question = item.querySelector('.aide-faq-question').textContent.toLowerCase();
-          var answer   = item.querySelector('.aide-faq-answer').textContent.toLowerCase();
-          var match    = keywords.includes(query) || question.includes(query) || answer.includes(query);
+          var answer = item.querySelector('.aide-faq-answer').textContent.toLowerCase();
+          var match = keywords.includes(query) || question.includes(query) || answer.includes(query);
 
           item.style.display = match ? '' : 'none';
           if (match) {
@@ -634,13 +629,17 @@
   </script>
 
   <script>
-    document.getElementById('aideContactForm').addEventListener('submit', function (e) {
+    document.getElementById('aideContactForm').addEventListener('submit', function(e) {
       e.preventDefault();
       document.getElementById('aideContactSuccess').style.display = 'flex';
       this.reset();
-      document.getElementById('aideContactSuccess').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      document.getElementById('aideContactSuccess').scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
     });
   </script>
-
+  <?php include '../footer.php'; ?>
 </body>
+
 </html>

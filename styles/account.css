@@ -8,16 +8,14 @@
     font-family: "Archivo";
     font-style: normal;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Archivo";
     font-style: italic;
     font-weight: 100 900;
-    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf")
-        format("truetype");
+    src: url("../assets/fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 body {
@@ -150,7 +148,7 @@ header {
     font-style: italic;
 }
 
-/* ─── Autocomplete dropdown ─────────────────────────────── */
+/* Autocomplete dropdown */
 .autocomplete-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -322,7 +320,7 @@ nav a:hover {
     padding: 40px 40px;
 }
 
-/* Profile Section - en haut à gauche */
+/* Section profil - en haut à gauche */
 .profile-section {
     display: flex;
     gap: 60px;

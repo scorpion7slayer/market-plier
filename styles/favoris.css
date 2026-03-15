@@ -187,7 +187,7 @@
     margin: 0 auto;
 }
 
-.fav-empty i {
+.fav-empty > i {
     font-size: 48px;
     color: var(--mp-border);
     margin-bottom: 16px;
@@ -227,31 +227,27 @@
 }
 
 .btn-brand {
-    background-color: #7fb885;
-    border-color: #7fb885;
-    color: white;
+    background: transparent;
+    color: #7fb885;
     font-weight: 600;
     font-style: italic;
     border-radius: 50px;
-    padding: 10px 25px;
+    padding: 8px 20px;
+    font-size: 0.85rem;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
-    border: 2px solid #7fb885;
+    border: 1.5px solid #7fb885;
 }
 
-.btn-brand.btn-sm {
-    padding: 4px 12px !important;
-    font-size: 12px !important;
-    border-width: 1px !important;
+.btn-brand i {
+    color: var(--mp-text-muted) !important;
 }
 
 .btn-brand:hover {
-    background-color: #6aa070;
-    border-color: #6aa070;
-    color: white;
+    background: rgba(127, 184, 133, 0.1);
+    color: #7fb885;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(127, 184, 133, 0.4);
 }
 
 @media (max-width: 768px) {

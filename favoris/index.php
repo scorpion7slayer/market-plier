@@ -74,6 +74,7 @@ $conditionLabels = [
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/index.css">
+  <link rel="stylesheet" href="../styles/search.css">
   <link rel="stylesheet" href="../styles/favoris.css">
   <link rel="stylesheet" href="../styles/theme.css">
 </head>
@@ -99,7 +100,7 @@ $conditionLabels = [
           <i class="fa-regular fa-heart"></i>
           <p><?= htmlspecialchars(t('favorites_empty'), ENT_QUOTES, 'UTF-8') ?></p>
           <span><?= htmlspecialchars(t('favorites_empty_sub'), ENT_QUOTES, 'UTF-8') ?></span>
-          <a href="../shop/search.php" class="btn btn-brand btn-sm fav-browse-btn">
+          <a href="../shop/search.php" class="category-chip">
             <i class="fa-solid fa-magnifying-glass"></i> <?= htmlspecialchars(t('favorites_browse'), ENT_QUOTES, 'UTF-8') ?>
           </a>
         </div>

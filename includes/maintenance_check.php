@@ -26,7 +26,11 @@ if (getSiteSetting($pdo, 'maintenance_mode') === '1') {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Market Plier - Maintenance</title>
-            <link rel="stylesheet" href="/market-plier/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+            <?php
+                $appUrl = $_ENV['APP_URL'] ?? '/market-plier';
+                $basePath = parse_url($appUrl, PHP_URL_PATH) ?: '';
+            ?>
+            <link rel="stylesheet" href="<?= htmlspecialchars($basePath) ?>/node_modules/@fortawesome/fontawesome-free/css/all.min.css">
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {

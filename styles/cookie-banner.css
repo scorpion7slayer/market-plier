@@ -257,3 +257,10 @@
         width: 100%;
     }
 }
+
+/* Remonter le cookie banner au-dessus de la bottom nav mobile */
+@media (max-width: 768px) {
+    .cookie-banner {
+        bottom: 60px;
+    }
+}

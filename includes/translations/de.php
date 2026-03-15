@@ -79,6 +79,9 @@ return [
   'header_account_deleted' => 'Konto gelöscht',
   'header_account_deleted_text' => 'Ihr Konto wurde von einem Administrator gelöscht. Sie werden automatisch abgemeldet.',
   'header_close' => 'Schließen',
+  'header_home' => 'Startseite',
+  'header_profile' => 'Profil',
+  'header_signup' => 'Registrieren',
 
   // Cookie banner
   'cookie_title' => 'Wir verwenden Cookies',

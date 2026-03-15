@@ -10,7 +10,7 @@ try {
 require_once '../includes/remember_me.php';
 require_once '../includes/site_settings.php';
 
-// --- FONCTIONS ---
+// FONCTIONS
 
 function initAdminPage($pdo)
 {
@@ -38,9 +38,9 @@ function checkIsAdmin($pdo, $token)
   return $check && $check['is_admin'] == 1;
 }
 
-function fetchAdminData($pdo)
+function fetchAdminData($pdo, $listingPage = 1, $listingsPerPage = 20)
 {
-  $data = ['users' => [], 'listings' => [], 'pending_listings' => [], 'stats' => ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0, 'pending' => 0]];
+  $data = ['users' => [], 'listings' => [], 'pending_listings' => [], 'stats' => ['users' => 0, 'listings' => 0, 'admins' => 0, 'new_month' => 0, 'pending' => 0], 'listings_total' => 0, 'listings_page' => $listingPage, 'listings_per_page' => $listingsPerPage, 'listings_total_pages' => 1];
   try {
     $data['stats']['users'] = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
     $data['stats']['listings'] = $pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'active'")->fetchColumn();
@@ -48,7 +48,19 @@ function fetchAdminData($pdo)
     $data['stats']['new_month'] = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
     $data['stats']['pending'] = $pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'pending'")->fetchColumn();
     $data['users'] = $pdo->query("SELECT username, email, auth_provider, is_admin, created_at, auth_token, profile_photo FROM users ORDER BY created_at DESC")->fetchAll();
-    $data['listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, l.status, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT 20")->fetchAll();
+
+    // Pagination des annonces
+    $data['listings_total'] = (int) $pdo->query("SELECT COUNT(*) FROM listings l JOIN users u ON l.auth_token = u.auth_token")->fetchColumn();
+    $data['listings_total_pages'] = max(1, (int) ceil($data['listings_total'] / $listingsPerPage));
+    $data['listings_page'] = max(1, min($listingPage, $data['listings_total_pages']));
+    $offset = ($data['listings_page'] - 1) * $listingsPerPage;
+
+    $stmt = $pdo->prepare("SELECT l.id, l.title, l.price, l.category, l.created_at, l.status, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token ORDER BY l.created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bindValue(1, $listingsPerPage, PDO::PARAM_INT);
+    $stmt->bindValue(2, $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $data['listings'] = $stmt->fetchAll();
+
     $data['pending_listings'] = $pdo->query("SELECT l.id, l.title, l.price, l.category, l.created_at, u.username FROM listings l JOIN users u ON l.auth_token = u.auth_token WHERE l.status = 'pending' ORDER BY l.created_at ASC")->fetchAll();
   } catch (PDOException $ex) {
     error_log("Error fetching admin data: " . $ex->getMessage());
@@ -109,11 +121,16 @@ function deleteUserProfilePhoto($pdo, $targetToken)
   $photoData = $photoStmt->fetch();
 
   if ($photoData && $photoData['profile_photo']) {
+    // Supprimer le fichier sur disque s'il existe (legacy)
     $photoPath = '../uploads/profiles/' . $photoData['profile_photo'];
     if (file_exists($photoPath)) {
-      unlink($photoPath);
+      @unlink($photoPath);
     }
   }
+
+  // Supprimer les données BLOB en DB
+  $pdo->prepare("UPDATE users SET profile_photo = NULL, profile_photo_data = NULL, profile_photo_mime = NULL WHERE auth_token = ?")
+    ->execute([$targetToken]);
 }
 
 /**
@@ -206,7 +223,7 @@ function handleApproveListing($pdo, &$successMessage, &$errorMessage)
   }
 }
 
-// --- INITIALISATION ---
+// INITIALISATION
 $currentToken = initAdminPage($pdo);
 $successMessage = '';
 $errorMessage = '';
@@ -218,11 +235,15 @@ handleDeleteListing($pdo, $successMessage, $errorMessage);
 handleApproveListing($pdo, $successMessage, $errorMessage);
 
 // Fetch data
-$adminData = fetchAdminData($pdo);
+$listingPage = max(1, (int) ($_GET['lp'] ?? 1));
+$adminData = fetchAdminData($pdo, $listingPage);
 $users = $adminData['users'];
 $listings = $adminData['listings'];
 $pendingListings = $adminData['pending_listings'];
 $stats = $adminData['stats'];
+$listingsTotal = $adminData['listings_total'];
+$listingsTotalPages = $adminData['listings_total_pages'];
+$listingsCurrentPage = $adminData['listings_page'];
 $siteSettings = getSiteSettings($pdo);
 ?>
 <!DOCTYPE html>
@@ -311,7 +332,7 @@ $siteSettings = getSiteSettings($pdo);
               <tr>
                 <td>
                   <div class="admin-user-cell">
-                    <img src="<?= ($u['profile_photo'] && file_exists('../uploads/profiles/' . $u['profile_photo'])) ? '../uploads/profiles/' . htmlspecialchars($u['profile_photo'], ENT_QUOTES, 'UTF-8') : '../assets/images/default-avatar.svg' ?>"
+                    <img src="../api/profile_photo.php?token=<?= urlencode($u['auth_token']) ?>"
                       class="admin-mini-avatar" alt="">
                     <span class="admin-username"><?= htmlspecialchars($u['username'], ENT_QUOTES, 'UTF-8') ?></span>
                     <?php if ($u['auth_token'] === $currentToken): ?>
@@ -372,59 +393,8 @@ $siteSettings = getSiteSettings($pdo);
 
     <!-- Annonces en attente de modération -->
     <?php if (!empty($pendingListings)): ?>
-    <section class="settings-section">
-      <h2 class="settings-section-title"><i class="fas fa-hourglass-half" style="color: #f0c040;"></i> Annonces en attente (<?= count($pendingListings) ?>)</h2>
-      <div class="admin-table-wrapper">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Titre</th>
-              <th>Prix</th>
-              <th>Catégorie</th>
-              <th>Auteur</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($pendingListings as $pl): ?>
-              <tr>
-                <td class="admin-listing-title"><?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?></td>
-                <td><span class="admin-price"><?= number_format($pl['price'], 2, ',', ' ') ?> €</span></td>
-                <td class="admin-category"><?= htmlspecialchars($pl['category'], ENT_QUOTES, 'UTF-8') ?></td>
-                <td class="admin-username"><?= htmlspecialchars($pl['username'], ENT_QUOTES, 'UTF-8') ?></td>
-                <td class="admin-date"><?= date('d/m/Y', strtotime($pl['created_at'])) ?></td>
-                <td>
-                  <div class="admin-actions-cell">
-                    <form method="POST" style="display:inline;">
-                      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="listing_id" value="<?= (int) $pl['id'] ?>">
-                      <button type="submit" name="approve_listing" class="admin-action-btn admin-action-toggle" title="Approuver">
-                        <i class="fas fa-check"></i>
-                      </button>
-                    </form>
-                    <button type="button" class="admin-action-btn admin-action-delete" title="Supprimer"
-                      data-open-delete-listing
-                      data-listing-id="<?= (int) $pl['id'] ?>"
-                      data-listing-title="<?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?>">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
-    </section>
-    <?php endif; ?>
-
-    <!-- Annonces -->
-    <section class="settings-section">
-      <h2 class="settings-section-title"><i class="fas fa-clipboard-list"></i> Annonces récentes</h2>
-      <?php if (empty($listings)): ?>
-        <p class="settings-desc">Aucune annonce pour le moment.</p>
-      <?php else: ?>
+      <section class="settings-section">
+        <h2 class="settings-section-title"><i class="fas fa-hourglass-half" style="color: #f0c040;"></i> Annonces en attente (<?= count($pendingListings) ?>)</h2>
         <div class="admin-table-wrapper">
           <table class="admin-table">
             <thead>
@@ -434,16 +404,93 @@ $siteSettings = getSiteSettings($pdo);
                 <th>Catégorie</th>
                 <th>Auteur</th>
                 <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($pendingListings as $pl): ?>
+                <tr>
+                  <td class="admin-listing-title"><?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                  <td><span class="admin-price"><?= number_format($pl['price'], 2, ',', ' ') ?> €</span></td>
+                  <td class="admin-category"><?= htmlspecialchars($pl['category'], ENT_QUOTES, 'UTF-8') ?></td>
+                  <td class="admin-username"><?= htmlspecialchars($pl['username'], ENT_QUOTES, 'UTF-8') ?></td>
+                  <td class="admin-date"><?= date('d/m/Y', strtotime($pl['created_at'])) ?></td>
+                  <td>
+                    <div class="admin-actions-cell">
+                      <form method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="listing_id" value="<?= (int) $pl['id'] ?>">
+                        <button type="submit" name="approve_listing" class="admin-action-btn admin-action-toggle" title="Approuver">
+                          <i class="fas fa-check"></i>
+                        </button>
+                      </form>
+                      <button type="button" class="admin-action-btn admin-action-delete" title="Supprimer"
+                        data-open-delete-listing
+                        data-listing-id="<?= (int) $pl['id'] ?>"
+                        data-listing-title="<?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?>">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <?php endif; ?>
+
+    <!-- Toutes les annonces -->
+    <section class="settings-section" id="listings-section">
+      <h2 class="settings-section-title">
+        <i class="fas fa-clipboard-list"></i> Toutes les annonces
+        <span class="admin-count-badge"><?= $listingsTotal ?></span>
+      </h2>
+      <?php if ($listingsTotal === 0): ?>
+        <p class="settings-desc">Aucune annonce pour le moment.</p>
+      <?php else: ?>
+        <div class="admin-listing-filters">
+          <input type="text" class="admin-listing-search" id="listingSearchInput" placeholder="Rechercher une annonce...">
+          <select class="admin-listing-filter-select" id="listingStatusFilter">
+            <option value="">Tous les statuts</option>
+            <option value="active">Active</option>
+            <option value="pending">En attente</option>
+            <option value="sold">Vendue</option>
+          </select>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table" id="listingsTable">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Prix</th>
+                <th>Catégorie</th>
+                <th>Auteur</th>
+                <th>Statut</th>
+                <th>Date</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($listings as $l): ?>
-                <tr>
-                  <td class="admin-listing-title"><?= htmlspecialchars($l['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                <tr data-status="<?= htmlspecialchars($l['status'], ENT_QUOTES, 'UTF-8') ?>">
+                  <td class="admin-listing-title">
+                    <a href="../shop/buy.php?id=<?= (int) $l['id'] ?>" class="admin-listing-link">
+                      <?= htmlspecialchars($l['title'], ENT_QUOTES, 'UTF-8') ?>
+                    </a>
+                  </td>
                   <td><span class="admin-price"><?= number_format($l['price'], 2, ',', ' ') ?> €</span></td>
                   <td class="admin-category"><?= htmlspecialchars($l['category'], ENT_QUOTES, 'UTF-8') ?></td>
                   <td class="admin-username"><?= htmlspecialchars($l['username'], ENT_QUOTES, 'UTF-8') ?></td>
+                  <td>
+                    <?php
+                    $statusLabels = ['active' => 'Active', 'pending' => 'En attente', 'sold' => 'Vendue'];
+                    $statusClass = 'admin-status-' . ($l['status'] ?? 'active');
+                    ?>
+                    <span class="admin-status-badge <?= $statusClass ?>">
+                      <?= $statusLabels[$l['status']] ?? ucfirst($l['status']) ?>
+                    </span>
+                  </td>
                   <td class="admin-date"><?= date('d/m/Y', strtotime($l['created_at'])) ?></td>
                   <td>
                     <button type="button" class="admin-action-btn admin-action-delete" title="Supprimer"
@@ -457,6 +504,53 @@ $siteSettings = getSiteSettings($pdo);
               <?php endforeach; ?>
             </tbody>
           </table>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($listingsTotalPages > 1): ?>
+          <nav class="admin-pagination">
+            <?php if ($listingsCurrentPage > 1): ?>
+              <a href="?lp=<?= $listingsCurrentPage - 1 ?>#listings-section" class="admin-page-btn">
+                <i class="fas fa-chevron-left"></i>
+              </a>
+            <?php else: ?>
+              <span class="admin-page-btn admin-page-disabled"><i class="fas fa-chevron-left"></i></span>
+            <?php endif; ?>
+
+            <?php
+            // Calculer les pages à afficher
+            $startPage = max(1, $listingsCurrentPage - 2);
+            $endPage = min($listingsTotalPages, $listingsCurrentPage + 2);
+            if ($startPage > 1): ?>
+              <a href="?lp=1#listings-section" class="admin-page-btn">1</a>
+              <?php if ($startPage > 2): ?><span class="admin-page-ellipsis">...</span><?php endif; ?>
+            <?php endif; ?>
+
+            <?php for ($p = $startPage; $p <= $endPage; $p++): ?>
+              <?php if ($p === $listingsCurrentPage): ?>
+                <span class="admin-page-btn admin-page-active"><?= $p ?></span>
+              <?php else: ?>
+                <a href="?lp=<?= $p ?>#listings-section" class="admin-page-btn"><?= $p ?></a>
+              <?php endif; ?>
+            <?php endfor; ?>
+
+            <?php if ($endPage < $listingsTotalPages): ?>
+              <?php if ($endPage < $listingsTotalPages - 1): ?><span class="admin-page-ellipsis">...</span><?php endif; ?>
+              <a href="?lp=<?= $listingsTotalPages ?>#listings-section" class="admin-page-btn"><?= $listingsTotalPages ?></a>
+            <?php endif; ?>
+
+            <?php if ($listingsCurrentPage < $listingsTotalPages): ?>
+              <a href="?lp=<?= $listingsCurrentPage + 1 ?>#listings-section" class="admin-page-btn">
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            <?php else: ?>
+              <span class="admin-page-btn admin-page-disabled"><i class="fas fa-chevron-right"></i></span>
+            <?php endif; ?>
+          </nav>
+        <?php endif; ?>
+
+        <div class="admin-listing-count-footer">
+          Page <?= $listingsCurrentPage ?> / <?= $listingsTotalPages ?> — <?= $listingsTotal ?> annonce<?= $listingsTotal > 1 ? 's' : '' ?> au total
         </div>
       <?php endif; ?>
     </section>
@@ -614,21 +708,29 @@ $siteSettings = getSiteSettings($pdo);
           var cb = this;
 
           fetch('handle_site_settings.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ key: key, value: value, csrf_token: csrfToken })
-          })
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (!data.success) {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                key: key,
+                value: value,
+                csrf_token: csrfToken
+              })
+            })
+            .then(function(res) {
+              return res.json();
+            })
+            .then(function(data) {
+              if (!data.success) {
+                cb.checked = !cb.checked;
+                alert('Erreur : ' + (data.message || 'Impossible de sauvegarder'));
+              }
+            })
+            .catch(function() {
               cb.checked = !cb.checked;
-              alert('Erreur : ' + (data.message || 'Impossible de sauvegarder'));
-            }
-          })
-          .catch(function() {
-            cb.checked = !cb.checked;
-            alert('Erreur réseau. Veuillez réessayer.');
-          });
+              alert('Erreur réseau. Veuillez réessayer.');
+            });
         });
       });
     })();
@@ -647,6 +749,33 @@ $siteSettings = getSiteSettings($pdo);
           sessionStorage.setItem(key, window.scrollY);
         });
       });
+    })();
+  </script>
+  <script>
+    // Listings search + status filter (filtre côté client sur la page courante)
+    (function() {
+      var searchInput = document.getElementById('listingSearchInput');
+      var statusFilter = document.getElementById('listingStatusFilter');
+      var table = document.getElementById('listingsTable');
+      if (!searchInput || !table) return;
+
+      var rows = table.querySelectorAll('tbody tr');
+
+      function filterListings() {
+        var query = searchInput.value.trim().toLowerCase();
+        var status = statusFilter ? statusFilter.value : '';
+
+        rows.forEach(function(row) {
+          var text = row.textContent.toLowerCase();
+          var rowStatus = row.getAttribute('data-status') || '';
+          var matchText = !query || text.indexOf(query) !== -1;
+          var matchStatus = !status || rowStatus === status;
+          row.style.display = (matchText && matchStatus) ? '' : 'none';
+        });
+      }
+
+      searchInput.addEventListener('input', filterListings);
+      if (statusFilter) statusFilter.addEventListener('change', filterListings);
     })();
   </script>
 </body>

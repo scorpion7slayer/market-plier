@@ -273,6 +273,22 @@ if (empty($_SESSION['csrf_token'])) {
               <i class="fa-solid fa-trash"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
             </button>
           <?php else: ?>
+            <?php
+            // Vérifier si le vendeur accepte les paiements Stripe
+            $sellerStripeStmt = $pdo->prepare("SELECT stripe_account_id, stripe_onboarding_complete FROM users WHERE auth_token = ?");
+            $sellerStripeStmt->execute([$listing['auth_token']]);
+            $sellerStripe = $sellerStripeStmt->fetch();
+            $sellerCanReceivePayments = $sellerStripe && !empty($sellerStripe['stripe_account_id']) && $sellerStripe['stripe_onboarding_complete'];
+            ?>
+            <?php if ($sellerCanReceivePayments && $user): ?>
+              <form action="../stripe/checkout.php" method="POST" style="display:contents;">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="listing_id" value="<?= (int) $listing['id'] ?>">
+                <button type="submit" class="buy-btn buy-btn-primary">
+                  <i class="fa-solid fa-credit-card"></i> Acheter maintenant
+                </button>
+              </form>
+            <?php endif; ?>
             <button class="buy-btn buy-btn-cart <?= $isInCart ? 'buy-btn-cart-active' : '' ?>" id="cartBtn" type="button">
               <i class="fa-solid fa-basket-shopping"></i>
               <span id="cartText"><?= htmlspecialchars($isInCart ? t('cart_remove') : t('cart_add'), ENT_QUOTES, 'UTF-8') ?></span>
@@ -305,12 +321,8 @@ if (empty($_SESSION['csrf_token'])) {
           <h2 class="buy-section-title"><?= htmlspecialchars(t('buy_seller'), ENT_QUOTES, 'UTF-8') ?></h2>
           <a href="../inscription-connexion/profile.php?user=<?= urlencode($listing['username']) ?>" class="seller-info seller-link">
             <div class="seller-avatar">
-              <?php if ($listing['profile_photo'] && file_exists('../uploads/profiles/' . $listing['profile_photo'])): ?>
-                <img src="../uploads/profiles/<?= htmlspecialchars($listing['profile_photo'], ENT_QUOTES, 'UTF-8') ?>"
-                  alt="<?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?>">
-              <?php else: ?>
-                <i class="fa-solid fa-user"></i>
-              <?php endif; ?>
+              <img src="../api/profile_photo.php?token=<?= urlencode($listing['seller_token']) ?>"
+                alt="<?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?>">
             </div>
             <div class="seller-details">
               <span class="seller-name"><?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;opacity:0.5;"></i></span>
@@ -375,11 +387,7 @@ if (empty($_SESSION['csrf_token'])) {
                   <div class="review-header">
                     <div class="review-author">
                       <div class="review-author-avatar">
-                        <?php if ($rev['profile_photo'] && file_exists('../uploads/profiles/' . $rev['profile_photo'])): ?>
-                          <img src="../uploads/profiles/<?= htmlspecialchars($rev['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-                        <?php else: ?>
-                          <img src="../assets/images/default-avatar.svg" alt="">
-                        <?php endif; ?>
+                        <img src="../api/profile_photo.php?token=<?= urlencode($rev['reviewer_token'] ?? '') ?>" alt="">
                       </div>
                       <span class="review-author-name"><?= htmlspecialchars($rev['username'], ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
@@ -407,63 +415,70 @@ if (empty($_SESSION['csrf_token'])) {
   <?php include '../footer.php'; ?>
 
   <?php if ($user && !$isOwner): ?>
-  <!-- Modal contacter le vendeur -->
-  <div class="confirm-modal-overlay" id="contactOverlay">
-    <div class="confirm-modal" style="max-width: 480px;">
-      <div class="confirm-modal-icon" style="background: rgba(127, 184, 133, 0.1);">
-        <i class="fa-solid fa-envelope" style="color: #7fb885;"></i>
-      </div>
-      <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_contact_seller'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?></h3>
-      <p class="confirm-modal-text" style="margin-bottom: 12px;">
-        <?= htmlspecialchars(t('buy_about_listing'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> »
-      </p>
-      <form id="contactForm">
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
-        <input type="hidden" name="seller_token" value="<?= htmlspecialchars($listing['auth_token'], ENT_QUOTES, 'UTF-8') ?>">
-        <input type="hidden" name="listing_id" value="<?= (int) $listingId ?>">
-        <textarea name="message" class="contact-textarea" placeholder="<?= htmlspecialchars(t('buy_contact_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="4" maxlength="2000" required></textarea>
-        <div class="confirm-modal-actions">
-          <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="contactCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
-          <button type="submit" class="confirm-modal-btn" style="background:#7fb885;color:#fff;" id="contactSend">
-            <i class="fa-solid fa-paper-plane"></i> <?= htmlspecialchars(t('msg_send'), ENT_QUOTES, 'UTF-8') ?>
-          </button>
+    <!-- Modal contacter le vendeur -->
+    <div class="confirm-modal-overlay" id="contactOverlay">
+      <div class="confirm-modal" style="max-width: 480px;">
+        <div class="confirm-modal-icon" style="background: rgba(127, 184, 133, 0.1);">
+          <i class="fa-solid fa-envelope" style="color: #7fb885;"></i>
         </div>
-      </form>
+        <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_contact_seller'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($listing['username'], ENT_QUOTES, 'UTF-8') ?></h3>
+        <p class="confirm-modal-text" style="margin-bottom: 12px;">
+          <?= htmlspecialchars(t('buy_about_listing'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> »
+        </p>
+        <form id="contactForm">
+          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+          <input type="hidden" name="seller_token" value="<?= htmlspecialchars($listing['auth_token'], ENT_QUOTES, 'UTF-8') ?>">
+          <input type="hidden" name="listing_id" value="<?= (int) $listingId ?>">
+          <textarea name="message" class="contact-textarea" placeholder="<?= htmlspecialchars(t('buy_contact_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="4" maxlength="2000" required></textarea>
+          <div class="confirm-modal-actions">
+            <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="contactCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
+            <button type="submit" class="confirm-modal-btn" style="background:#7fb885;color:#fff;" id="contactSend">
+              <i class="fa-solid fa-paper-plane"></i> <?= htmlspecialchars(t('msg_send'), ENT_QUOTES, 'UTF-8') ?>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
   <?php endif; ?>
 
   <?php if ($isOwner): ?>
-  <!-- Modal suppression annonce -->
-  <div class="confirm-modal-overlay" id="deleteListingOverlay">
-    <div class="confirm-modal">
-      <div class="confirm-modal-icon">
-        <i class="fa-solid fa-trash-alt"></i>
-      </div>
-      <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_delete_listing_title'), ENT_QUOTES, 'UTF-8') ?></h3>
-      <p class="confirm-modal-text">
-        <?= htmlspecialchars(t('buy_delete_listing_text'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> ».
-      </p>
-      <div class="confirm-modal-actions">
-        <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="deleteListingCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
-        <a href="delete_listing.php?id=<?= (int) $listing['id'] ?>" class="confirm-modal-btn confirm-modal-btn-danger">
-          <i class="fa-solid fa-trash-alt"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
-        </a>
+    <!-- Modal suppression annonce -->
+    <div class="confirm-modal-overlay" id="deleteListingOverlay">
+      <div class="confirm-modal">
+        <div class="confirm-modal-icon">
+          <i class="fa-solid fa-trash-alt"></i>
+        </div>
+        <h3 class="confirm-modal-title"><?= htmlspecialchars(t('buy_delete_listing_title'), ENT_QUOTES, 'UTF-8') ?></h3>
+        <p class="confirm-modal-text">
+          <?= htmlspecialchars(t('buy_delete_listing_text'), ENT_QUOTES, 'UTF-8') ?> « <strong><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></strong> ».
+        </p>
+        <div class="confirm-modal-actions">
+          <button type="button" class="confirm-modal-btn confirm-modal-btn-cancel" id="deleteListingCancel"><?= htmlspecialchars(t('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
+          <a href="delete_listing.php?id=<?= (int) $listing['id'] ?>" class="confirm-modal-btn confirm-modal-btn-danger">
+            <i class="fa-solid fa-trash-alt"></i> <?= htmlspecialchars(t('account_delete'), ENT_QUOTES, 'UTF-8') ?>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
-  <script>
-    (function() {
-      var overlay = document.getElementById('deleteListingOverlay');
-      document.getElementById('openDeleteListingModal').addEventListener('click', function() {
-        overlay.classList.add('visible');
-      });
-      function close() { overlay.classList.remove('visible'); }
-      document.getElementById('deleteListingCancel').addEventListener('click', close);
-      overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
-      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
-    })();
-  </script>
+    <script>
+      (function() {
+        var overlay = document.getElementById('deleteListingOverlay');
+        document.getElementById('openDeleteListingModal').addEventListener('click', function() {
+          overlay.classList.add('visible');
+        });
+
+        function close() {
+          overlay.classList.remove('visible');
+        }
+        document.getElementById('deleteListingCancel').addEventListener('click', close);
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) close();
+        });
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') close();
+        });
+      })();
+    </script>
   <?php endif; ?>
 
   <script src="../styles/theme.js"></script>
@@ -512,184 +527,203 @@ if (empty($_SESSION['csrf_token'])) {
   </script>
 
   <?php if (!$isOwner): ?>
-  <script>
-    (function() {
-      var basePath = '../';
-      var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
-      var i18n = <?= json_encode([
-                    'error' => t('generic_error'),
-                    'favorite_added' => t('buy_favorite_added'),
-                    'favorite_removed' => t('buy_favorite_removed'),
-                    'review_sent' => t('buy_review_sent'),
-                    'cart_added' => t('cart_added'),
-                    'cart_removed' => t('cart_removed'),
-                  ]) ?>;
+    <script>
+      (function() {
+        var basePath = '../';
+        var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
+        var i18n = <?= json_encode([
+                      'error' => t('generic_error'),
+                      'favorite_added' => t('buy_favorite_added'),
+                      'favorite_removed' => t('buy_favorite_removed'),
+                      'review_sent' => t('buy_review_sent'),
+                      'cart_added' => t('cart_added'),
+                      'cart_removed' => t('cart_removed'),
+                    ]) ?>;
 
-      // ═══ CART TOGGLE ═══════════════════════════════════
-      var cartBtn = document.getElementById('cartBtn');
-      if (cartBtn) {
-        cartBtn.addEventListener('click', function() {
-          cartBtn.disabled = true;
+        // Cart toggle
+        var cartBtn = document.getElementById('cartBtn');
+        if (cartBtn) {
+          cartBtn.addEventListener('click', function() {
+            cartBtn.disabled = true;
 
-          var fd = new FormData();
-          fd.append('csrf_token', csrfToken);
-          fd.append('listing_id', <?= (int) $listingId ?>);
-          fd.append('action', 'toggle');
+            var fd = new FormData();
+            fd.append('csrf_token', csrfToken);
+            fd.append('listing_id', <?= (int) $listingId ?>);
+            fd.append('action', 'toggle');
 
-          fetch(basePath + 'api/toggle_cart.php', {
-              method: 'POST',
-              body: fd,
-              credentials: 'same-origin'
-            })
-            .then(function(r) {
-              return r.json();
-            })
-            .then(function(data) {
-              if (!data.success) {
-                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
-                return;
-              }
-
-              var cartText = document.getElementById('cartText');
-              if (data.in_cart) {
-                cartBtn.classList.add('buy-btn-cart-active');
-                cartText.textContent = <?= json_encode(t('cart_remove')) ?>;
-                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_added, 'success');
-              } else {
-                cartBtn.classList.remove('buy-btn-cart-active');
-                cartText.textContent = <?= json_encode(t('cart_add')) ?>;
-                if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_removed, 'success');
-              }
-
-              if (typeof window.mpUpdateCartBadges === 'function') {
-                window.mpUpdateCartBadges(data.count || 0);
-              }
-            })
-            .catch(function() {
-              if (typeof mpShowToast === 'function') mpShowToast(i18n.error, 'error');
-            })
-            .finally(function() {
-              cartBtn.disabled = false;
-            });
-        });
-      }
-
-      // ═══ CONTACT SELLER ════════════════════════════════
-      var contactBtn = document.getElementById('contactSellerBtn');
-      var contactOverlay = document.getElementById('contactOverlay');
-      var contactForm = document.getElementById('contactForm');
-      var contactCancel = document.getElementById('contactCancel');
-
-      if (contactBtn && contactOverlay) {
-        contactBtn.addEventListener('click', function() {
-          contactOverlay.classList.add('visible');
-        });
-        function closeContact() { contactOverlay.classList.remove('visible'); }
-        contactCancel.addEventListener('click', closeContact);
-        contactOverlay.addEventListener('click', function(e) { if (e.target === contactOverlay) closeContact(); });
-
-        contactForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          var sendBtn = document.getElementById('contactSend');
-          sendBtn.disabled = true;
-
-          fetch(basePath + 'api/start_conversation.php', {
-              method: 'POST',
-              body: new FormData(contactForm),
-              credentials: 'same-origin'
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              if (data.success) {
-                window.location.href = basePath + 'messagerie/conversation.php?id=' + data.conversation_id;
-              } else {
-                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
-                sendBtn.disabled = false;
-              }
-            })
-            .catch(function() {
-              sendBtn.disabled = false;
-            });
-        });
-      }
-
-      // ═══ FAVORITE TOGGLE ═══════════════════════════════
-      var favBtn = document.getElementById('favBtn');
-      if (favBtn) {
-        favBtn.addEventListener('click', function() {
-          favBtn.disabled = true;
-          var fd = new FormData();
-          fd.append('csrf_token', csrfToken);
-          fd.append('listing_id', <?= (int) $listingId ?>);
-
-          fetch(basePath + 'api/toggle_favorite.php', { method: 'POST', body: fd, credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              if (data.success) {
-                var icon = favBtn.querySelector('i');
-                var text = document.getElementById('favText');
-                if (data.favorited) {
-                  favBtn.classList.add('buy-btn-fav-active');
-                  icon.className = 'fa-solid fa-heart';
-                  text.textContent = <?= json_encode(t('buy_remove_favorite')) ?>;
-                  if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_added, 'success');
-                } else {
-                  favBtn.classList.remove('buy-btn-fav-active');
-                  icon.className = 'fa-regular fa-heart';
-                  text.textContent = <?= json_encode(t('buy_add_favorite')) ?>;
-                  if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_removed, 'success');
+            fetch(basePath + 'api/toggle_cart.php', {
+                method: 'POST',
+                body: fd,
+                credentials: 'same-origin'
+              })
+              .then(function(r) {
+                return r.json();
+              })
+              .then(function(data) {
+                if (!data.success) {
+                  if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+                  return;
                 }
-              }
-            })
-            .finally(function() { favBtn.disabled = false; });
-        });
-      }
 
-      // ═══ REVIEW STARS ══════════════════════════════════
-      var starsInput = document.getElementById('starsInput');
-      var ratingInput = document.getElementById('ratingInput');
-      var reviewForm = document.getElementById('reviewForm');
-      var submitBtn = document.getElementById('reviewSubmitBtn');
+                var cartText = document.getElementById('cartText');
+                if (data.in_cart) {
+                  cartBtn.classList.add('buy-btn-cart-active');
+                  cartText.textContent = <?= json_encode(t('cart_remove')) ?>;
+                  if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_added, 'success');
+                } else {
+                  cartBtn.classList.remove('buy-btn-cart-active');
+                  cartText.textContent = <?= json_encode(t('cart_add')) ?>;
+                  if (typeof mpShowToast === 'function') mpShowToast(i18n.cart_removed, 'success');
+                }
 
-      if (starsInput) {
-        var starBtns = starsInput.querySelectorAll('.review-star-btn');
-        starBtns.forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            var rating = parseInt(this.getAttribute('data-rating'));
-            ratingInput.value = rating;
-            submitBtn.disabled = false;
-            starBtns.forEach(function(b, idx) {
-              var icon = b.querySelector('i');
-              icon.className = idx < rating ? 'fa-solid fa-star' : 'fa-regular fa-star';
+                if (typeof window.mpUpdateCartBadges === 'function') {
+                  window.mpUpdateCartBadges(data.count || 0);
+                }
+              })
+              .catch(function() {
+                if (typeof mpShowToast === 'function') mpShowToast(i18n.error, 'error');
+              })
+              .finally(function() {
+                cartBtn.disabled = false;
+              });
+          });
+        }
+
+        // Contact seller
+        var contactBtn = document.getElementById('contactSellerBtn');
+        var contactOverlay = document.getElementById('contactOverlay');
+        var contactForm = document.getElementById('contactForm');
+        var contactCancel = document.getElementById('contactCancel');
+
+        if (contactBtn && contactOverlay) {
+          contactBtn.addEventListener('click', function() {
+            contactOverlay.classList.add('visible');
+          });
+
+          function closeContact() {
+            contactOverlay.classList.remove('visible');
+          }
+          contactCancel.addEventListener('click', closeContact);
+          contactOverlay.addEventListener('click', function(e) {
+            if (e.target === contactOverlay) closeContact();
+          });
+
+          contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var sendBtn = document.getElementById('contactSend');
+            sendBtn.disabled = true;
+
+            fetch(basePath + 'api/start_conversation.php', {
+                method: 'POST',
+                body: new FormData(contactForm),
+                credentials: 'same-origin'
+              })
+              .then(function(r) {
+                return r.json();
+              })
+              .then(function(data) {
+                if (data.success) {
+                  window.location.href = basePath + 'messagerie/conversation.php?id=' + data.conversation_id;
+                } else {
+                  if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+                  sendBtn.disabled = false;
+                }
+              })
+              .catch(function() {
+                sendBtn.disabled = false;
+              });
+          });
+        }
+
+        // Favorite toggle
+        var favBtn = document.getElementById('favBtn');
+        if (favBtn) {
+          favBtn.addEventListener('click', function() {
+            favBtn.disabled = true;
+            var fd = new FormData();
+            fd.append('csrf_token', csrfToken);
+            fd.append('listing_id', <?= (int) $listingId ?>);
+
+            fetch(basePath + 'api/toggle_favorite.php', {
+                method: 'POST',
+                body: fd,
+                credentials: 'same-origin'
+              })
+              .then(function(r) {
+                return r.json();
+              })
+              .then(function(data) {
+                if (data.success) {
+                  var icon = favBtn.querySelector('i');
+                  var text = document.getElementById('favText');
+                  if (data.favorited) {
+                    favBtn.classList.add('buy-btn-fav-active');
+                    icon.className = 'fa-solid fa-heart';
+                    text.textContent = <?= json_encode(t('buy_remove_favorite')) ?>;
+                    if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_added, 'success');
+                  } else {
+                    favBtn.classList.remove('buy-btn-fav-active');
+                    icon.className = 'fa-regular fa-heart';
+                    text.textContent = <?= json_encode(t('buy_add_favorite')) ?>;
+                    if (typeof mpShowToast === 'function') mpShowToast(i18n.favorite_removed, 'success');
+                  }
+                }
+              })
+              .finally(function() {
+                favBtn.disabled = false;
+              });
+          });
+        }
+
+        // Étoiles de review
+        var starsInput = document.getElementById('starsInput');
+        var ratingInput = document.getElementById('ratingInput');
+        var reviewForm = document.getElementById('reviewForm');
+        var submitBtn = document.getElementById('reviewSubmitBtn');
+
+        if (starsInput) {
+          var starBtns = starsInput.querySelectorAll('.review-star-btn');
+          starBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var rating = parseInt(this.getAttribute('data-rating'));
+              ratingInput.value = rating;
+              submitBtn.disabled = false;
+              starBtns.forEach(function(b, idx) {
+                var icon = b.querySelector('i');
+                icon.className = idx < rating ? 'fa-solid fa-star' : 'fa-regular fa-star';
+              });
             });
           });
-        });
 
-        reviewForm.addEventListener('submit', function(e) {
-          e.preventDefault();
-          if (ratingInput.value === '0') return;
-          submitBtn.disabled = true;
+          reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (ratingInput.value === '0') return;
+            submitBtn.disabled = true;
 
-          fetch(basePath + 'api/submit_review.php', {
-              method: 'POST',
-              body: new FormData(reviewForm),
-              credentials: 'same-origin'
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              if (data.success) {
-                if (typeof mpShowToast === 'function') mpShowToast(i18n.review_sent, 'success');
-                reviewForm.style.display = 'none';
-              } else {
-                if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+            fetch(basePath + 'api/submit_review.php', {
+                method: 'POST',
+                body: new FormData(reviewForm),
+                credentials: 'same-origin'
+              })
+              .then(function(r) {
+                return r.json();
+              })
+              .then(function(data) {
+                if (data.success) {
+                  if (typeof mpShowToast === 'function') mpShowToast(i18n.review_sent, 'success');
+                  reviewForm.style.display = 'none';
+                } else {
+                  if (typeof mpShowToast === 'function') mpShowToast(data.error || i18n.error, 'error');
+                  submitBtn.disabled = false;
+                }
+              })
+              .catch(function() {
                 submitBtn.disabled = false;
-              }
-            })
-            .catch(function() { submitBtn.disabled = false; });
-        });
-      }
-    })();
-  </script>
+              });
+          });
+        }
+      })();
+    </script>
   <?php endif; ?>
 </body>
 

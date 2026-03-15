@@ -211,6 +211,185 @@
     color: var(--mp-text-muted, #ccc);
 }
 
+/* Compteur badge dans le titre de section */
+.admin-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 12px;
+    background: rgba(127, 184, 133, 0.15);
+    color: #7fb885;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-style: normal;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* Filtres annonces */
+.admin-listing-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.admin-listing-search {
+    flex: 1;
+    height: 40px;
+    padding: 0 14px;
+    border: 1.5px solid var(--mp-border-light, #e0ddd7);
+    border-radius: 10px;
+    background: var(--mp-input-bg, #f8f6f2);
+    color: var(--mp-input-text, #333);
+    font-family: "Archivo", sans-serif;
+    font-size: 0.88rem;
+    font-style: italic;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.admin-listing-search:focus {
+    border-color: #7fb885;
+}
+
+.admin-listing-search::placeholder {
+    color: var(--mp-input-placeholder, #aaa);
+}
+
+.admin-listing-filter-select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid var(--mp-border-light, #e0ddd7);
+    border-radius: 10px;
+    background: var(--mp-input-bg, #f8f6f2);
+    color: var(--mp-input-text, #333);
+    font-family: "Archivo", sans-serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.admin-listing-filter-select:focus {
+    border-color: #7fb885;
+}
+
+/* Badges de statut */
+.admin-status-badge {
+    font-size: 0.73rem;
+    font-weight: 700;
+    font-style: italic;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.admin-status-active {
+    background: rgba(127, 184, 133, 0.15);
+    color: #5a9e60;
+    border: 1.5px solid rgba(127, 184, 133, 0.3);
+}
+
+.admin-status-pending {
+    background: rgba(240, 192, 64, 0.15);
+    color: #d4a017;
+    border: 1.5px solid rgba(240, 192, 64, 0.3);
+}
+
+.admin-status-sold {
+    background: rgba(108, 117, 125, 0.12);
+    color: var(--mp-text-muted, #888);
+    border: 1.5px solid rgba(108, 117, 125, 0.2);
+}
+
+/* Lien annonce */
+.admin-listing-link {
+    color: var(--mp-text, #333);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.admin-listing-link:hover {
+    color: #7fb885;
+}
+
+/* Pagination */
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.admin-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 10px;
+    font-family: "Archivo", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--mp-text-secondary, #555);
+    background: var(--mp-input-bg, #f8f6f2);
+    border: 1.5px solid var(--mp-border-light, #e0ddd7);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.admin-page-btn:hover {
+    background: rgba(127, 184, 133, 0.12);
+    border-color: #7fb885;
+    color: #7fb885;
+    text-decoration: none;
+}
+
+.admin-page-active {
+    background: #7fb885;
+    color: #fff;
+    border-color: #7fb885;
+    cursor: default;
+}
+
+.admin-page-active:hover {
+    background: #7fb885;
+    color: #fff;
+    border-color: #7fb885;
+}
+
+.admin-page-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.admin-page-ellipsis {
+    color: var(--mp-text-muted, #999);
+    font-size: 0.85rem;
+    padding: 0 2px;
+}
+
+/* Footer compteur */
+.admin-listing-count-footer {
+    text-align: center;
+    padding: 10px 0 0;
+    font-family: "Archivo", sans-serif;
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--mp-text-muted, #999);
+}
+
 /* Spécifique aux annonces */
 .admin-listing-title {
     font-weight: 600;
@@ -277,6 +456,28 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    .admin-listing-filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .admin-listing-search {
+        height: 52px;
+        font-size: 1.05rem;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border-width: 2.5px;
+    }
+
+    .admin-listing-filter-select {
+        height: 48px;
+        font-size: 0.95rem;
+        padding: 0 14px;
+        border-radius: 12px;
+        border-width: 2px;
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -298,6 +499,7 @@
     .admin-mini-avatar-placeholder i {
         font-size: 11px;
     }
+
 }
 
 /* Modal de suppression */

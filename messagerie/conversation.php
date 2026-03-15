@@ -96,11 +96,7 @@ if (empty($_SESSION['csrf_token'])) {
         <a href="inbox.php" class="conv-back" aria-label="<?= htmlspecialchars(t('conv_back'), ENT_QUOTES, 'UTF-8') ?>"><i class="fa-solid fa-arrow-left"></i></a>
         <a href="../inscription-connexion/profile.php?user=<?= urlencode($conversation['other_username']) ?>" class="conv-user-info">
           <div class="conv-avatar">
-            <?php if ($conversation['other_photo'] && file_exists('../uploads/profiles/' . $conversation['other_photo'])): ?>
-              <img src="../uploads/profiles/<?= htmlspecialchars($conversation['other_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-            <?php else: ?>
-              <img src="../assets/images/default-avatar.svg" alt="">
-            <?php endif; ?>
+            <img src="../api/profile_photo.php?token=<?= urlencode($conversation['other_token']) ?>" alt="">
           </div>
           <span class="conv-username"><?= htmlspecialchars($conversation['other_username'], ENT_QUOTES, 'UTF-8') ?></span>
         </a>
@@ -135,7 +131,7 @@ if (empty($_SESSION['csrf_token'])) {
           <?php endif; ?>
 
           <div class="conv-bubble <?= $msg['sender_token'] === $myToken ? 'conv-bubble-mine' : 'conv-bubble-other' ?>"
-               data-msg-id="<?= (int) $msg['id'] ?>">
+            data-msg-id="<?= (int) $msg['id'] ?>">
             <div class="conv-bubble-content">
               <?= nl2br(htmlspecialchars($msg['content'], ENT_QUOTES, 'UTF-8')) ?>
             </div>
@@ -180,7 +176,7 @@ if (empty($_SESSION['csrf_token'])) {
                     'network_error' => t('network_error'),
                   ]) ?>;
 
-      // ═══ TIMEZONE : convertir UTC -> heure locale ══════
+      // TIMEZONE : convertir UTC -> heure locale
       function utcToLocal(utcStr) {
         // Le serveur renvoie "2026-03-06 13:00:15" en UTC
         // On ajoute 'Z' pour forcer l'interprétation UTC
@@ -189,7 +185,10 @@ if (empty($_SESSION['csrf_token'])) {
       }
 
       function formatTime(date) {
-        return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString(locale, {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
       }
 
       function formatDateSep(date) {
@@ -198,7 +197,11 @@ if (empty($_SESSION['csrf_token'])) {
         var yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         if (date.toDateString() === yesterday.toDateString()) return i18n.yesterday;
-        return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return date.toLocaleDateString(locale, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
       }
 
       // Appliquer les heures locales aux messages rendus par PHP
@@ -219,13 +222,13 @@ if (empty($_SESSION['csrf_token'])) {
         el.textContent = formatDateSep(d);
       });
 
-      // ═══ SCROLL ════════════════════════════════════════
+      // Défilement vers le bas
       function scrollBottom() {
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }
       scrollBottom();
 
-      // ═══ AUTO-RESIZE TEXTAREA ══════════════════════════
+      // Redimensionnement automatique du textarea
       input.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 120) + 'px';
@@ -238,7 +241,7 @@ if (empty($_SESSION['csrf_token'])) {
         }
       });
 
-      // ═══ HELPERS ═══════════════════════════════════════
+      // Helpers
       function escapeText(t) {
         var d = document.createElement('div');
         d.textContent = t;
@@ -271,7 +274,7 @@ if (empty($_SESSION['csrf_token'])) {
         return bubble;
       }
 
-      // ═══ ENVOI AJAX ════════════════════════════════════
+      // Envoi AJAX
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         var content = input.value.trim();
@@ -285,7 +288,9 @@ if (empty($_SESSION['csrf_token'])) {
             body: formData,
             credentials: 'same-origin'
           })
-          .then(function(r) { return r.json(); })
+          .then(function(r) {
+            return r.json();
+          })
           .then(function(data) {
             if (data.success) {
               var time = formatTime(new Date());
@@ -317,12 +322,14 @@ if (empty($_SESSION['csrf_token'])) {
           });
       });
 
-      // ═══ POLLING (3s) ══════════════════════════════════
+      // Polling (3s)
       setInterval(function() {
         fetch(basePath + 'api/poll_messages.php?conversation_id=<?= (int) $conversationId ?>&after=' + lastMsgId, {
             credentials: 'same-origin'
           })
-          .then(function(r) { return r.json(); })
+          .then(function(r) {
+            return r.json();
+          })
           .then(function(data) {
             var scrolled = false;
 

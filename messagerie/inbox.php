@@ -84,11 +84,7 @@ $conversations = $stmt->fetchAll();
           <?php foreach ($conversations as $conv): ?>
             <a href="conversation.php?id=<?= (int) $conv['conversation_id'] ?>" class="msg-item <?= $conv['unread_count'] > 0 ? 'msg-unread' : '' ?>">
               <div class="msg-avatar">
-                <?php if ($conv['other_photo'] && file_exists('../uploads/profiles/' . $conv['other_photo'])): ?>
-                  <img src="../uploads/profiles/<?= htmlspecialchars($conv['other_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-                <?php else: ?>
-                  <img src="../assets/images/default-avatar.svg" alt="">
-                <?php endif; ?>
+                <img src="../api/profile_photo.php?token=<?= urlencode($conv['other_token']) ?>" alt="">
               </div>
               <div class="msg-content">
                 <div class="msg-top">

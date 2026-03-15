@@ -19,7 +19,7 @@ if (!isset($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// --- INITIALISATION ET TRAITEMENT ---
+// INITIALISATION ET TRAITEMENT
 $state = initPageState($pdo ?? null);
 
 if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,7 +31,18 @@ if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 extract($state);
 
-// --- TRADUCTIONS ---
+// Informations vendeur Stripe
+$stripeAccountId = null;
+$stripeOnboardingComplete = false;
+if (isset($pdo)) {
+  $stripeStmt = $pdo->prepare("SELECT stripe_account_id, stripe_onboarding_complete FROM users WHERE auth_token = ?");
+  $stripeStmt->execute([$_SESSION['auth_token']]);
+  $stripeRow = $stripeStmt->fetch();
+  $stripeAccountId = $stripeRow['stripe_account_id'] ?? null;
+  $stripeOnboardingComplete = !empty($stripeRow['stripe_onboarding_complete']);
+}
+
+// TRADUCTIONS
 $_translations = loadTranslations($userSettings['language'] ?? 'fr');
 $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings['language'];
 ?>
@@ -152,7 +163,7 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
       <h2 class="settings-section-title"><i class="fas fa-camera"></i> <?= htmlspecialchars(t('profile_photo'), ENT_QUOTES, 'UTF-8') ?></h2>
       <div id="photoDropzone" class="settings-dropzone" data-csrf="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="file" id="photoInput" accept=".jpg,.jpeg,.png,.webp" style="position:absolute;left:-9999px;">
-        <img src="<?= ($profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto)) ? '../uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : '../assets/images/default-avatar.svg' ?>"
+        <img src="<?= !empty($profilePhoto) ? '../api/profile_photo.php?token=' . urlencode($_SESSION['auth_token']) . '&v=' . time() : '../assets/images/default-avatar.svg' ?>"
           alt="<?= htmlspecialchars(t('profile_photo'), ENT_QUOTES, 'UTF-8') ?>" class="settings-avatar" id="avatarPreview">
         <div class="settings-dropzone-text">
           <p class="settings-dropzone-main"><i class="fas fa-cloud-upload-alt"></i> <?= htmlspecialchars(t('drag_photo'), ENT_QUOTES, 'UTF-8') ?></p>
@@ -213,6 +224,36 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
           <i class="fas fa-key"></i> <?= htmlspecialchars($hasPassword ? t('change_password') : t('set_password_btn'), ENT_QUOTES, 'UTF-8') ?>
         </button>
       </form>
+    </section>
+
+    <!-- Paiements vendeur (Stripe Connect) -->
+    <section class="settings-section">
+      <h2 class="settings-section-title"><i class="fas fa-store"></i> Paiements vendeur</h2>
+      <?php if ($stripeOnboardingComplete): ?>
+        <div class="settings-alert" style="background: rgba(127, 184, 133, 0.1); color: #4a8b50; border: 1.5px solid #7fb885; border-radius: 12px; padding: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-check-circle" style="font-size: 1.2rem;"></i>
+          <div>
+            <strong>Compte vendeur actif</strong><br>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Vous pouvez recevoir des paiements. Commission plateforme : 5%.</span>
+          </div>
+        </div>
+        <a href="../stripe/onboarding.php" class="settings-btn settings-btn-primary">
+          <i class="fas fa-external-link-alt"></i> Tableau de bord Stripe
+        </a>
+      <?php elseif ($stripeAccountId): ?>
+        <div class="settings-alert" style="background: rgba(245, 158, 11, 0.1); color: #b45309; border: 1.5px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Vérification incomplète</strong> — Finalisez votre inscription pour recevoir des paiements.
+        </div>
+        <a href="../stripe/onboarding.php" class="settings-btn settings-btn-primary">
+          <i class="fas fa-arrow-right"></i> Terminer la vérification
+        </a>
+      <?php else: ?>
+        <p class="settings-desc">Activez les paiements pour vendre vos articles. Les acheteurs pourront payer par carte bancaire. Commission plateforme : 5%.</p>
+        <a href="../stripe/onboarding.php" class="settings-btn settings-btn-primary">
+          <i class="fas fa-credit-card"></i> Devenir vendeur
+        </a>
+      <?php endif; ?>
     </section>
 
     <!-- Apparence -->
@@ -555,41 +596,50 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
     (function() {
       var csrfToken = <?= json_encode($_SESSION['csrf_token']) ?>;
       var i18n = <?= json_encode([
-        'setting_saved' => t('setting_saved'),
-        'network_error' => t('network_error'),
-        'save_error' => t('save_error'),
-        'notif_permission_denied' => t('notif_permission_denied'),
-        'notif_not_supported' => t('notif_not_supported'),
-      ]) ?>;
+                    'setting_saved' => t('setting_saved'),
+                    'network_error' => t('network_error'),
+                    'save_error' => t('save_error'),
+                    'notif_permission_denied' => t('notif_permission_denied'),
+                    'notif_not_supported' => t('notif_not_supported'),
+                  ]) ?>;
 
       function saveSetting(setting, value, toggleRow) {
         if (toggleRow) toggleRow.classList.add('saving');
 
         return fetch('save_settings.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            csrf_token: csrfToken,
-            setting: setting,
-            value: value
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              csrf_token: csrfToken,
+              setting: setting,
+              value: value
+            })
           })
-        })
-        .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
-        .then(function(result) {
-          if (toggleRow) toggleRow.classList.remove('saving');
-          if (!result.ok) {
-            showSettingsToast(result.data.error || i18n.save_error, 'error');
+          .then(function(res) {
+            return res.json().then(function(data) {
+              return {
+                ok: res.ok,
+                data: data
+              };
+            });
+          })
+          .then(function(result) {
+            if (toggleRow) toggleRow.classList.remove('saving');
+            if (!result.ok) {
+              showSettingsToast(result.data.error || i18n.save_error, 'error');
+              return false;
+            } else {
+              showSettingsToast(i18n.setting_saved, 'success');
+              return true;
+            }
+          })
+          .catch(function() {
+            if (toggleRow) toggleRow.classList.remove('saving');
+            showSettingsToast(i18n.network_error, 'error');
             return false;
-          } else {
-            showSettingsToast(i18n.setting_saved, 'success');
-            return true;
-          }
-        })
-        .catch(function() {
-          if (toggleRow) toggleRow.classList.remove('saving');
-          showSettingsToast(i18n.network_error, 'error');
-          return false;
-        });
+          });
       }
 
       // Mini toast pour feedback
@@ -607,7 +657,9 @@ $htmlLang = ($userSettings['language'] ?? 'fr') === 'fr' ? 'fr' : $userSettings[
         });
         setTimeout(function() {
           toast.classList.remove('show');
-          setTimeout(function() { toast.remove(); }, 300);
+          setTimeout(function() {
+            toast.remove();
+          }, 300);
         }, 2000);
       }
 

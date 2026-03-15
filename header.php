@@ -7,7 +7,11 @@ require_once __DIR__ . '/includes/lang.php';
 require_once __DIR__ . '/includes/cart.php';
 
 $profilePhoto = $headerUser['profile_photo'] ?? null;
-$profilePhotoExists = $profilePhoto && file_exists(__DIR__ . '/uploads/profiles/' . $profilePhoto);
+$profilePhotoExists = !empty($profilePhoto);
+$headerAuthToken = $_SESSION['auth_token'] ?? '';
+$profilePhotoUrl = ($profilePhotoExists && $headerAuthToken)
+  ? $headerBasePath . 'api/profile_photo.php?token=' . urlencode($headerAuthToken) . '&v=' . crc32($profilePhoto)
+  : $headerBasePath . 'assets/images/default-avatar.svg';
 $headerBrowserNotificationsEnabled = false;
 $headerCartCount = cart_count();
 
@@ -37,9 +41,12 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
       <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
     </form>
     <div class="header-divider"></div>
+
     <?php if (isset($_SESSION['auth_token'])): ?>
-      <!-- Icônes header : panier, favoris, messagerie, notifications -->
       <div class="header-icons">
+        <a href="<?= $headerBasePath ?>shop/sell.php" class="header-icon-link" title="<?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?>">
+          <i class="fa-solid fa-plus"></i>
+        </a>
         <a href="<?= $headerBasePath ?>panier/" class="header-icon-link" title="<?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?>">
           <i class="fa-solid fa-basket-shopping"></i>
           <span class="header-badge header-badge-cart" id="badgeCart" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 99 ? '99+' : $headerCartCount ?></span>
@@ -66,65 +73,66 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
     <?php endif; ?>
 
     <a class="profile-photo-container" href="<?= $headerBasePath ?><?= isset($_SESSION['auth_token']) ? 'inscription-connexion/account.php' : 'inscription-connexion/register.php' ?>">
-      <img src="<?= $profilePhotoExists ? $headerBasePath . 'uploads/profiles/' . htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') : $headerBasePath . 'assets/images/default-avatar.svg' ?>"
+      <img src="<?= htmlspecialchars($profilePhotoUrl, ENT_QUOTES, 'UTF-8') ?>"
         alt="Photo de profil"
         class="profile-photo" />
     </a>
 
-    <!-- Theme toggle desktop -->
     <button class="theme-toggle" data-theme-toggle title="Changer le thème">
       <i class="fa-solid fa-moon"></i>
       <i class="fa-solid fa-sun"></i>
     </button>
-
-    <!-- Hamburger mobile -->
-    <button class="hamburger-btn" aria-label="Menu">
-      <i class="fa-solid fa-bars"></i>
-      <?php if (isset($_SESSION['auth_token'])): ?>
-        <span class="header-badge" id="badgeHamburger" style="display:none;"></span>
-      <?php endif; ?>
-    </button>
-  </div>
-
-  <div class="header-bottom">
-    <nav>
-      <a href="<?= $headerBasePath ?>shop/sell.php"><?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?></a>
-      <a href="<?= $headerBasePath ?>settings/settings.php"><?= htmlspecialchars(t('header_settings'), ENT_QUOTES, 'UTF-8') ?></a>
-      <a href="<?= $headerBasePath ?>support/help.php"><?= htmlspecialchars(t('header_help'), ENT_QUOTES, 'UTF-8') ?></a>
-    </nav>
   </div>
 </header>
 
-<!-- Menu mobile (slide-in) -->
-<div class="mobile-menu-overlay"></div>
-<div class="mobile-menu">
-  <div class="mobile-menu-header">
-    <span><?= htmlspecialchars(t('header_menu'), ENT_QUOTES, 'UTF-8') ?></span>
-    <button class="mobile-menu-close" aria-label="Fermer">&times;</button>
-  </div>
-  <nav>
-    <a href="<?= $headerBasePath ?>shop/sell.php"><i class="fa-solid fa-tag"></i>&nbsp; <?= htmlspecialchars(t('header_sell'), ENT_QUOTES, 'UTF-8') ?></a>
-    <a href="<?= $headerBasePath ?>panier/"><i class="fa-solid fa-basket-shopping"></i>&nbsp; <?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeCartMobile" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 99 ? '99+' : $headerCartCount ?></span></a>
-    <?php if (isset($_SESSION['auth_token'])): ?>
-      <a href="<?= $headerBasePath ?>messagerie/inbox.php"><i class="fa-solid fa-envelope"></i>&nbsp; <?= htmlspecialchars(t('header_messages'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeMsgMobile" style="display:none;"></span></a>
-      <a href="<?= $headerBasePath ?>favoris/"><i class="fa-solid fa-heart"></i>&nbsp; <?= htmlspecialchars(t('header_favorites'), ENT_QUOTES, 'UTF-8') ?></a>
-      <a href="<?= $headerBasePath ?>notifications/"><i class="fa-solid fa-bell"></i>&nbsp; <?= htmlspecialchars(t('header_notifications'), ENT_QUOTES, 'UTF-8') ?><span class="mobile-menu-badge" id="badgeNotifMobile" style="display:none;"></span></a>
-    <?php endif; ?>
-    <a href="<?= $headerBasePath ?>settings/settings.php"><i class="fa-solid fa-gear"></i>&nbsp; <?= htmlspecialchars(t('header_settings'), ENT_QUOTES, 'UTF-8') ?></a>
-    <a href="<?= $headerBasePath ?>support/help.php"><i class="fa-solid fa-circle-question"></i>&nbsp; <?= htmlspecialchars(t('header_help'), ENT_QUOTES, 'UTF-8') ?></a>
-    <?php if (isset($_SESSION['auth_token'])): ?>
-      <a href="<?= $headerBasePath ?>inscription-connexion/account.php"><i class="fa-solid fa-user"></i>&nbsp; <?= htmlspecialchars(t('header_my_profile'), ENT_QUOTES, 'UTF-8') ?></a>
-    <?php else: ?>
-      <a href="<?= $headerBasePath ?>inscription-connexion/register.php"><i class="fa-solid fa-user-plus"></i>&nbsp; <?= htmlspecialchars(t('header_register'), ENT_QUOTES, 'UTF-8') ?></a>
-    <?php endif; ?>
-  </nav>
-  <div class="theme-toggle-mobile">
-    <button data-theme-toggle>
-      <i class="fa-solid fa-circle-half-stroke"></i>
-      <span class="theme-toggle-label"><?= htmlspecialchars(t('header_dark_mode'), ENT_QUOTES, 'UTF-8') ?></span>
+<!-- Panneau recherche mobile -->
+<div class="mobile-search-panel" id="mobileSearchPanel">
+  <form action="<?= $headerBasePath ?>shop/search.php" method="GET" autocomplete="off" class="mobile-search-form">
+    <input type="text" name="q" class="mobile-search-input" id="mobileSearchInput"
+      placeholder="<?= htmlspecialchars(t('header_search'), ENT_QUOTES, 'UTF-8') ?>"
+      value="<?= htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>" />
+    <button type="button" class="mobile-search-close" id="mobileSearchClose">
+      <i class="fa-solid fa-xmark"></i>
     </button>
-  </div>
+  </form>
+  <div class="mobile-search-results" id="mobileSearchResults"></div>
 </div>
+
+<!-- BOTTOM NAV MOBILE -->
+<nav class="bottom-nav">
+  <a href="<?= $headerBasePath ?>index.php" class="bottom-nav-item">
+    <i class="fa-solid fa-house"></i>
+    <span><?= htmlspecialchars(t('header_home'), ENT_QUOTES, 'UTF-8') ?></span>
+  </a>
+  <button type="button" class="bottom-nav-item" id="bottomNavSearch">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span><?= htmlspecialchars(t('header_search'), ENT_QUOTES, 'UTF-8') ?></span>
+  </button>
+  <a href="<?= $headerBasePath ?>shop/sell.php" class="bottom-nav-item bottom-nav-sell">
+    <i class="fa-solid fa-plus"></i>
+  </a>
+  <?php if (isset($_SESSION['auth_token'])): ?>
+    <a href="<?= $headerBasePath ?>messagerie/inbox.php" class="bottom-nav-item">
+      <i class="fa-solid fa-envelope"></i>
+      <span><?= htmlspecialchars(t('header_messages'), ENT_QUOTES, 'UTF-8') ?></span>
+      <span class="bottom-nav-badge" id="badgeMsgBottom" style="display:none;"></span>
+    </a>
+    <a href="<?= $headerBasePath ?>inscription-connexion/account.php" class="bottom-nav-item">
+      <i class="fa-solid fa-user"></i>
+      <span><?= htmlspecialchars(t('header_profile'), ENT_QUOTES, 'UTF-8') ?></span>
+    </a>
+  <?php else: ?>
+    <a href="<?= $headerBasePath ?>panier/" class="bottom-nav-item">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <span><?= htmlspecialchars(t('header_cart'), ENT_QUOTES, 'UTF-8') ?></span>
+      <span class="bottom-nav-badge" id="badgeCartBottom" style="<?= $headerCartCount > 0 ? '' : 'display:none;' ?>"><?= $headerCartCount > 0 ? ($headerCartCount > 99 ? '99+' : $headerCartCount) : '' ?></span>
+    </a>
+    <a href="<?= $headerBasePath ?>inscription-connexion/register.php" class="bottom-nav-item">
+      <i class="fa-solid fa-user-plus"></i>
+      <span><?= htmlspecialchars(t('header_signup'), ENT_QUOTES, 'UTF-8') ?></span>
+    </a>
+  <?php endif; ?>
+</nav>
 
 <script>
   (function() {
@@ -134,7 +142,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
       var safeCount = Math.max(0, parseInt(count, 10) || 0);
       var label = safeCount > 99 ? '99+' : String(safeCount);
 
-      ['badgeCart', 'badgeCartMobile'].forEach(function(id) {
+      ['badgeCart', 'badgeCartBottom'].forEach(function(id) {
         var badge = document.getElementById(id);
         if (!badge) return;
         if (safeCount > 0) {
@@ -245,7 +253,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
   </script>
 <?php endif; ?>
 
-<!-- ═══ COOKIE CONSENT BANNER ═══════════════════════════════ -->
+<!-- COOKIE CONSENT BANNER -->
 <div class="cookie-banner" id="cookieBanner">
   <div class="cookie-banner-inner">
     <div class="cookie-banner-text">
@@ -322,12 +330,40 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
 <script src="<?= $headerBasePath ?>styles/cookie-banner.js"></script>
 
 <?php if (isset($_SESSION['auth_token'])): ?>
-  <!-- ═══ BADGES TEMPS RÉEL ══════════════════════════════════ -->
+  <!-- BADGES TEMPS RÉEL -->
   <script>
     (function() {
       var basePath = <?= json_encode($headerBasePath) ?>;
       var browserNotificationsEnabled = <?= json_encode($headerBrowserNotificationsEnabled) ?>;
       var notificationStorageKey = <?= json_encode('mp-last-notification-id-' . ($_SESSION['auth_token'] ?? 'guest')) ?>;
+      var vapidPublicKey = <?= json_encode($_ENV['VAPID_PUBLIC_KEY'] ?? '') ?>;
+      var csrfTokenHeader = <?= json_encode($_SESSION['csrf_token'] ?? '') ?>;
+
+      // Enregistrer le service worker + souscrire aux push
+      if ('serviceWorker' in navigator && browserNotificationsEnabled && vapidPublicKey) {
+        navigator.serviceWorker.register(basePath + 'sw.js').then(function(reg) {
+          return reg.pushManager.getSubscription().then(function(sub) {
+            if (sub) return sub;
+            var key = Uint8Array.from(atob(vapidPublicKey.replace(/-/g,'+').replace(/_/g,'/')), function(c){return c.charCodeAt(0);});
+            return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+          });
+        }).then(function(sub) {
+          if (!sub) return;
+          var key = sub.toJSON();
+          fetch(basePath + 'api/push_subscribe.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              csrf_token: csrfTokenHeader,
+              endpoint: key.endpoint,
+              p256dh: key.keys.p256dh,
+              auth: key.keys.auth,
+              action: 'subscribe'
+            }),
+            credentials: 'same-origin'
+          }).catch(function(){});
+        }).catch(function(e){ console.log('SW/Push error:', e); });
+      }
       var _notifCount = 0,
         _msgCount = 0;
 
@@ -416,7 +452,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
             _notifCount = data.unread_count || 0;
             syncBrowserNotifications(data.notifications || []);
             var count = _notifCount > 0 ? (_notifCount > 99 ? '99+' : _notifCount) : null;
-            ['badgeNotif', 'badgeNotifMobile'].forEach(function(id) {
+            ['badgeNotif'].forEach(function(id) {
               var badge = document.getElementById(id);
               if (!badge) return;
               if (count) {
@@ -440,7 +476,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
           .then(function(data) {
             _msgCount = data.unread_count || 0;
             var count = _msgCount > 0 ? (_msgCount > 99 ? '99+' : _msgCount) : null;
-            ['badgeMsg', 'badgeMsgMobile'].forEach(function(id) {
+            ['badgeMsg', 'badgeMsgBottom'].forEach(function(id) {
               var badge = document.getElementById(id);
               if (!badge) return;
               if (count) {
@@ -460,7 +496,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
   </script>
 <?php endif; ?>
 
-<!-- ═══ AUTOCOMPLETE ════════════════════════════════════════ -->
+<!-- AUTOCOMPLETE -->
 <script>
   (function() {
     var input = document.getElementById('searchInput');
@@ -575,6 +611,27 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
       return allLink;
     }
 
+    function createUserLink(user) {
+      var a = document.createElement('a');
+      a.href = basePath + 'inscription-connexion/profile.php?user=' + encodeURIComponent(user.username);
+      a.className = 'ac-item ac-user';
+
+      var avatarHtml = '';
+      if (user.has_photo) {
+        avatarHtml = '<img class="ac-thumb ac-thumb-round" src="' + basePath + 'api/profile_photo.php?token=' + encodeURIComponent(user.auth_token) + '" alt="">';
+      } else {
+        avatarHtml = '<div class="ac-thumb ac-thumb-round ac-thumb-empty"><i class="fa-solid fa-user"></i></div>';
+      }
+
+      a.innerHTML = avatarHtml +
+        '<div class="ac-text">' +
+        '<span class="ac-label">' + escapeHtml(user.username) + '</span>' +
+        '<span class="ac-count">Profil utilisateur</span>' +
+        '</div>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      return a;
+    }
+
     function appendSeparator() {
       var sep = document.createElement('div');
       sep.className = 'ac-separator';
@@ -582,7 +639,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
     }
 
     function doSearch(q) {
-      if (q.length < 2) {
+      if (q.length < 1) {
         if (activeController) {
           activeController.abort();
           activeController = null;
@@ -640,6 +697,17 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
             });
           }
 
+          // Users
+          var users = Array.isArray(data.users) ? data.users : [];
+          if (users.length > 0) {
+            if (categories.length > 0 || suggestions.length > 0) appendSeparator();
+            users.forEach(function(user) {
+              var a = createUserLink(user);
+              dropdown.appendChild(a);
+              currentItems.push(a);
+            });
+          }
+
           if (currentItems.length > 0) {
             appendSeparator();
           }
@@ -671,7 +739,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
     });
 
     input.addEventListener('focus', function() {
-      if (input.value.trim().length >= 2 && dropdown.children.length > 0) show();
+      if (input.value.trim().length >= 1 && dropdown.children.length > 0) show();
     });
 
     input.addEventListener('keydown', function(e) {
@@ -695,6 +763,142 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
       if (!input.contains(e.target) && !dropdown.contains(e.target)) hide();
     });
   })();
+</script>
+
+<!-- MOBILE SEARCH PANEL -->
+<script>
+(function() {
+  var toggle = document.getElementById('mobileSearchToggle');
+  var panel = document.getElementById('mobileSearchPanel');
+  var closeBtn = document.getElementById('mobileSearchClose');
+  var mobileInput = document.getElementById('mobileSearchInput');
+  var mobileResults = document.getElementById('mobileSearchResults');
+  if (!toggle || !panel) return;
+
+  var basePath = <?= json_encode($headerBasePath) ?>;
+  var mobileDebounce = null;
+  var mobileController = null;
+  var mobileSeq = 0;
+
+  var categoryIcons = {
+    vetements: 'fa-shirt', electronique: 'fa-laptop', livres: 'fa-book',
+    maison: 'fa-house', sport: 'fa-futbol', vehicules: 'fa-car', autre: 'fa-ellipsis'
+  };
+
+  function escHtml(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+  function openSearchPanel() {
+    panel.classList.add('open');
+    mobileInput.focus();
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', function() {
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) mobileInput.focus();
+    });
+  }
+
+  var bottomSearchBtn = document.getElementById('bottomNavSearch');
+  if (bottomSearchBtn) {
+    bottomSearchBtn.addEventListener('click', openSearchPanel);
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      panel.classList.remove('open');
+      mobileInput.value = '';
+      mobileResults.innerHTML = '';
+    });
+  }
+
+  function renderMobileResults(data, q) {
+    mobileResults.innerHTML = '';
+    var categories = Array.isArray(data.categories) ? data.categories : [];
+    var suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+    var users = Array.isArray(data.users) ? data.users : [];
+
+    categories.forEach(function(cat) {
+      var a = document.createElement('a');
+      a.href = basePath + 'shop/search.php?category=' + cat.key + (cat.preserve_query && q ? '&q=' + encodeURIComponent(q) : '');
+      a.className = 'ac-item';
+      a.innerHTML = '<i class="fa-solid ' + (categoryIcons[cat.key] || 'fa-tag') + ' ac-icon"></i>' +
+        '<span class="ac-label">' + escHtml(cat.label) + ' (' + cat.count + ')</span>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      mobileResults.appendChild(a);
+    });
+
+    if (suggestions.length > 0 && categories.length > 0) {
+      var sep = document.createElement('div'); sep.className = 'ac-separator'; mobileResults.appendChild(sep);
+    }
+
+    suggestions.forEach(function(item) {
+      var a = document.createElement('a');
+      a.href = basePath + 'shop/buy.php?id=' + item.id;
+      a.className = 'ac-item';
+      var price = parseFloat(item.price).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €';
+      var imgHtml = item.image_id
+        ? '<img class="ac-thumb" src="' + basePath + 'api/image.php?id=' + item.image_id + '" alt="">'
+        : '<div class="ac-thumb ac-thumb-empty"><i class="fa-solid fa-image"></i></div>';
+      a.innerHTML = imgHtml + '<div class="ac-text"><span class="ac-label">' + escHtml(item.title) +
+        '</span><span class="ac-price">' + price + '</span></div><i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      mobileResults.appendChild(a);
+    });
+
+    if (users.length > 0) {
+      if (suggestions.length > 0 || categories.length > 0) {
+        var sep2 = document.createElement('div'); sep2.className = 'ac-separator'; mobileResults.appendChild(sep2);
+      }
+      users.forEach(function(user) {
+        var a = document.createElement('a');
+        a.href = basePath + 'inscription-connexion/profile.php?user=' + encodeURIComponent(user.username);
+        a.className = 'ac-item';
+        var avatar = user.has_photo
+          ? '<img class="ac-thumb ac-thumb-round" src="' + basePath + 'api/profile_photo.php?token=' + encodeURIComponent(user.auth_token) + '" alt="">'
+          : '<div class="ac-thumb ac-thumb-round ac-thumb-empty"><i class="fa-solid fa-user"></i></div>';
+        a.innerHTML = avatar + '<div class="ac-text"><span class="ac-label">' + escHtml(user.username) +
+          '</span><span class="ac-count">Profil</span></div><i class="fa-solid fa-arrow-right ac-arrow"></i>';
+        mobileResults.appendChild(a);
+      });
+    }
+
+    // Lien "tout voir"
+    if (q) {
+      if (mobileResults.children.length > 0) {
+        var sep3 = document.createElement('div'); sep3.className = 'ac-separator'; mobileResults.appendChild(sep3);
+      }
+      var all = document.createElement('a');
+      all.href = basePath + 'shop/search.php?q=' + encodeURIComponent(q);
+      all.className = 'ac-item ac-all';
+      all.innerHTML = '<i class="fa-solid fa-magnifying-glass ac-icon"></i>' +
+        '<span class="ac-label">Rechercher « ' + escHtml(q) + ' »</span>' +
+        '<i class="fa-solid fa-arrow-right ac-arrow"></i>';
+      mobileResults.appendChild(all);
+    }
+  }
+
+  function doMobileSearch(q) {
+    if (q.length < 1) { mobileResults.innerHTML = ''; return; }
+    mobileSeq++;
+    var mySeq = mobileSeq;
+    if (mobileController) mobileController.abort();
+    mobileController = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var opts = mobileController ? { signal: mobileController.signal } : {};
+
+    fetch(basePath + 'api/autocomplete.php?q=' + encodeURIComponent(q), opts)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (mySeq === mobileSeq) renderMobileResults(data, q);
+      })
+      .catch(function(e) { if (e && e.name !== 'AbortError') mobileResults.innerHTML = ''; });
+  }
+
+  mobileInput.addEventListener('input', function() {
+    clearTimeout(mobileDebounce);
+    var q = mobileInput.value.trim();
+    mobileDebounce = setTimeout(function() { doMobileSearch(q); }, 200);
+  });
+})();
 </script>
 
 <?php include __DIR__ . '/includes/toast.php'; ?>

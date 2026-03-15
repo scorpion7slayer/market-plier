@@ -12,6 +12,8 @@
 
 Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
 
+[Stripe carte de test](https://docs.stripe.com/testing#cards)
+
 ## API
 
 [ipapi](https://ipapi.co/)

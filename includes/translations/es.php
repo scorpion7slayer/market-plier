@@ -79,6 +79,9 @@ return [
   'header_account_deleted' => 'Cuenta eliminada',
   'header_account_deleted_text' => 'Tu cuenta ha sido eliminada por un administrador. Se cerrará la sesión automáticamente.',
   'header_close' => 'Cerrar',
+  'header_home' => 'Inicio',
+  'header_profile' => 'Perfil',
+  'header_signup' => 'Registro',
 
   // Cookie banner
   'cookie_title' => 'Usamos cookies',

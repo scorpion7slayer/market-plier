@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../database/db.php';
+require_once '../includes/send_notification.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -79,12 +80,11 @@ try {
   $senderStmt->execute([$myToken]);
   $sender = $senderStmt->fetch();
 
-  $pdo->prepare("INSERT INTO notifications (auth_token, type, title, content, link) VALUES (?, 'message', ?, ?, ?)")
-    ->execute([
-      $sellerToken,
-      ($sender['username'] ?? 'Quelqu\'un') . ' vous a envoyé un message',
-      mb_strimwidth($message, 0, 120, '...'),
-      'messagerie/conversation.php?id=' . $conversationId
+  sendNotification($pdo, $sellerToken, [
+      'type' => 'message',
+      'title' => ($sender['username'] ?? 'Quelqu\'un') . ' vous a envoyé un message',
+      'content' => mb_strimwidth($message, 0, 120, '...'),
+      'link' => 'messagerie/conversation.php?id=' . $conversationId,
     ]);
 
   echo json_encode(['success' => true, 'conversation_id' => $conversationId]);

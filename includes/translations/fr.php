@@ -79,6 +79,9 @@ return [
   'header_account_deleted' => 'Compte supprimé',
   'header_account_deleted_text' => 'Votre compte a été supprimé par un administrateur. Vous allez être déconnecté automatiquement.',
   'header_close' => 'Fermer',
+  'header_home' => 'Accueil',
+  'header_profile' => 'Profil',
+  'header_signup' => 'Inscription',
 
   // Cookie banner
   'cookie_title' => 'Nous utilisons des cookies',

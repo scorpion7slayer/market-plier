@@ -17,10 +17,11 @@ function normalizeAutocompleteText(string $value): string
 
 $query = trim($_GET['q'] ?? '');
 
-if (mb_strlen($query) < 2) {
+if (mb_strlen($query) < 1) {
   echo json_encode([
     'suggestions' => [],
-    'categories' => [],
+    'users'       => [],
+    'categories'  => [],
   ], JSON_UNESCAPED_UNICODE);
   exit;
 }
@@ -52,6 +53,26 @@ $stmt = $pdo->prepare(
 );
 $stmt->execute([$searchTerm, $searchTerm]);
 $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Recherche d'utilisateurs
+$userStmt = $pdo->prepare(
+  "SELECT username, auth_token, profile_photo
+   FROM users
+   WHERE username LIKE ?
+   ORDER BY username ASC
+   LIMIT 4"
+);
+$userStmt->execute([$searchTerm]);
+$users = $userStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$userResults = [];
+foreach ($users as $u) {
+  $userResults[] = [
+    'username' => $u['username'],
+    'auth_token' => $u['auth_token'],
+    'has_photo' => !empty($u['profile_photo']),
+  ];
+}
 
 // Suggest categories that can further narrow the current text query.
 $matchedCategories = [];
@@ -115,5 +136,6 @@ foreach ($categoryLabels as $key => $label) {
 
 echo json_encode([
   'suggestions' => $listings,
+  'users'       => $userResults,
   'categories'  => array_values($matchedCategories),
 ], JSON_UNESCAPED_UNICODE);

@@ -45,12 +45,14 @@ $typeIcons = [
   'review'   => 'fa-star',
   'favorite' => 'fa-heart',
   'system'   => 'fa-bell',
+  'sale'     => 'fa-credit-card',
 ];
 $typeColors = [
   'message'  => '#3b82f6',
   'review'   => '#f59e0b',
   'favorite' => '#ef4444',
   'system'   => '#7fb885',
+  'sale'     => '#10b981',
 ];
 ?>
 <!DOCTYPE html>

@@ -44,6 +44,8 @@ if (! empty($cartIds)) {
     $stmt = $pdo->prepare("
     SELECT l.id, l.title, l.price, l.category, l.item_condition, l.location, l.auth_token,
            u.username AS seller_name,
+           u.stripe_account_id AS seller_stripe_id,
+           u.stripe_onboarding_complete AS seller_stripe_ok,
            (SELECT li.id FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1) AS image_id,
            COALESCE(
              (SELECT li.image_path FROM listing_images li WHERE li.listing_id = l.id ORDER BY li.sort_order ASC LIMIT 1),
@@ -85,6 +87,7 @@ if (! empty($cartIds)) {
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../styles/index.css">
+  <link rel="stylesheet" href="../styles/search.css">
   <link rel="stylesheet" href="../styles/cart.css">
   <link rel="stylesheet" href="../styles/theme.css">
 </head>
@@ -110,10 +113,9 @@ include '../header.php';
 
       <?php if (empty($cartItems)): ?>
         <section class="cart-empty">
-          <i class="fa-solid fa-basket-shopping"></i>
           <h2><?= htmlspecialchars(t('cart_empty_title'), ENT_QUOTES, 'UTF-8') ?></h2>
           <p><?= htmlspecialchars(t('cart_empty_text'), ENT_QUOTES, 'UTF-8') ?></p>
-          <a href="../shop/search.php" class="cart-primary-link">
+          <a href="../shop/search.php" class="category-chip">
             <i class="fa-solid fa-magnifying-glass"></i> <?= htmlspecialchars(t('cart_browse'), ENT_QUOTES, 'UTF-8') ?>
           </a>
         </section>
@@ -156,6 +158,15 @@ include '../header.php';
                     <a href="../shop/buy.php?id=<?= (int) $item['id'] ?>" class="cart-secondary-link">
                       <i class="fa-solid fa-eye"></i> <?= htmlspecialchars(t('cart_view_listing'), ENT_QUOTES, 'UTF-8') ?>
                     </a>
+                    <?php if ($user && !empty($item['seller_stripe_id']) && $item['seller_stripe_ok'] && $item['auth_token'] !== ($_SESSION['auth_token'] ?? '')): ?>
+                      <form action="../stripe/checkout.php" method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="listing_id" value="<?= (int) $item['id'] ?>">
+                        <button type="submit" class="cart-primary-link" style="border:none;cursor:pointer;">
+                          <i class="fa-solid fa-credit-card"></i> Acheter
+                        </button>
+                      </form>
+                    <?php endif; ?>
                   </div>
                 </div>
               </article>

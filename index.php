@@ -47,7 +47,7 @@ if ($user) {
   }
 }
 
-// --- Données pour la page d'accueil ---
+// Données pour la page d'accueil
 
 $categoryLabels = [
   'vetements'    => t('cat_vetements'),

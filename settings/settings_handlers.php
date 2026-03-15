@@ -1,6 +1,6 @@
 <?php
 
-// --- Fonctions utilitaires ---
+// Fonctions utilitaires
 
 function destroySessionAndRedirect()
 {
@@ -113,7 +113,7 @@ function validateSettingsCsrf()
   return isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token'];
 }
 
-// --- Helpers de validation ---
+// Helpers de validation
 
 function validateUploadedPhoto($file)
 {
@@ -132,26 +132,30 @@ function validateUploadedPhoto($file)
 
 function saveProfilePhoto($pdo, $file, &$profilePhoto)
 {
+  // Lire le fichier uploadé en mémoire
+  $imageData = file_get_contents($file['tmp_name']);
+  if ($imageData === false || strlen($imageData) === 0) {
+    return "Erreur lors de la lecture du fichier.";
+  }
+
+  $mimeType = $file['type'] ?: 'image/jpeg';
+  $fileName = 'user_' . $_SESSION['auth_token'] . '_' . time() . '.jpg';
+
+  // Stocker en DB (BLOB) — utiliser PDO::PARAM_LOB pour le binding binaire
+  $stmt = $pdo->prepare("UPDATE users SET profile_photo = ?, profile_photo_data = ?, profile_photo_mime = ? WHERE auth_token = ?");
+  $stmt->bindValue(1, $fileName);
+  $stmt->bindValue(2, $imageData, PDO::PARAM_LOB);
+  $stmt->bindValue(3, $mimeType);
+  $stmt->bindValue(4, $_SESSION['auth_token']);
+  $stmt->execute();
+
+  // Supprimer l'ancien fichier sur disque s'il existe
   $uploadDir = '../uploads/profiles/';
-  if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
-  }
-
-  $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-  $newFileName = 'user_' . $_SESSION['auth_token'] . '_' . time() . '.' . $extension;
-  $uploadPath = $uploadDir . $newFileName;
-
   if ($profilePhoto && file_exists($uploadDir . $profilePhoto)) {
-    unlink($uploadDir . $profilePhoto);
+    @unlink($uploadDir . $profilePhoto);
   }
 
-  if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
-    return "Erreur lors de l'upload.";
-  }
-
-  $pdo->prepare("UPDATE users SET profile_photo = ? WHERE auth_token = ?")
-    ->execute([$newFileName, $_SESSION['auth_token']]);
-  $profilePhoto = $newFileName;
+  $profilePhoto = $fileName;
   return null;
 }
 
@@ -213,7 +217,7 @@ function validateDeleteInput($pdo, $email, $hasPassword)
   return null;
 }
 
-// --- Handlers ---
+// Handlers
 
 function handlePhotoUpload($pdo, array &$state)
 {
@@ -332,9 +336,12 @@ function handleDeleteAccount($pdo, array &$state)
 
 function deleteUserData($pdo, $profilePhoto)
 {
+  // Supprimer l'ancien fichier sur disque s'il existe
   if ($profilePhoto && file_exists('../uploads/profiles/' . basename($profilePhoto))) {
-    unlink('../uploads/profiles/' . basename($profilePhoto));
+    @unlink('../uploads/profiles/' . basename($profilePhoto));
   }
+  // Supprimer les push subscriptions
+  $pdo->prepare("DELETE FROM push_subscriptions WHERE auth_token = ?")->execute([$_SESSION['auth_token']]);
   $pdo->prepare("DELETE FROM users WHERE auth_token = ?")->execute([$_SESSION['auth_token']]);
   session_destroy();
   header('Location: ../index.php?account_deleted=1');

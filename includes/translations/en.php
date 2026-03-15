@@ -79,6 +79,9 @@ return [
   'header_account_deleted' => 'Account deleted',
   'header_account_deleted_text' => 'Your account has been deleted by an administrator. You will be logged out automatically.',
   'header_close' => 'Close',
+  'header_home' => 'Home',
+  'header_profile' => 'Profile',
+  'header_signup' => 'Sign up',
 
   // Cookie banner
   'cookie_title' => 'We use cookies',

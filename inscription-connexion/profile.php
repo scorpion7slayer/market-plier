@@ -143,19 +143,15 @@ $reviews = $reviewsStmt->fetchAll();
 
   // Assigné APRÈS l'include header.php qui écrase $profilePhoto avec celle du user connecté
   $profilePhoto = $profileUser['profile_photo'] ?? null;
-  $profilePhotoExists = $profilePhoto && file_exists('../uploads/profiles/' . $profilePhoto);
+  $profilePhotoExists = !empty($profilePhoto);
   ?>
 
   <main class="profile-main">
     <!-- En-tête du profil -->
     <div class="profile-hero">
       <div class="profile-hero-avatar">
-        <?php if ($profilePhotoExists): ?>
-          <img src="../uploads/profiles/<?= htmlspecialchars($profilePhoto, ENT_QUOTES, 'UTF-8') ?>"
-            alt="<?= $username ?>">
-        <?php else: ?>
-          <img src="../assets/images/default-avatar.svg" alt="<?= $username ?>">
-        <?php endif; ?>
+        <img src="../api/profile_photo.php?token=<?= urlencode($profileUser['auth_token']) ?>"
+          alt="<?= $username ?>">
       </div>
       <div class="profile-hero-info">
         <h1 class="profile-hero-name"><?= $username ?></h1>
@@ -251,11 +247,7 @@ $reviews = $reviewsStmt->fetchAll();
               <div class="profile-review-header">
                 <div class="profile-review-author">
                   <div class="profile-review-avatar">
-                    <?php if ($rev['profile_photo'] && file_exists('../uploads/profiles/' . $rev['profile_photo'])): ?>
-                      <img src="../uploads/profiles/<?= htmlspecialchars($rev['profile_photo'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-                    <?php else: ?>
-                      <img src="../assets/images/default-avatar.svg" alt="">
-                    <?php endif; ?>
+                    <img src="../api/profile_photo.php?token=<?= urlencode($rev['reviewer_token']) ?>" alt="">
                   </div>
                   <span class="profile-review-name"><?= htmlspecialchars($rev['username'], ENT_QUOTES, 'UTF-8') ?></span>
                 </div>

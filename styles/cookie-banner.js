@@ -8,7 +8,7 @@
     var COOKIE_NAME = "mp_cookie_consent";
     var COOKIE_DAYS = 365;
 
-    // ─── Cookie helpers ───────────────────────────────────────
+    // Helpers cookies
 
     function setCookie(name, value, days) {
         var d = new Date();
@@ -23,9 +23,7 @@
     }
 
     function getCookie(name) {
-        var match = document.cookie.match(
-            new RegExp("(^| )" + name + "=([^;]+)"),
-        );
+        var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
         return match ? decodeURIComponent(match[2]) : null;
     }
 
@@ -43,7 +41,7 @@
         setCookie(COOKIE_NAME, JSON.stringify(consent), COOKIE_DAYS);
     }
 
-    // ─── UI ───────────────────────────────────────────────────
+    // UI
 
     function showBanner() {
         var banner = document.getElementById("cookieBanner");
@@ -69,7 +67,7 @@
         if (modal) modal.classList.remove("visible");
     }
 
-    // ─── Actions ──────────────────────────────────────────────
+    // Actions
 
     function applyConsent(analytics, marketing, preferences) {
         var consent = {
@@ -99,7 +97,7 @@
         );
     }
 
-    // ─── Init ────────────────────────────────────────────────
+    // Init
 
     window.addEventListener("DOMContentLoaded", function () {
         // Si déjà consenti, ne rien afficher

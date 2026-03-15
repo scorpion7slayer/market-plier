@@ -11,7 +11,7 @@ try {
     exit;
 }
 
-// --- Vérification des erreurs Google ---
+// Vérification des erreurs Google
 if (isset($_GET['error'])) {
     $errorMsg = $_GET['error'] === 'access_denied'
         ? "Vous avez annulé la connexion avec Google."
@@ -20,13 +20,13 @@ if (isset($_GET['error'])) {
     exit;
 }
 
-// --- Vérification du code d'autorisation ---
+// Vérification du code d'autorisation
 if (empty($_GET['code'])) {
     header("Location: ../inscription-connexion/login.php?error=" . urlencode("Code d'autorisation manquant."));
     exit;
 }
 
-// --- Vérification du state token CSRF ---
+// Vérification du state token CSRF
 if (empty($_GET['state']) || empty($_SESSION['google_oauth_state']) || $_GET['state'] !== $_SESSION['google_oauth_state']) {
     header("Location: ../inscription-connexion/login.php?error=" . urlencode("Token de sécurité invalide. Veuillez réessayer."));
     exit;
@@ -36,7 +36,7 @@ unset($_SESSION['google_oauth_state']);
 
 $client = getGoogleClient();
 
-// --- Échange du code contre un token d'accès ---
+// Échange du code contre un token d'accès
 $tokenData = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
 if (isset($tokenData['error'])) {
@@ -47,7 +47,7 @@ if (isset($tokenData['error'])) {
 
 $client->setAccessToken($tokenData);
 
-// --- Récupérer le profil utilisateur Google ---
+// Récupérer le profil utilisateur Google
 try {
     $oauth2Service = new Google\Service\Oauth2($client);
     $googleUser    = $oauth2Service->userinfo->get();
@@ -67,7 +67,7 @@ if (empty($googleId) || empty($googleEmail)) {
     exit;
 }
 
-// --- Recherche de l'utilisateur en BDD ---
+// Recherche de l'utilisateur en BDD
 try {
     // Cas A : Recherche par google_id
     $stmt = $pdo->prepare("SELECT auth_token, username, email, google_id, auth_provider FROM users WHERE google_id = ?");

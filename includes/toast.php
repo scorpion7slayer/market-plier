@@ -20,7 +20,7 @@ if (!empty($toastError)) {
 }
 ?>
 
-<!-- ═══ TOAST NOTIFICATIONS ═══════════════════════════════ -->
+<!-- Toast notifications -->
 <div class="toast-container position-fixed top-0 end-0 p-3" id="mpToastContainer" style="z-index: 9999;"></div>
 <script>
   function mpShowToast(message, type) {

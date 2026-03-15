@@ -1,8 +1,8 @@
-/* ═══ AIDE.CSS — Centre d'aide Market Plier ══════════════════ */
+/* AIDE.CSS — Centre d'aide Market Plier */
 /* Dépend de settings.css pour les classes partagées            */
 /* (settings-top-bar, settings-container, settings-section…)   */
 
-/* ═══ BARRE DE RECHERCHE ═════════════════════════════════════ */
+/* Barre de recherche */
 .aide-search-wrapper {
     position: relative;
     margin-bottom: 32px;
@@ -30,7 +30,9 @@
     border-radius: 16px;
     outline: none;
     box-shadow: 0 2px 14px var(--mp-card-shadow, rgba(0, 0, 0, 0.05));
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     box-sizing: border-box;
 }
 
@@ -43,7 +45,7 @@
     color: var(--mp-input-placeholder, #bbb);
 }
 
-/* ═══ CATÉGORIES RAPIDES ══════════════════════════════════════ */
+/* Catégories rapides */
 .aide-categories {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -94,7 +96,7 @@
     color: #7fb885;
 }
 
-/* ═══ FAQ — ACCORDÉON ════════════════════════════════════════ */
+/* FAQ — Accordéon */
 .aide-faq-item {
     border-bottom: 1px solid var(--mp-border-light, #e8e5df);
 }
@@ -134,7 +136,9 @@
     color: var(--mp-text-muted, #aaa);
     font-size: 0.85rem;
     flex-shrink: 0;
-    transition: transform 0.25s ease, color 0.2s ease;
+    transition:
+        transform 0.25s ease,
+        color 0.2s ease;
 }
 
 .aide-faq-question.open .aide-faq-chevron {
@@ -176,11 +180,17 @@
 }
 
 @keyframes aideSlideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* ═══ BADGE STATUT ═══════════════════════════════════════════ */
+/* Badge statut */
 .aide-badge {
     display: inline-flex;
     align-items: center;
@@ -212,7 +222,7 @@
     border: 1.5px solid #7fb885;
 }
 
-/* ═══ DÉLAIS INFO ════════════════════════════════════════════ */
+/* Délais info */
 .aide-delays-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -249,7 +259,7 @@
     color: var(--mp-text, #222);
 }
 
-/* ═══ FORMULAIRE DE CONTACT ══════════════════════════════════ */
+/* Formulaire de contact */
 .aide-contact-intro {
     display: flex;
     align-items: center;
@@ -283,7 +293,9 @@
     outline: none;
     resize: vertical;
     min-height: 120px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
     box-sizing: border-box;
 }
 
@@ -297,7 +309,7 @@
     color: var(--mp-input-placeholder, #bbb);
 }
 
-/* ═══ SECTION URGENCE ════════════════════════════════════════ */
+/* Section urgence */
 .aide-urgency-section {
     border: 2px solid rgba(231, 76, 60, 0.25);
 }
@@ -310,7 +322,7 @@
     color: #e74c3c;
 }
 
-/* ═══ AUCUN RÉSULTAT (RECHERCHE) ═════════════════════════════ */
+/* Aucun résultat (recherche) */
 .aide-no-results {
     text-align: center;
     padding: 40px 20px;
@@ -326,7 +338,7 @@
     color: var(--mp-border, #d4d0ca);
 }
 
-/* ═══ RESPONSIVE ═════════════════════════════════════════════ */
+/* Responsive */
 @media (max-width: 640px) {
     .aide-categories {
         grid-template-columns: 1fr 1fr;

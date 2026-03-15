@@ -84,7 +84,7 @@ body {
         color 0.3s ease;
 }
 
-/* ═══ HEADER ICONS (favoris, messagerie, notifications) ══ */
+/* Icônes de l'en-tête (favoris, messagerie, notifications) */
 .header-icons {
     display: flex;
     align-items: center;
@@ -144,8 +144,234 @@ body {
 
 @media (max-width: 768px) {
     .header-icons {
-        display: none;
+        display: none !important;
     }
+
+    .search-form {
+        display: none !important;
+    }
+
+    .profile-photo-container {
+        display: none !important;
+    }
+
+    .theme-toggle {
+        display: none !important;
+    }
+}
+
+/* Navigation mobile en bas */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    background: var(--mp-card-bg, #fff);
+    border-top: 1px solid var(--mp-border-light, #eee);
+    min-height: 60px;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: flex;
+    }
+
+    /* Espace en bas pour ne pas cacher le contenu derrière la bottom nav */
+    body {
+        padding-bottom: 80px !important;
+    }
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+    color: var(--mp-text-muted, #888);
+    font-size: 10px;
+    font-family: "Archivo", sans-serif;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0;
+    position: relative;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item i {
+    font-size: 18px;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item:active {
+    color: #7fb885;
+    text-decoration: none;
+}
+
+.bottom-nav-sell {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #7fb885;
+    color: #fff !important;
+    padding: 0;
+    flex: 0 0 48px;
+    margin-top: -18px;
+    box-shadow: 0 4px 12px rgba(127, 184, 133, 0.4);
+}
+
+.bottom-nav-sell i {
+    font-size: 20px;
+}
+
+.bottom-nav-sell:hover {
+    background: #6aa070;
+    color: #fff !important;
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+}
+
+[data-bs-theme="dark"] .bottom-nav {
+    background: var(--mp-card-bg, #1e1e1e);
+    border-top-color: var(--mp-border, #333);
+}
+
+[data-bs-theme="dark"] .bottom-nav-item {
+    color: var(--mp-text-muted, #888);
+}
+
+[data-bs-theme="dark"] .bottom-nav-item:hover {
+    color: #7fb885;
+}
+
+/* Panneau recherche mobile */
+.mobile-search-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1500;
+    background: var(--mp-card-bg, #fff);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    transform: translateY(-100%);
+    transition: transform 0.25s ease;
+}
+
+.mobile-search-panel.open {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .mobile-search-panel {
+        display: block;
+    }
+}
+
+.mobile-search-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.mobile-search-input {
+    flex: 1;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 30px;
+    border: 1.5px solid var(--mp-border, #ccc);
+    background: var(--mp-bg, #f2efe9);
+    color: var(--mp-text, #333);
+    font-size: 15px;
+    font-style: italic;
+    font-family: "Archivo", sans-serif;
+    outline: none;
+}
+
+.mobile-search-input:focus {
+    border-color: #7fb885;
+}
+
+.mobile-search-close {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--mp-text-muted, #888);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mobile-search-results {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.mobile-search-results .ac-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    text-decoration: none;
+    color: var(--mp-text, #333);
+    border-radius: 10px;
+    transition: background 0.15s;
+}
+
+.mobile-search-results .ac-item:hover {
+    background: #7fb88518;
+}
+
+.mobile-search-results .ac-separator {
+    height: 1px;
+    background: var(--mp-border-light, #eee);
+    margin: 4px 8px;
+}
+
+[data-bs-theme="dark"] .mobile-search-input {
+    background: var(--mp-input-bg, #2a2a2a);
+    border-color: var(--mp-input-border, #444);
+    color: var(--mp-input-text, #eee);
+}
+
+[data-bs-theme="dark"] .mobile-search-panel {
+    background: var(--mp-card-bg, #1e1e1e);
 }
 
 /* BOUTON DE BASCULEMENT DU THÈME */
@@ -382,7 +608,7 @@ body {
     color: #fff;
 }
 
-/* ═══ RESPONSIVE HEADER ═══════════════════════════════════════ */
+/* En-tête responsive */
 @media (max-width: 992px) {
     header {
         height: auto !important;
@@ -436,19 +662,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    .header-bottom {
-        display: none !important;
-    }
-
-    .hamburger-btn {
-        display: flex;
-    }
-
-    /* Masquer le toggle thème desktop — il est dans le menu mobile */
-    .theme-toggle {
-        display: none !important;
-    }
-
     header {
         height: auto !important;
         padding: 8px 12px !important;
@@ -486,7 +699,7 @@ body {
     }
 }
 
-/* ═══ DARK THEME - FORMS & CARDS ══════════════════════════════ */
+/* Thème sombre - formulaires & cartes */
 [data-bs-theme="dark"] .card {
     background-color: var(--mp-card-bg);
     border-color: var(--mp-border);
@@ -521,7 +734,7 @@ body {
     color: var(--mp-text-muted);
 }
 
-/* ═══ FOOTER ════════════════════════════════════════════════ */
+/* Pied de page */
 .mp-footer {
     position: relative;
     margin-top: 56px;
@@ -759,7 +972,7 @@ body {
 
 @media (max-width: 768px) {
     .mp-footer {
-        padding: 0 12px 24px;
+        padding: 0 12px 80px;
         margin-top: 40px;
     }
 
@@ -796,9 +1009,9 @@ body {
 
     .mp-back-to-top {
         right: 16px;
-        bottom: 16px;
-        width: 52px;
-        height: 52px;
+        bottom: 76px;
+        width: 48px;
+        height: 48px;
     }
 }
 
@@ -829,7 +1042,7 @@ body {
     color: var(--mp-text);
 }
 
-/* ═══ DARK THEME - REGISTER/LOGIN ═════════════════════════════ */
+/* Thème sombre - inscription/connexion */
 [data-bs-theme="dark"] .register-container {
     background-color: var(--mp-bg);
 }
@@ -877,7 +1090,7 @@ body {
     color: var(--mp-text-muted);
 }
 
-/* ═══ DARK THEME - INDEX PAGE ═════════════════════════════════ */
+/* Thème sombre - page d'accueil */
 [data-bs-theme="dark"] .greeting {
     color: var(--mp-text);
 }
@@ -896,7 +1109,7 @@ body {
     background: var(--mp-skeleton);
 }
 
-/* ═══ DARK THEME - ACCOUNT PAGE ═══════════════════════════════ */
+/* Thème sombre - page compte */
 [data-bs-theme="dark"] .username {
     color: var(--mp-text);
 }
@@ -959,7 +1172,7 @@ body {
     color: var(--mp-text-muted);
 }
 
-/* ═══ DARK THEME - SELL PAGE ══════════════════════════════════ */
+/* Thème sombre - page vente */
 [data-bs-theme="dark"] .page-title {
     color: var(--mp-text);
 }
@@ -1053,7 +1266,7 @@ body {
     background: rgba(127, 184, 133, 0.15);
 }
 
-/* ═══ DARK THEME - DASHBOARD ══════════════════════════════════ */
+/* Thème sombre - tableau de bord */
 [data-bs-theme="dark"] .shadow-sm {
     box-shadow: 0 2px 10px var(--mp-card-shadow) !important;
 }
@@ -1076,7 +1289,7 @@ body {
     border-left-color: #2196f3;
 }
 
-/* ═══ DARK THEME - SETTINGS PAGE ═════════════════════════════ */
+/* Thème sombre - page paramètres */
 [data-bs-theme="dark"] .settings-top-bar {
     background: var(--mp-bg);
 }
@@ -1180,7 +1393,7 @@ body {
     color: var(--mp-text-muted);
 }
 
-/* ═══ DARK THEME - ADMIN PAGE ═══════════════════════════════ */
+/* Thème sombre - page admin */
 [data-bs-theme="dark"] .admin-table thead th {
     color: var(--mp-text-muted);
     border-bottom-color: var(--mp-border);
@@ -1202,7 +1415,7 @@ body {
     color: var(--mp-text);
 }
 
-/* ═══ MODAL COMPTE SUPPRIMÉ ════════════════════════════════ */
+/* Modal compte supprimé */
 .deleted-account-overlay {
     position: fixed;
     inset: 0;
@@ -1384,7 +1597,7 @@ body {
     color: var(--mp-text-muted);
 }
 
-/* ═══ RESPONSIVE - INDEX PAGE ═════════════════════════════════ */
+/* Responsive - page d'accueil */
 @media (max-width: 768px) {
     main {
         padding: 15px !important;
@@ -1459,7 +1672,7 @@ body {
     }
 }
 
-/* ═══ RESPONSIVE - ACCOUNT PAGE ═══════════════════════════════ */
+/* Responsive - page compte */
 @media (max-width: 768px) {
     .profile-section {
         flex-direction: column;
@@ -1489,7 +1702,7 @@ body {
     }
 }
 
-/* ═══ RESPONSIVE - SELL PAGE ══════════════════════════════════ */
+/* Responsive - page vente */
 @media (max-width: 768px) {
     .photos-container {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));

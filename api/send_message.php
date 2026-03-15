@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../database/db.php';
+require_once '../includes/send_notification.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -51,19 +52,18 @@ try {
   // Mettre à jour updated_at de la conversation
   $pdo->prepare("UPDATE conversations SET updated_at = NOW() WHERE id = ?")->execute([$conversationId]);
 
-  // Notification au destinataire
+  // Notification au destinataire (in-app + Web Push)
   $recipientToken = $conv['user1_token'] === $myToken ? $conv['user2_token'] : $conv['user1_token'];
   $senderStmt = $pdo->prepare("SELECT username FROM users WHERE auth_token = ?");
   $senderStmt->execute([$myToken]);
   $sender = $senderStmt->fetch();
 
-  $pdo->prepare("INSERT INTO notifications (auth_token, type, title, content, link) VALUES (?, 'message', ?, ?, ?)")
-    ->execute([
-      $recipientToken,
-      ($sender['username'] ?? 'Quelqu\'un') . ' vous a envoyé un message',
-      mb_strimwidth($content, 0, 120, '...'),
-      'messagerie/conversation.php?id=' . $conversationId
-    ]);
+  sendNotification($pdo, $recipientToken, [
+      'type' => 'message',
+      'title' => ($sender['username'] ?? 'Quelqu\'un') . ' vous a envoyé un message',
+      'content' => mb_strimwidth($content, 0, 120, '...'),
+      'link' => 'messagerie/conversation.php?id=' . $conversationId,
+  ]);
 
   echo json_encode(['success' => true, 'message_id' => (int) $messageId]);
 } catch (PDOException $e) {
