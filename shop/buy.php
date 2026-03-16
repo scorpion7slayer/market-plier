@@ -236,8 +236,8 @@ if (empty($_SESSION['csrf_token'])) {
       <div class="buy-details">
         <!-- Prix + titre -->
         <div class="buy-card buy-card-main">
-          <div class="buy-price"><?= number_format((float) $listing['price'], 2, ',', ' ') ?> €</div>
           <h1 class="buy-title"><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></h1>
+          <div class="buy-price"><?= number_format((float) $listing['price'], 2, ',', ' ') ?> €</div>
 
           <div class="buy-tags">
             <span class="buy-tag buy-tag-category">

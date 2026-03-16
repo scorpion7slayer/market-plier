@@ -186,20 +186,20 @@
 
 /* Prix */
 .buy-price {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--mp-text);
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
-}
-
-/* Titre */
-.buy-title {
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--mp-text);
     margin: 0 0 14px;
     line-height: 1.4;
+}
+
+/* Titre */
+.buy-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--mp-text);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
 }
 
 /* Tags (catégorie, état) */
