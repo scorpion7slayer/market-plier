@@ -1,8 +1,5 @@
 <?php
-/**
- * Serves listing images from database BLOB, with file-system fallback.
- * Usage: api/image.php?id=<listing_images.id>
- */
+
 require_once __DIR__ . '/../database/db.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
