@@ -245,7 +245,12 @@ try {
         <div class="row">
             <div class="col-12">
                 <div class="articles-section">
-                    <h2 class="section-title">Vos articles en vente</h2>
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
+                        <h2 class="section-title" style="margin-bottom:0;">Vos articles en vente</h2>
+                        <a href="../orders/index.php" style="display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:50px;background:var(--mp-border-light);color:var(--mp-text);text-decoration:none;font-weight:600;font-size:0.9rem;border:1.5px solid var(--mp-border);">
+                            <i class="fa-solid fa-bag-shopping"></i> Mes achats
+                        </a>
+                    </div>
 
                     <?php if (empty($userListings)): ?>
                         <div class="no-articles">
@@ -270,8 +275,19 @@ try {
                                 ];
                                 $conditionLabel = $conditionLabels[$listing['item_condition']] ?? $listing['item_condition'];
                                 ?>
-                                <div class="article-card" data-listing-id="<?= $listing['id'] ?>">
-                                    <div class="article-image">
+                                <?php
+                                $listingStatus = $listing['status'] ?? 'active';
+                                $listingQty = (int)($listing['quantity'] ?? 1);
+                                $statusBadge = match($listingStatus) {
+                                    'sold'    => ['Épuisé',       '#dc3545', 'rgba(220,53,69,0.1)',   'fa-ban'],
+                                    'pending' => ['En attente',   '#b38600', 'rgba(255,193,7,0.12)',  'fa-clock'],
+                                    default   => $listingQty === 1
+                                        ? ['Dernier',    '#b38600', 'rgba(255,193,7,0.12)', 'fa-layer-group']
+                                        : null,
+                                };
+                                ?>
+                                <div class="article-card" data-listing-id="<?= $listing['id'] ?>" style="<?= $listingStatus === 'sold' ? 'opacity:0.7;' : '' ?>">
+                                    <a href="../shop/buy.php?id=<?= (int)$listing['id'] ?>" class="article-image" style="display:block;text-decoration:none;position:relative;">
                                         <?php if (count($listing['all_images']) > 1): ?>
                                             <div id="carousel-<?= $listing['id'] ?>" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
                                                 <div class="carousel-inner">
@@ -301,9 +317,16 @@ try {
                                             </div>
                                         <?php endif; ?>
                                         <div class="article-condition"><?= htmlspecialchars($conditionLabel) ?></div>
-                                    </div>
+                                        <?php if ($statusBadge): ?>
+                                            <span style="position:absolute;top:8px;right:8px;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;background:<?= $statusBadge[2] ?>;color:<?= $statusBadge[1] ?>;border:1px solid <?= $statusBadge[1] ?>20;">
+                                                <i class="fa-solid <?= $statusBadge[3] ?>"></i> <?= $statusBadge[0] ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </a>
                                     <div class="article-info">
+                                        <a href="../shop/buy.php?id=<?= (int)$listing['id'] ?>" style="text-decoration:none;color:inherit;">
                                         <h3 class="article-title"><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                                        </a>
                                         <p class="article-price"><?= $price ?> €</p>
                                         <?php if (!empty($listing['location'])): ?>
                                             <p class="article-location">

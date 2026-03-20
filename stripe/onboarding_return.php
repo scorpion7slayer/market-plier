@@ -32,9 +32,10 @@ try {
     if ($transfersActive) {
         $pdo->prepare("UPDATE users SET stripe_onboarding_complete = 1 WHERE auth_token = ?")
             ->execute([$authToken]);
-        header('Location: ../settings/settings.php?success=' . urlencode('Compte vendeur activé ! Vous pouvez maintenant recevoir des paiements.'));
+        header('Location: ../inscription-connexion/account.php?success=' . urlencode('Compte vendeur activé ! Vous pouvez maintenant recevoir des paiements.'));
     } else {
-        header('Location: ../settings/settings.php?error=' . urlencode('Vérification Stripe incomplète. Veuillez réessayer.'));
+        // Onboarding incomplet — renvoyer vers la page setup pour réessayer
+        header('Location: ../stripe/seller_setup.php?incomplete=1');
     }
 } catch (\Stripe\Exception\ApiErrorException $e) {
     error_log("Stripe return error: " . $e->getMessage());

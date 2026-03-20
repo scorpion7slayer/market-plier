@@ -52,6 +52,7 @@ if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_tok
 $title       = trim($_POST['title']       ?? '');
 $description = trim($_POST['description'] ?? '');
 $price       = trim($_POST['price']       ?? '');
+$quantity    = trim($_POST['quantity']    ?? '1');
 $category    = trim($_POST['category']    ?? '');
 $condition   = trim($_POST['condition']   ?? '');
 $location    = trim($_POST['location']    ?? '');
@@ -73,6 +74,12 @@ if (!is_numeric($price) || (float)$price < 0) {
     $errors[] = "Le prix doit être un nombre positif.";
 } elseif ((float)$price > 99999.99) {
     $errors[] = "Le prix ne peut pas dépasser 99 999 €.";
+}
+
+if (!ctype_digit($quantity) || (int)$quantity < 1) {
+    $errors[] = "La quantité doit être un entier positif.";
+} elseif ((int)$quantity > 9999) {
+    $errors[] = "La quantité ne peut pas dépasser 9 999.";
 }
 
 $validCategories = ['vetements', 'electronique', 'livres', 'maison', 'sport', 'vehicules', 'autre'];
@@ -126,32 +133,20 @@ if (!empty($_FILES['images']['name'][0])) {
 
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $imageName = 'listing_' . bin2hex(random_bytes(8)) . '_' . time() . '_' . $i . '.' . $ext;
-            $uploadDir = __DIR__ . '/../uploads/listings/';
-
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+            $imageData = file_get_contents($file['tmp_name']);
+            if ($imageData === false) {
+                $errors[] = "Impossible de lire l'image " . ($i + 1) . ".";
+                continue;
             }
-
-            if (move_uploaded_file($file['tmp_name'], $uploadDir . $imageName)) {
-                $uploadedImages[] = $imageName;
-            } else {
-                $errors[] = "Impossible de sauvegarder l'image " . ($i + 1) . ". Vérifiez les permissions du dossier.";
-            }
+            $uploadedImages[] = ['name' => $imageName, 'data' => $imageData, 'mime' => $mimeType];
         }
     }
 }
 
 // Première image pour le champ image de la table listings (rétrocompatibilité)
-$mainImage = !empty($uploadedImages) ? $uploadedImages[0] : null;
+$mainImage = !empty($uploadedImages) ? $uploadedImages[0]['name'] : null;
 
 if (!empty($errors)) {
-    // Supprime les images déjà uploadées en cas d'erreur
-    foreach ($uploadedImages as $img) {
-        $imgPath = __DIR__ . '/../uploads/listings/' . $img;
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
-        }
-    }
     header('Location: sell.php?error=' . urlencode(implode(' ', $errors)));
     exit();
 }
@@ -165,14 +160,15 @@ try {
 
     // Insertion de l'annonce principale
     $stmt = $pdo->prepare(
-        "INSERT INTO listings (auth_token, title, description, price, category, item_condition, image, location, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO listings (auth_token, title, description, price, quantity, category, item_condition, image, location, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $_SESSION['auth_token'],
         $title,
         $description,
         round((float)$price, 2),
+        (int)$quantity,
         $category,
         $condition,
         $mainImage,
@@ -182,19 +178,51 @@ try {
 
     $listingId = $pdo->lastInsertId();
 
-    // Insertion des images additionnelles (avec BLOB en DB)
+    // Insertion des images additionnelles (BLOB en DB uniquement)
     if (!empty($uploadedImages)) {
         $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order, image_data, mime_type) VALUES (?, ?, ?, ?, ?)");
-        $uploadDir = __DIR__ . '/../uploads/listings/';
-        foreach ($uploadedImages as $index => $imgName) {
-            $filePath = $uploadDir . $imgName;
-            $imageData = file_exists($filePath) ? file_get_contents($filePath) : null;
-            $mimeType = file_exists($filePath) ? (mime_content_type($filePath) ?: 'image/jpeg') : 'image/jpeg';
-            $stmtImg->execute([$listingId, $imgName, $index, $imageData, $mimeType]);
+        foreach ($uploadedImages as $index => $img) {
+            $stmtImg->bindValue(1, $listingId);
+            $stmtImg->bindValue(2, $img['name']);
+            $stmtImg->bindValue(3, $index);
+            $stmtImg->bindValue(4, $img['data'], PDO::PARAM_LOB);
+            $stmtImg->bindValue(5, $img['mime']);
+            $stmtImg->execute();
         }
     }
 
     $pdo->commit();
+
+    // Vérifier si le vendeur a déjà configuré Stripe
+    $stripeRow = $pdo->prepare("SELECT stripe_account_id, stripe_onboarding_complete, email FROM users WHERE auth_token = ?");
+    $stripeRow->execute([$_SESSION['auth_token']]);
+    $stripeUser = $stripeRow->fetch();
+
+    // Si Stripe non configuré, créer le compte Express silencieusement et rediriger vers la page setup
+    if (empty($stripeUser['stripe_onboarding_complete'])) {
+        if (empty($stripeUser['stripe_account_id'])) {
+            try {
+                require_once '../config/stripe.php';
+                $account = \Stripe\Account::create([
+                    'type'  => 'express',
+                    'email' => $stripeUser['email'],
+                    'capabilities' => ['transfers' => ['requested' => true]],
+                    'business_profile' => [
+                        'product_description' => 'Vendeur sur Market Plier',
+                    ],
+                ]);
+                $pdo->prepare("UPDATE users SET stripe_account_id = ? WHERE auth_token = ?")
+                    ->execute([$account->id, $_SESSION['auth_token']]);
+            } catch (\Exception $e) {
+                error_log("Auto Stripe account creation failed: " . $e->getMessage());
+                // Échec Stripe : on redirige quand même vers seller_setup (pas d'exit ici)
+            }
+        }
+        // Toujours rediriger vers seller_setup si l'onboarding n'est pas complet
+        $pending = ($listingStatus === 'pending') ? '1' : '0';
+        header('Location: ../stripe/seller_setup.php?listing_id=' . $listingId . '&pending=' . $pending);
+        exit();
+    }
 
     $successMsg = ($listingStatus === 'pending')
         ? "Votre annonce a été soumise et sera visible après validation par un administrateur."
@@ -203,13 +231,6 @@ try {
     exit();
 } catch (PDOException $e) {
     $pdo->rollBack();
-    // Supprime les images uploadées en cas d'erreur DB
-    foreach ($uploadedImages as $img) {
-        $imgPath = __DIR__ . '/../uploads/listings/' . $img;
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
-        }
-    }
     error_log("handle_sell PDO error: " . $e->getMessage());
     header('Location: sell.php?error=' . urlencode("Une erreur est survenue lors de la publication. Veuillez réessayer."));
     exit();

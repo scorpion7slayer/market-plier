@@ -248,6 +248,23 @@ if (empty($_SESSION['csrf_token'])) {
               <i class="fa-solid fa-circle-info"></i>
               <?= htmlspecialchars($conditionLabel, ENT_QUOTES, 'UTF-8') ?>
             </span>
+            <?php $qty = (int)($listing['quantity'] ?? 1); ?>
+            <?php if ($listing['status'] === 'active' && $qty > 1): ?>
+              <span class="buy-tag" style="background: rgba(127,184,133,0.15); color: #7fb885; border: 1px solid rgba(127,184,133,0.3);">
+                <i class="fa-solid fa-layer-group"></i>
+                <?= $qty ?> disponibles
+              </span>
+            <?php elseif ($listing['status'] === 'active' && $qty === 1): ?>
+              <span class="buy-tag" style="background: rgba(255,193,7,0.12); color: #b38600; border: 1px solid rgba(255,193,7,0.3);">
+                <i class="fa-solid fa-layer-group"></i>
+                Dernier en stock
+              </span>
+            <?php elseif ($listing['status'] === 'sold'): ?>
+              <span class="buy-tag" style="background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.25);">
+                <i class="fa-solid fa-ban"></i>
+                Épuisé
+              </span>
+            <?php endif; ?>
           </div>
 
           <?php if ($listing['location']): ?>
@@ -266,6 +283,17 @@ if (empty($_SESSION['csrf_token'])) {
         <!-- Actions -->
         <div class="buy-card buy-card-actions">
           <?php if ($isOwner): ?>
+            <?php
+            $ownerStripeStmt = $pdo->prepare("SELECT stripe_account_id, stripe_onboarding_complete FROM users WHERE auth_token = ?");
+            $ownerStripeStmt->execute([$listing['auth_token']]);
+            $ownerStripe = $ownerStripeStmt->fetch();
+            $ownerStripeReady = $ownerStripe && !empty($ownerStripe['stripe_account_id']) && $ownerStripe['stripe_onboarding_complete'];
+            ?>
+            <?php if (!$ownerStripeReady): ?>
+              <a href="../stripe/seller_setup.php" class="buy-btn buy-btn-primary" style="justify-content:center;">
+                <i class="fa-solid fa-wallet"></i> Activer les paiements pour vendre
+              </a>
+            <?php endif; ?>
             <a href="edit_listing.php?id=<?= (int) $listing['id'] ?>" class="buy-btn buy-btn-primary">
               <i class="fa-solid fa-pen"></i> <?= htmlspecialchars(t('buy_edit_listing'), ENT_QUOTES, 'UTF-8') ?>
             </a>
@@ -288,6 +316,11 @@ if (empty($_SESSION['csrf_token'])) {
                   <i class="fa-solid fa-credit-card"></i> Acheter maintenant
                 </button>
               </form>
+            <?php elseif (!$sellerCanReceivePayments && $listing['status'] === 'active'): ?>
+              <div style="padding: 12px 16px; border-radius: 14px; background: rgba(108,117,125,0.1); border: 1.5px solid var(--mp-border); color: var(--mp-text-muted); font-size: 0.88rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-clock"></i>
+                <span>Ce vendeur n'a pas encore activé les paiements — paiement en ligne non disponible pour l'instant.</span>
+              </div>
             <?php endif; ?>
             <button class="buy-btn buy-btn-cart <?= $isInCart ? 'buy-btn-cart-active' : '' ?>" id="cartBtn" type="button">
               <i class="fa-solid fa-basket-shopping"></i>

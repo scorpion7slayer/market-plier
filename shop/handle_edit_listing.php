@@ -56,6 +56,7 @@ $redirectUrl = 'edit_listing.php?id=' . $listingId;
 $title       = trim($_POST['title']       ?? '');
 $description = trim($_POST['description'] ?? '');
 $price       = trim($_POST['price']       ?? '');
+$quantity    = trim($_POST['quantity']    ?? '1');
 $category    = trim($_POST['category']    ?? '');
 $condition   = trim($_POST['condition']   ?? '');
 $location    = trim($_POST['location']    ?? '');
@@ -81,6 +82,12 @@ if (!is_numeric($price) || (float)$price < 0) {
     $errors[] = "Le prix doit être un nombre positif.";
 } elseif ((float)$price > 99999.99) {
     $errors[] = "Le prix ne peut pas dépasser 99 999 €.";
+}
+
+if (!ctype_digit($quantity) || (int)$quantity < 1) {
+    $errors[] = "La quantité doit être un entier positif.";
+} elseif ((int)$quantity > 9999) {
+    $errors[] = "La quantité ne peut pas dépasser 9 999.";
 }
 
 $validCategories = ['vetements', 'electronique', 'livres', 'maison', 'sport', 'vehicules', 'autre'];
@@ -152,29 +159,17 @@ if (!empty($_FILES['new_images']['name'][0])) {
 
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $imageName = 'listing_' . bin2hex(random_bytes(8)) . '_' . time() . '_' . $i . '.' . $ext;
-            $uploadDir = __DIR__ . '/../uploads/listings/';
-
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+            $imageData = file_get_contents($file['tmp_name']);
+            if ($imageData === false) {
+                $errors[] = "Impossible de lire l'image " . ($i + 1) . ".";
+                continue;
             }
-
-            if (move_uploaded_file($file['tmp_name'], $uploadDir . $imageName)) {
-                $uploadedImages[] = $imageName;
-            } else {
-                $errors[] = "Impossible de sauvegarder l'image " . ($i + 1) . ".";
-            }
+            $uploadedImages[] = ['name' => $imageName, 'data' => $imageData, 'mime' => $mimeType];
         }
     }
 }
 
 if (!empty($errors)) {
-    // Supprimer les nouvelles images uploadées en cas d'erreur
-    foreach ($uploadedImages as $img) {
-        $imgPath = __DIR__ . '/../uploads/listings/' . $img;
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
-        }
-    }
     header('Location: ' . $redirectUrl . '&error=' . urlencode(implode(' ', $errors)));
     exit();
 }
@@ -185,13 +180,14 @@ try {
 
     // 1. Mettre à jour les champs de l'annonce
     $stmt = $pdo->prepare(
-        "UPDATE listings SET title = ?, description = ?, price = ?, category = ?, item_condition = ?, location = ?
+        "UPDATE listings SET title = ?, description = ?, price = ?, quantity = ?, category = ?, item_condition = ?, location = ?
          WHERE id = ? AND auth_token = ?"
     );
     $stmt->execute([
         $title,
         $description,
         round((float)$price, 2),
+        (int)$quantity,
         $category,
         $condition,
         $location !== '' ? $location : null,
@@ -204,29 +200,23 @@ try {
     $allExistingStmt->execute([$listingId]);
     $allExisting = $allExistingStmt->fetchAll();
 
-    $uploadDir = __DIR__ . '/../uploads/listings/';
     foreach ($allExisting as $row) {
         if (!isset($validKeepIds[$row['id']])) {
-            // Supprimer le fichier du serveur
-            $imgPath = $uploadDir . $row['image_path'];
-            if (file_exists($imgPath)) {
-                unlink($imgPath);
-            }
-            // Supprimer de la base
             $pdo->prepare("DELETE FROM listing_images WHERE id = ?")->execute([$row['id']]);
         }
     }
 
-    // 3. Insérer les nouvelles images (avec BLOB en DB)
+    // 3. Insérer les nouvelles images (BLOB en DB uniquement)
     if (!empty($uploadedImages)) {
         $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, image_path, sort_order, image_data, mime_type) VALUES (?, ?, ?, ?, ?)");
         $sortStart = $currentKeptCount;
-        $uploadDir = __DIR__ . '/../uploads/listings/';
-        foreach ($uploadedImages as $index => $imgName) {
-            $filePath = $uploadDir . $imgName;
-            $imageData = file_exists($filePath) ? file_get_contents($filePath) : null;
-            $mimeType = file_exists($filePath) ? (mime_content_type($filePath) ?: 'image/jpeg') : 'image/jpeg';
-            $stmtImg->execute([$listingId, $imgName, $sortStart + $index, $imageData, $mimeType]);
+        foreach ($uploadedImages as $index => $img) {
+            $stmtImg->bindValue(1, $listingId);
+            $stmtImg->bindValue(2, $img['name']);
+            $stmtImg->bindValue(3, $sortStart + $index);
+            $stmtImg->bindValue(4, $img['data'], PDO::PARAM_LOB);
+            $stmtImg->bindValue(5, $img['mime']);
+            $stmtImg->execute();
         }
     }
 
@@ -249,7 +239,7 @@ try {
                 $newIdx = (int)substr($part, 4);
                 if (isset($uploadedImages[$newIdx])) {
                     $pdo->prepare("UPDATE listing_images SET sort_order = ? WHERE listing_id = ? AND image_path = ?")
-                        ->execute([$sortIndex, $listingId, $uploadedImages[$newIdx]]);
+                        ->execute([$sortIndex, $listingId, $uploadedImages[$newIdx]['name']]);
                     $sortIndex++;
                 }
             }
@@ -261,20 +251,6 @@ try {
     $mainImgStmt->execute([$listingId]);
     $mainImage = $mainImgStmt->fetchColumn();
 
-    // Supprimer l'ancienne image principale si elle n'est plus dans listing_images
-    $oldMainImage = $listing['image'];
-    if ($oldMainImage && $oldMainImage !== $mainImage) {
-        // Vérifier si l'ancienne image principale existe encore dans listing_images
-        $checkOldMain = $pdo->prepare("SELECT COUNT(*) FROM listing_images WHERE listing_id = ? AND image_path = ?");
-        $checkOldMain->execute([$listingId, $oldMainImage]);
-        if ($checkOldMain->fetchColumn() == 0) {
-            $oldPath = $uploadDir . $oldMainImage;
-            if (file_exists($oldPath)) {
-                unlink($oldPath);
-            }
-        }
-    }
-
     $pdo->prepare("UPDATE listings SET image = ? WHERE id = ?")->execute([$mainImage ?: null, $listingId]);
 
     $pdo->commit();
@@ -283,13 +259,6 @@ try {
     exit();
 } catch (PDOException $e) {
     $pdo->rollBack();
-    // Supprimer les nouvelles images uploadées en cas d'erreur
-    foreach ($uploadedImages as $img) {
-        $imgPath = __DIR__ . '/../uploads/listings/' . $img;
-        if (file_exists($imgPath)) {
-            unlink($imgPath);
-        }
-    }
     error_log("handle_edit_listing PDO error: " . $e->getMessage());
     header('Location: ' . $redirectUrl . '&error=' . urlencode("Une erreur est survenue lors de la modification. Veuillez réessayer."));
     exit();

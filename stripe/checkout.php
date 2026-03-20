@@ -35,7 +35,7 @@ $buyerToken = $_SESSION['auth_token'];
 
 // Récupérer l'annonce + vendeur
 $stmt = $pdo->prepare("
-    SELECT l.id, l.title, l.price, l.auth_token AS seller_token, l.status,
+    SELECT l.id, l.title, l.price, l.quantity, l.auth_token AS seller_token, l.status,
            u.stripe_account_id, u.stripe_onboarding_complete, u.username AS seller_name
     FROM listings l
     JOIN users u ON u.auth_token = l.auth_token
@@ -49,7 +49,7 @@ if (!$listing) {
     exit();
 }
 
-if ($listing['status'] !== 'active') {
+if ($listing['status'] !== 'active' || (int)($listing['quantity'] ?? 1) < 1) {
     header('Location: ../shop/buy.php?id=' . $listingId . '&error=' . urlencode('Cette annonce n\'est plus disponible.'));
     exit();
 }
@@ -65,6 +65,7 @@ if (empty($listing['stripe_account_id']) || !$listing['stripe_onboarding_complet
     header('Location: ../shop/buy.php?id=' . $listingId . '&error=' . urlencode('Ce vendeur n\'a pas encore activé les paiements.'));
     exit();
 }
+
 
 $amountCents = (int) round($listing['price'] * 100);
 $feeCents = (int) round($amountCents * $stripeConfig['platform_fee_pct'] / 100);
@@ -94,6 +95,9 @@ try {
             'quantity' => 1,
         ]],
         'mode' => 'payment',
+        'shipping_address_collection' => [
+            'allowed_countries' => ['FR', 'BE', 'CH', 'LU', 'MC'],
+        ],
         'payment_intent_data' => [
             'application_fee_amount' => $feeCents,
             'transfer_data' => [
@@ -119,6 +123,23 @@ try {
 
 } catch (\Stripe\Exception\ApiErrorException $e) {
     error_log("Stripe checkout error: " . $e->getMessage());
-    header('Location: ../shop/buy.php?id=' . $listingId . '&error=' . urlencode('Erreur lors de la création du paiement.'));
+
+    // Si l'erreur vient du compte connecté (vendeur), réinitialiser son flag et afficher un message clair
+    $stripeCode = $e->getStripeCode() ?? '';
+    $errMsg = $e->getMessage();
+    $isAccountError = in_array($stripeCode, ['account_invalid', 'account_country_invalid_address', 'no_account'], true)
+        || str_contains($errMsg, 'destination')
+        || str_contains($errMsg, 'transfer')
+        || str_contains($errMsg, 'connected account')
+        || str_contains($errMsg, 'acct_');
+
+    if ($isAccountError) {
+        // Réinitialiser le flag onboarding en DB pour forcer le vendeur à re-vérifier
+        $pdo->prepare("UPDATE users SET stripe_onboarding_complete = 0 WHERE stripe_account_id = ?")
+            ->execute([$listing['stripe_account_id']]);
+        header('Location: ../shop/buy.php?id=' . $listingId . '&error=' . urlencode('Ce vendeur ne peut pas encore recevoir de paiements. Veuillez le contacter.'));
+    } else {
+        header('Location: ../shop/buy.php?id=' . $listingId . '&error=' . urlencode('Erreur lors de la création du paiement. Veuillez réessayer.'));
+    }
     exit();
 }

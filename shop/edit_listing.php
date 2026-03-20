@@ -174,21 +174,37 @@ $user = [
                     </div>
                 </div>
 
-                <div class="field-group" style="margin-top: 18px;">
-                    <label class="field-label" for="price"><?= htmlspecialchars(t('sell_price'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <div class="price-wrapper">
+                <div class="field-row" style="margin-top: 18px;">
+                    <div class="field-group">
+                        <label class="field-label" for="price"><?= htmlspecialchars(t('sell_price'), ENT_QUOTES, 'UTF-8') ?></label>
+                        <div class="price-wrapper">
+                            <input
+                                type="number"
+                                class="sell-input"
+                                id="price"
+                                name="price"
+                                placeholder="0.00"
+                                min="0"
+                                max="99999"
+                                step="0.01"
+                                required
+                                value="<?php echo htmlspecialchars(rtrim(rtrim(number_format((float)$listing['price'], 2, '.', ''), '0'), '.'), ENT_QUOTES, 'UTF-8'); ?>">
+                            <span class="price-symbol">€</span>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="quantity">Quantité disponible</label>
                         <input
                             type="number"
                             class="sell-input"
-                            id="price"
-                            name="price"
-                            placeholder="0.00"
-                            min="0"
-                            max="99999"
-                            step="0.01"
+                            id="quantity"
+                            name="quantity"
+                            placeholder="1"
+                            min="1"
+                            max="9999"
+                            step="1"
                             required
-                            value="<?php echo htmlspecialchars(rtrim(rtrim(number_format((float)$listing['price'], 2, '.', ''), '0'), '.'), ENT_QUOTES, 'UTF-8'); ?>">
-                        <span class="price-symbol">€</span>
+                            value="<?php echo (int)($listing['quantity'] ?? 1); ?>">
                     </div>
                 </div>
             </div>

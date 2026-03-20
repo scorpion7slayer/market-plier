@@ -410,7 +410,12 @@ $siteSettings = getSiteSettings($pdo);
             <tbody>
               <?php foreach ($pendingListings as $pl): ?>
                 <tr>
-                  <td class="admin-listing-title"><?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?></td>
+                  <td class="admin-listing-title">
+                    <a href="../shop/buy.php?id=<?= (int)$pl['id'] ?>" target="_blank" style="color:var(--mp-text);text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+                      <?= htmlspecialchars($pl['title'], ENT_QUOTES, 'UTF-8') ?>
+                      <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7em;opacity:0.45;flex-shrink:0;"></i>
+                    </a>
+                  </td>
                   <td><span class="admin-price"><?= number_format($pl['price'], 2, ',', ' ') ?> €</span></td>
                   <td class="admin-category"><?= htmlspecialchars($pl['category'], ENT_QUOTES, 'UTF-8') ?></td>
                   <td class="admin-username"><?= htmlspecialchars($pl['username'], ENT_QUOTES, 'UTF-8') ?></td>

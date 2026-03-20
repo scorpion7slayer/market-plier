@@ -65,10 +65,24 @@ function handleCheckoutCompleted($session, $pdo)
     $feePct = 5;
     $platformFee = round($amountTotal * $feePct / 100, 2);
 
+    // Extraire l'adresse de livraison collectée par Stripe
+    $deliveryAddress = null;
+    if (!empty($session->shipping_details)) {
+        $addr = $session->shipping_details->address;
+        $deliveryAddress = json_encode([
+            'name'        => $session->shipping_details->name ?? '',
+            'line1'       => $addr->line1 ?? '',
+            'line2'       => $addr->line2 ?? '',
+            'city'        => $addr->city ?? '',
+            'postal_code' => $addr->postal_code ?? '',
+            'country'     => $addr->country ?? '',
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
     // Créer la commande
     $stmt = $pdo->prepare("
-        INSERT INTO orders (listing_id, buyer_token, seller_token, stripe_session_id, stripe_payment_intent, amount, platform_fee, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'completed')
+        INSERT INTO orders (listing_id, buyer_token, seller_token, stripe_session_id, stripe_payment_intent, amount, platform_fee, delivery_address, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed')
     ");
     $stmt->execute([
         $listingId,
@@ -78,30 +92,42 @@ function handleCheckoutCompleted($session, $pdo)
         $session->payment_intent,
         $amountTotal,
         $platformFee,
+        $deliveryAddress,
     ]);
 
-    // Marquer l'annonce comme vendue
-    $pdo->prepare("UPDATE listings SET status = 'sold' WHERE id = ? AND status = 'active'")
+    // Décrémenter la quantité et marquer comme vendue si stock épuisé
+    $pdo->prepare("UPDATE listings SET quantity = GREATEST(0, quantity - 1), status = IF(quantity <= 1, 'sold', status) WHERE id = ? AND status = 'active'")
         ->execute([$listingId]);
 
-    // Récupérer le titre de l'annonce et le nom de l'acheteur
-    $listingStmt = $pdo->prepare("SELECT title FROM listings WHERE id = ?");
+    // Récupérer le titre et le nouveau statut de l'annonce
+    $listingStmt = $pdo->prepare("SELECT title, status FROM listings WHERE id = ?");
     $listingStmt->execute([$listingId]);
     $listingRow = $listingStmt->fetch();
     $listingTitle = $listingRow ? $listingRow['title'] : 'Article';
+    $listingNowSold = $listingRow && $listingRow['status'] === 'sold';
 
     $buyerStmt = $pdo->prepare("SELECT username FROM users WHERE auth_token = ?");
     $buyerStmt->execute([$buyerToken]);
     $buyerRow = $buyerStmt->fetch();
     $buyerName = $buyerRow ? $buyerRow['username'] : 'Acheteur';
 
-    // Notifier le vendeur (in-app + push)
+    // Notifier le vendeur : vente réalisée
     sendNotification($pdo, $sellerToken, [
-        'type' => 'sale',
-        'title' => 'Vente réalisée !',
+        'type'    => 'sale',
+        'title'   => 'Vente réalisée !',
         'content' => $buyerName . ' a acheté « ' . $listingTitle . ' » pour ' . number_format($amountTotal, 2, ',', ' ') . ' €',
-        'link' => 'notifications/',
+        'link'    => 'notifications/',
     ]);
+
+    // Notification supplémentaire si stock épuisé
+    if ($listingNowSold) {
+        sendNotification($pdo, $sellerToken, [
+            'type'    => 'stock',
+            'title'   => 'Stock épuisé',
+            'content' => 'Votre annonce « ' . $listingTitle . ' » est maintenant épuisée et a été retirée de la vente.',
+            'link'    => 'inscription-connexion/account.php',
+        ]);
+    }
 }
 
 /**

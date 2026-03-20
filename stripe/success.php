@@ -8,6 +8,7 @@ require_once '../database/db.php';
 require_once '../config/stripe.php';
 require_once '../includes/remember_me.php';
 require_once '../includes/lang.php';
+require_once '../includes/send_notification.php';
 
 $user = null;
 if (isset($_SESSION['auth_token'])) {
@@ -24,7 +25,74 @@ if ($sessionId) {
     try {
         $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
 
-        $listingId = $stripeSession->metadata->listing_id ?? null;
+        $listingId   = $stripeSession->metadata->listing_id   ?? null;
+        $buyerToken  = $stripeSession->metadata->buyer_token  ?? null;
+        $sellerToken = $stripeSession->metadata->seller_token ?? null;
+
+        // Fallback : créer la commande si le webhook n'a pas encore tourné
+        if ($stripeSession->payment_status === 'paid' && $listingId && $buyerToken && $sellerToken) {
+            $existsCheck = $pdo->prepare("SELECT id FROM orders WHERE stripe_session_id = ?");
+            $existsCheck->execute([$sessionId]);
+            if (!$existsCheck->fetch()) {
+                $amountTotal  = ($stripeSession->amount_total ?? 0) / 100;
+                $platformFee  = round($amountTotal * 5 / 100, 2);
+
+                $deliveryAddress = null;
+                if (!empty($stripeSession->shipping_details)) {
+                    $addr = $stripeSession->shipping_details->address;
+                    $deliveryAddress = json_encode([
+                        'name'        => $stripeSession->shipping_details->name ?? '',
+                        'line1'       => $addr->line1 ?? '',
+                        'line2'       => $addr->line2 ?? '',
+                        'city'        => $addr->city ?? '',
+                        'postal_code' => $addr->postal_code ?? '',
+                        'country'     => $addr->country ?? '',
+                    ], JSON_UNESCAPED_UNICODE);
+                }
+
+                $pdo->prepare("
+                    INSERT INTO orders (listing_id, buyer_token, seller_token, stripe_session_id, stripe_payment_intent, amount, platform_fee, delivery_address, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed')
+                ")->execute([
+                    $listingId, $buyerToken, $sellerToken,
+                    $sessionId, $stripeSession->payment_intent,
+                    $amountTotal, $platformFee, $deliveryAddress,
+                ]);
+
+                // Décrémenter stock et passer en sold si épuisé
+                $pdo->prepare("
+                    UPDATE listings
+                    SET quantity = GREATEST(0, quantity - 1),
+                        status = IF(quantity <= 1, 'sold', status)
+                    WHERE id = ? AND status = 'active'
+                ")->execute([$listingId]);
+
+                // Notifications vendeur (vente + stock épuisé si applicable)
+                $lstCheck = $pdo->prepare("SELECT title, status FROM listings WHERE id = ?");
+                $lstCheck->execute([$listingId]);
+                $lstRow = $lstCheck->fetch();
+                $buyerRow = $pdo->prepare("SELECT username FROM users WHERE auth_token = ?");
+                $buyerRow->execute([$buyerToken]);
+                $buyerName = ($buyerRow->fetch())['username'] ?? 'Acheteur';
+
+                sendNotification($pdo, $sellerToken, [
+                    'type'    => 'sale',
+                    'title'   => 'Vente réalisée !',
+                    'content' => $buyerName . ' a acheté « ' . ($lstRow['title'] ?? 'Article') . ' » pour ' . number_format($amountTotal, 2, ',', ' ') . ' €',
+                    'link'    => 'notifications/',
+                ]);
+
+                if ($lstRow && $lstRow['status'] === 'sold') {
+                    sendNotification($pdo, $sellerToken, [
+                        'type'    => 'stock',
+                        'title'   => 'Stock épuisé',
+                        'content' => 'Votre annonce « ' . ($lstRow['title'] ?? 'Article') . ' » est maintenant épuisée et a été retirée de la vente.',
+                        'link'    => 'inscription-connexion/account.php',
+                    ]);
+                }
+            }
+        }
+
         if ($listingId) {
             $stmt = $pdo->prepare("SELECT l.*, u.username AS seller_name FROM listings l JOIN users u ON u.auth_token = l.auth_token WHERE l.id = ?");
             $stmt->execute([$listingId]);
@@ -71,15 +139,18 @@ if ($sessionId) {
         .success-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
         .success-text { color: var(--mp-text-muted, #666); margin-bottom: 24px; }
         .success-details {
-            background: var(--mp-bg-subtle, #f8f9fa);
+            background: var(--mp-border-light, #e0ddd7);
             border-radius: 12px;
             padding: 20px;
             text-align: left;
             margin-bottom: 24px;
         }
-        .success-row { display: flex; justify-content: space-between; padding: 6px 0; }
-        .success-row-label { color: var(--mp-text-muted, #666); }
-        .success-row-value { font-weight: 600; }
+        .success-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+        .success-row-label { color: var(--mp-text-muted, #666); flex-shrink: 0; }
+        .success-row-value { font-weight: 600; color: var(--mp-text, #1a1a1a); text-align: right; }
+        .success-delivery-block { padding: 10px 0 4px; border-top: 1px solid var(--mp-border, #eee); margin-top: 4px; }
+        .success-delivery-label { color: var(--mp-text-muted, #666); font-size: 0.85rem; margin-bottom: 4px; }
+        .success-delivery-value { font-weight: 600; color: var(--mp-text, #1a1a1a); font-size: 0.9rem; line-height: 1.5; }
         .success-total { border-top: 2px solid var(--mp-border, #eee); margin-top: 8px; padding-top: 12px; font-size: 1.1rem; }
         .success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .success-btn {
@@ -118,6 +189,28 @@ if ($sessionId) {
                         <span class="success-row-label">Vendeur</span>
                         <span class="success-row-value"><?= htmlspecialchars($listing['seller_name'], ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
+                    <?php
+                    $delivery = $order && !empty($order['delivery_address'])
+                        ? json_decode($order['delivery_address'], true)
+                        : null;
+                    if ($delivery):
+                        $addrLines = array_filter([
+                            $delivery['name']    ?? '',
+                            $delivery['line1']   ?? '',
+                            $delivery['line2']   ?? '',
+                            trim(($delivery['postal_code'] ?? '') . ' ' . ($delivery['city'] ?? '')),
+                            $delivery['country'] ?? '',
+                        ]);
+                    ?>
+                    <div class="success-delivery-block">
+                        <div class="success-delivery-label">Adresse de livraison</div>
+                        <div class="success-delivery-value">
+                            <?php foreach ($addrLines as $line): ?>
+                                <?= htmlspecialchars($line, ENT_QUOTES, 'UTF-8') ?><br>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                     <div class="success-row success-total">
                         <span class="success-row-label">Total payé</span>
                         <span class="success-row-value"><?= number_format((float)$listing['price'], 2, ',', ' ') ?> €</span>
@@ -126,11 +219,11 @@ if ($sessionId) {
             <?php endif; ?>
 
             <div class="success-actions">
-                <a href="../shop/search.php" class="success-btn success-btn-primary">
-                    <i class="fa-solid fa-magnifying-glass"></i> Continuer mes achats
+                <a href="../orders/index.php" class="success-btn success-btn-primary">
+                    <i class="fa-solid fa-bag-shopping"></i> Mes achats
                 </a>
-                <a href="../inscription-connexion/account.php" class="success-btn success-btn-outline">
-                    <i class="fa-solid fa-user"></i> Mon profil
+                <a href="../shop/search.php" class="success-btn success-btn-outline">
+                    <i class="fa-solid fa-magnifying-glass"></i> Continuer mes achats
                 </a>
             </div>
         </div>
