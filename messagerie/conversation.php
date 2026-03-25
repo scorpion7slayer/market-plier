@@ -322,51 +322,62 @@ if (empty($_SESSION['csrf_token'])) {
           });
       });
 
-      // Polling (3s)
-      setInterval(function() {
-        fetch(basePath + 'api/poll_messages.php?conversation_id=<?= (int) $conversationId ?>&after=' + lastMsgId, {
-            credentials: 'same-origin'
-          })
-          .then(function(r) {
-            return r.json();
-          })
-          .then(function(data) {
-            var scrolled = false;
+      // SSE : connexion persistante au lieu du polling
+      function applyMessages(messages) {
+        var scrolled = false;
+        messages.forEach(function(msg) {
+          if (msg.id > lastMsgId) lastMsgId = msg.id;
+          if (msg.sender_token === myToken) return;
+          if (messagesEl.querySelector('[data-msg-id="' + msg.id + '"]')) return;
+          var d = utcToLocal(msg.utc);
+          var bubble = createBubble(msg.content, 'conv-bubble-other', formatTime(d), msg.id);
+          messagesEl.appendChild(bubble);
+          scrolled = true;
+        });
+        if (scrolled) scrollBottom();
+      }
 
-            // Nouveaux messages de l'autre personne
-            if (data.messages && data.messages.length > 0) {
-              data.messages.forEach(function(msg) {
-                // Avancer lastMsgId dans tous les cas
-                if (msg.id > lastMsgId) lastMsgId = msg.id;
-                // Ne pas afficher mes propres messages (déjà ajoutés à l'envoi)
-                if (msg.sender_token === myToken) return;
-                // Vérifier qu'il n'existe pas déjà dans le DOM
-                if (messagesEl.querySelector('[data-msg-id="' + msg.id + '"]')) return;
+      function applyReadReceipts(readIds) {
+        readIds.forEach(function(id) {
+          var bubble = messagesEl.querySelector('[data-msg-id="' + id + '"]');
+          if (!bubble) return;
+          var icon = bubble.querySelector('.conv-check-icon');
+          if (icon && !icon.classList.contains('fa-check-double')) {
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-check-double', 'conv-read-icon');
+          }
+        });
+      }
 
-                var d = utcToLocal(msg.utc);
-                var bubble = createBubble(msg.content, 'conv-bubble-other', formatTime(d), msg.id);
-                messagesEl.appendChild(bubble);
-                scrolled = true;
-              });
-            }
+      var sseSource = null;
 
-            // Mise à jour des accusés de lecture (vus)
-            if (data.read_ids && data.read_ids.length > 0) {
-              data.read_ids.forEach(function(id) {
-                var bubble = messagesEl.querySelector('[data-msg-id="' + id + '"]');
-                if (!bubble) return;
-                var icon = bubble.querySelector('.conv-check-icon');
-                if (icon && !icon.classList.contains('fa-check-double')) {
-                  icon.classList.remove('fa-check');
-                  icon.classList.add('fa-check-double', 'conv-read-icon');
-                }
-              });
-            }
+      function connectSSE() {
+        if (sseSource) sseSource.close();
+        sseSource = new EventSource(basePath + 'api/sse_messages.php?conversation_id=<?= (int) $conversationId ?>&after=' + lastMsgId);
 
-            if (scrolled) scrollBottom();
-          })
-          .catch(function() {});
-      }, 3000);
+        sseSource.addEventListener('messages', function(e) {
+          var data = JSON.parse(e.data);
+          if (data.messages && data.messages.length > 0) applyMessages(data.messages);
+        });
+
+        sseSource.addEventListener('read_receipts', function(e) {
+          var data = JSON.parse(e.data);
+          if (data.read_ids && data.read_ids.length > 0) applyReadReceipts(data.read_ids);
+        });
+
+        // Le serveur ferme la connexion après 5 min pour éviter les fuites ressources
+        sseSource.addEventListener('timeout', function() {
+          sseSource.close();
+          connectSSE();
+        });
+      }
+
+      connectSSE();
+
+      // Fermer proprement la connexion SSE quand on quitte la page
+      window.addEventListener('beforeunload', function() {
+        if (sseSource) sseSource.close();
+      });
     })();
   </script>
 </body>
