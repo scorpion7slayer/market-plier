@@ -1,64 +1,133 @@
-# market
+# Market Plier
 
-## Frameworks
+Marketplace web en PHP permettant aux utilisateurs d'acheter et vendre des articles entre particuliers. Paiements intégrés via Stripe, messagerie en temps réel, notifications push et connexion Google OAuth.
 
-[Bootstrap 5.3 Introduction](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
+## Fonctionnalités
 
-[fontawesome](https://fontawesome.com/search?ic=free-collection)
+- Inscription / connexion locale et via Google OAuth
+- Dépôt et gestion d'annonces (photos, catégorie, état, localisation)
+- Paiement sécurisé via Stripe (Checkout + Connect pour les vendeurs)
+- Messagerie instantanée entre acheteurs et vendeurs (SSE)
+- Notifications push (Web Push API)
+- Système de favoris et d'avis
+- Tableau de bord admin (modération, paramètres du site)
+- Thème clair / sombre persistant
 
-[cropper.js](https://fengyuanchen.github.io/cropperjs/)
+## Stack technique
 
-## Notes
+| Couche | Technologie |
+|--------|-------------|
+| Backend | PHP 8.1+ (PDO, sessions, CSRF) |
+| Base de données | MySQL 8.0+ |
+| Frontend | Bootstrap 5.3 · Font Awesome 7 |
+| Paiements | Stripe Checkout + Stripe Connect |
+| Auth tierce | Google OAuth 2.0 |
+| Notifications | Web Push (minishlink/web-push) |
+| Dépendances PHP | Composer |
+| Dépendances JS/CSS | npm (pas de bundler) |
 
-Pour moyen de paiement on va passer par [Stripe](https://stripe.com/)
+## Installation
 
-[Stripe carte de test](https://docs.stripe.com/testing#cards)
+### Prérequis
 
-## API
+- PHP 8.1+
+- MySQL 8.0+
+- Composer
+- Node.js / npm
+- Un serveur web (Apache, Nginx, DDEV…)
 
-[ipapi](https://ipapi.co/)
+### 1. Cloner le dépôt
 
-## Truc a faire
+```bash
+git clone https://github.com/scorpion7slayer/market-plier.git
+cd market-plier
+```
 
-1. Page de recherche pour produits (chercher par catégorie : pays, prix, etc)
-2. Fonction panier et acheter
-3. Système de commentaire vendeur
+### 2. Installer les dépendances
 
-## Installation et configuration
+```bash
+composer install
+npm install
+```
 
-Pour mettre en place l'application en local sous Windows (WampServer ou équivalent) :
+### 3. Variables d'environnement
 
-1. **Récupérer le code**
-    - Cloner le dépôt : `git clone https://github.com/scorpion7slayer/market-plier.git`
-    - Ouvrir le dossier dans l'IDE.
+Copier le fichier exemple et remplir les valeurs :
 
-2. **Dépendances**
-    - PHP : aucune dépendance tierce en dehors de celles chargées via Composer.
-    - Exécuter `composer install` depuis la racine pour charger la bibliothèque Google/OAuth et autres (fournies dans `vendor/`).
-    - Installer les assets front (Bootstrap, FontAwesome) avec npm : `npm install`.
-    - Aucune compilation n'est nécessaire ; les fichiers CSS/JS sont servis tels quels.
+```bash
+cp .env.example .env
+```
 
-3. **Base de données**
-    - Démarrer MySQL (via WampServer, MAMP, DDEV, etc.).
-    - Créer une base `marketplier` (ou ajuster le nom dans `database/db.php`).
-    - Importer le schéma SQL : ouvrir `database/marketplier.sql` dans phpMyAdmin ou `mysql < database/marketplier.sql`.
-    - Vérifier le nom de la table de profil (`profile` vs `profiles`) et corriger si besoin (voir NOTE dans CLAUDE.md).
-    - Configurer les identifiants MySQL dans `database/db.php` (hôte, utilisateur, mot de passe).
+| Variable | Description |
+|----------|-------------|
+| `DB_HOST` / `DB_NAME` / `DB_USER` / `DB_PASS` | Connexion MySQL |
+| `APP_URL` | URL de base sans slash final (ex. `http://localhost/market-plier`) |
+| `STRIPE_SECRET_KEY` / `STRIPE_PUBLIC_KEY` / `STRIPE_WEBHOOK_SECRET` | Clés Stripe ([dashboard.stripe.com](https://dashboard.stripe.com/apikeys)) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` | OAuth Google ([console.cloud.google.com](https://console.cloud.google.com)) |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Notifications push Web Push |
 
-4. **Configuration Google OAuth (optionnel)**
-    - Copier `config/google_oauth.php.example` ou créer `config/google_oauth.php` en renseignant `CLIENT_ID`, `CLIENT_SECRET` et `REDIRECT_URI`.
-    - Mettre à jour `.gitignore` pour exclure ce fichier si ce n'est pas déjà fait.
+Générer les clés VAPID :
 
-5. **Serveur web**
-    - Placer le dossier dans le répertoire de votre serveur (e.g. `www/market-plier` sous Wamp).
-    - Accéder via `http://localhost/market-plier/`.
-    - S'assurer que `session_start()` fonctionne et que le dossier `uploads/` est accessible en écriture.
+```php
+php -r "print_r(Minishlink\WebPush\VAPID::createVapidKeys());"
+```
 
-6. **Utilisation**
-    - S'inscrire via `inscription-connexion/register.php` ou se connecter.
-    - Les jetons CSRF sont générés automatiquement ; pas d'action requise.
-    - Les mots de passe sont hashés avec `password_hash(..., PASSWORD_BCRYPT)`.
+### 4. Base de données
 
-7. **Conseils**
-    - Lors de la modification des chemins ou de l'ajout de sous-dossiers, ajuster `$headerBasePath` avant d'inclure `header.php`.
-    - Stocker les thèmes dans `localStorage` sous la clé `theme` ; voir `header.php` pour l'exemple de lecture/écriture.
+Créer une base MySQL puis importer le schéma :
+
+```bash
+mysql -u <user> -p -e "CREATE DATABASE marketplier CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+mysql -u <user> -p marketplier < database/example.sql
+```
+
+Cartes de test Stripe : [docs.stripe.com/testing#cards](https://docs.stripe.com/testing#cards)
+
+### 5. Permissions
+
+S'assurer que les dossiers d'upload sont accessibles en écriture :
+
+```bash
+chmod -R 775 uploads/
+```
+
+### 7. Lancer
+
+Placer le dossier dans le répertoire web de votre serveur et accéder à :
+
+```
+http://localhost/market-plier/
+```
+
+## Structure du projet
+
+```
+index.php                    # Page d'accueil
+header.php / footer.php      # Mise en page partagée
+database/
+  db.php                     # Connexion PDO
+  example.sql                # Schéma de la base (sans données)
+config/                      # Clés API (non versionnées)
+inscription-connexion/       # Auth (register, login, Google OAuth)
+shop/                        # Catalogue des annonces
+messagerie/                  # Chat temps réel (SSE)
+orders/                      # Commandes et suivi
+stripe/                      # Webhooks Stripe
+notifications/               # Notifications push
+favoris/                     # Gestion des favoris
+settings/                    # Paramètres utilisateur
+assets/                      # Images, polices
+styles/                      # CSS custom par page
+uploads/                     # Médias uploadés (non versionnés)
+```
+
+## Sécurité
+
+- Tokens CSRF sur tous les formulaires
+- Mots de passe hashés avec `PASSWORD_BCRYPT` (cost 12)
+- Identification via `auth_token` (jamais d'ID numérique exposé)
+- Voir [security.md](security.md) pour l'historique des correctifs
+
+## Licence
+
+MIT — voir [LICENSE](LICENSE)

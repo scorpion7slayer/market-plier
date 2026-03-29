@@ -20,9 +20,11 @@ node_modules/
 vendor/
 
 # Google OAuth - fichiers sensibles
-google/google_oauth.php
 google/cacert.pem
 google/client_secret_*.json
+# Base de données (dump avec données réelles — utiliser database/example.sql)
+database/marketplier.sql
+
 # ddev
 .ddev/
 
