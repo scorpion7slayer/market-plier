@@ -773,7 +773,7 @@ if (isset($_SESSION['auth_token']) && isset($GLOBALS['pdo'])) {
   var closeBtn = document.getElementById('mobileSearchClose');
   var mobileInput = document.getElementById('mobileSearchInput');
   var mobileResults = document.getElementById('mobileSearchResults');
-  if (!toggle || !panel) return;
+  if (!panel) return;
 
   var basePath = <?= json_encode($headerBasePath) ?>;
   var mobileDebounce = null;

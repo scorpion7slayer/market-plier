@@ -44,13 +44,13 @@ try {
     exit();
   }
 
-  // Insérer le message
+  // Insérer le message + mettre à jour la conversation atomiquement
+  $pdo->beginTransaction();
   $stmt = $pdo->prepare("INSERT INTO messages (conversation_id, sender_token, content) VALUES (?, ?, ?)");
   $stmt->execute([$conversationId, $myToken, $content]);
   $messageId = $pdo->lastInsertId();
-
-  // Mettre à jour updated_at de la conversation
   $pdo->prepare("UPDATE conversations SET updated_at = NOW() WHERE id = ?")->execute([$conversationId]);
+  $pdo->commit();
 
   // Notification au destinataire (in-app + Web Push)
   $recipientToken = $conv['user1_token'] === $myToken ? $conv['user2_token'] : $conv['user1_token'];
@@ -67,6 +67,7 @@ try {
 
   echo json_encode(['success' => true, 'message_id' => (int) $messageId]);
 } catch (PDOException $e) {
+  if ($pdo->inTransaction()) $pdo->rollBack();
   error_log("send_message error: " . $e->getMessage());
   echo json_encode(['success' => false, 'error' => 'Erreur serveur']);
 }
