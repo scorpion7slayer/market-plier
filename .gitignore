@@ -1,7 +1,4 @@
-CLAUDE.md
-AGENTS.md
 .grepai/
-.claude/
 # Ignorer les fichiers uploadés, garder les dossiers
 uploads/profiles/*
 !uploads/profiles/.gitkeep
