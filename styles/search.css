@@ -382,11 +382,11 @@
         min-height: auto;
     }
 
-    .category-filters {
+    .search-main .category-filters {
         display: none;
     }
 
-    .category-dropdown {
+    .search-main .category-dropdown {
         display: block;
     }
 
