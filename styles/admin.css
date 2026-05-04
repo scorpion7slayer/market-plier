@@ -50,7 +50,7 @@
 }
 
 .admin-table tbody tr:hover {
-    background: rgba(127, 184, 133, 0.04);
+    background: rgba(97, 147, 88, 0.04);
 }
 
 .admin-table td {
@@ -71,7 +71,7 @@
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #7fb885;
+    border: 2px solid #619358;
     flex-shrink: 0;
 }
 
@@ -79,7 +79,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7fb885, #6aa070);
+    background: linear-gradient(135deg, #619358, #4f7a49);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -102,7 +102,7 @@
     font-size: 0.65rem;
     font-weight: 700;
     font-style: italic;
-    background: #7fb885;
+    background: #619358;
     color: #fff;
     padding: 2px 8px;
     border-radius: 20px;
@@ -186,12 +186,12 @@
 }
 
 .admin-action-toggle {
-    background: rgba(127, 184, 133, 0.1);
-    color: #7fb885;
+    background: rgba(97, 147, 88, 0.1);
+    color: #619358;
 }
 
 .admin-action-toggle:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
     transform: translateY(-1px);
 }
@@ -220,8 +220,8 @@
     height: 24px;
     padding: 0 8px;
     border-radius: 12px;
-    background: rgba(127, 184, 133, 0.15);
-    color: #7fb885;
+    background: rgba(97, 147, 88, 0.15);
+    color: #619358;
     font-size: 0.8rem;
     font-weight: 700;
     font-style: normal;
@@ -252,7 +252,7 @@
 }
 
 .admin-listing-search:focus {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .admin-listing-search::placeholder {
@@ -275,7 +275,7 @@
 }
 
 .admin-listing-filter-select:focus {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 /* Badges de statut */
@@ -291,9 +291,9 @@
 }
 
 .admin-status-active {
-    background: rgba(127, 184, 133, 0.15);
+    background: rgba(97, 147, 88, 0.15);
     color: #5a9e60;
-    border: 1.5px solid rgba(127, 184, 133, 0.3);
+    border: 1.5px solid rgba(97, 147, 88, 0.3);
 }
 
 .admin-status-pending {
@@ -316,7 +316,7 @@
 }
 
 .admin-listing-link:hover {
-    color: #7fb885;
+    color: #619358;
 }
 
 /* Pagination */
@@ -349,23 +349,23 @@
 }
 
 .admin-page-btn:hover {
-    background: rgba(127, 184, 133, 0.12);
-    border-color: #7fb885;
-    color: #7fb885;
+    background: rgba(97, 147, 88, 0.12);
+    border-color: #619358;
+    color: #619358;
     text-decoration: none;
 }
 
 .admin-page-active {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
-    border-color: #7fb885;
+    border-color: #619358;
     cursor: default;
 }
 
 .admin-page-active:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .admin-page-disabled {
@@ -402,7 +402,7 @@
 
 .admin-price {
     font-weight: 700;
-    color: #7fb885;
+    color: #619358;
     white-space: nowrap;
 }
 

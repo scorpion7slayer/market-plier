@@ -31,7 +31,7 @@ body {
 
 /* HEADER  */
 header {
-    background-color: #7faa58;
+    background-color: #619358;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -210,7 +210,7 @@ header {
 
 .ac-item:hover,
 .ac-item.ac-active {
-    background: #7fb88518;
+    background: #61935818;
     text-decoration: none;
     color: var(--mp-text, #333);
 }
@@ -219,7 +219,7 @@ header {
     width: 20px;
     text-align: center;
     font-size: 14px;
-    color: #7fb885;
+    color: #619358;
     flex-shrink: 0;
 }
 
@@ -270,7 +270,7 @@ header {
 .ac-price {
     font-size: 12px;
     font-weight: 700;
-    color: #7fb885;
+    color: #619358;
 }
 
 .ac-arrow {
@@ -343,7 +343,7 @@ nav a {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7fb885 0%, #6aa070 100%);
+    background: linear-gradient(135deg, #619358 0%, #4f7a49 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -491,7 +491,7 @@ section + section {
 }
 
 .home-scroll-row::-webkit-scrollbar-thumb {
-    background: #7fb88560;
+    background: #61935860;
     border-radius: 4px;
 }
 

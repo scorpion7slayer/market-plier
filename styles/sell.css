@@ -44,7 +44,7 @@ main {
 .sell-alert-success {
     background: #e8fde8;
     color: #27ae60;
-    border: 1.5px solid #7fb885;
+    border: 1.5px solid #619358;
 }
 
 /* SECTIONS */
@@ -68,7 +68,7 @@ main {
 
 /* ZONE UPLOAD PHOTO */
 .photo-upload-zone {
-    border: 2.5px dashed #7fb885;
+    border: 2.5px dashed #619358;
     border-radius: 14px;
     width: 100%;
     min-height: 180px;
@@ -88,7 +88,7 @@ main {
 
 .photo-upload-zone:hover {
     background: #edf7ed;
-    border-color: #6aa070;
+    border-color: #4f7a49;
 }
 
 .photo-upload-zone input[type="file"] {
@@ -115,12 +115,12 @@ main {
     height: 60px;
     border-radius: 50%;
     background: #e8f5e9;
-    border: 2px solid #7fb885;
+    border: 2px solid #619358;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.6rem;
-    color: #7fb885;
+    color: #619358;
     flex-shrink: 0;
 }
 
@@ -183,8 +183,8 @@ main {
 }
 
 .photo-preview-wrapper.drag-over {
-    border-color: #7fb885;
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.3);
+    border-color: #619358;
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.3);
 }
 
 .photo-preview-img {
@@ -200,7 +200,7 @@ main {
     left: 6px;
     width: 24px;
     height: 24px;
-    background: rgba(127, 184, 133, 0.9);
+    background: rgba(97, 147, 88, 0.9);
     color: #fff;
     border-radius: 50%;
     display: flex;
@@ -264,20 +264,20 @@ main {
 
 .photo-main-btn:hover {
     background: #fff;
-    border-color: #7fb885;
-    color: #7fb885;
+    border-color: #619358;
+    color: #619358;
 }
 
 .photo-main-btn.active {
     opacity: 1;
-    background: #7fb885;
-    border-color: #7fb885;
+    background: #619358;
+    border-color: #619358;
     color: #fff;
 }
 
 .photo-upload-zone.drag-over {
     background: #edf7ed;
-    border-color: #6aa070;
+    border-color: #4f7a49;
     border-style: solid;
 }
 
@@ -330,9 +330,9 @@ main {
 .sell-input:focus,
 .sell-select:focus,
 .sell-textarea:focus {
-    border-color: #7fb885;
+    border-color: #619358;
     background: var(--mp-bg-secondary, #fff);
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
 }
 
 .sell-input::placeholder,
@@ -388,18 +388,18 @@ main {
 }
 
 .custom-select-trigger:hover {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .custom-select-trigger.open {
-    border-color: #7fb885;
+    border-color: #619358;
     background: var(--mp-bg-secondary, #fff);
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
     border-radius: 14px 14px 0 0;
 }
 
 .custom-select-arrow {
-    color: #7fb885;
+    color: #619358;
     font-size: 0.75rem;
     transition: transform 0.25s ease;
     flex-shrink: 0;
@@ -417,8 +417,8 @@ main {
     left: 0;
     right: 0;
     background: var(--mp-card-bg, #fff);
-    border: 2.5px solid #7fb885;
-    border-top: 1px solid rgba(127, 184, 133, 0.2);
+    border: 2.5px solid #619358;
+    border-top: 1px solid rgba(97, 147, 88, 0.2);
     border-radius: 0 0 14px 14px;
     max-height: 0;
     overflow: hidden;
@@ -448,17 +448,17 @@ main {
 }
 
 .custom-select-option:hover {
-    background: rgba(127, 184, 133, 0.08);
+    background: rgba(97, 147, 88, 0.08);
 }
 
 .custom-select-option.selected {
-    background: rgba(127, 184, 133, 0.12);
-    color: #6aa070;
+    background: rgba(97, 147, 88, 0.12);
+    color: #4f7a49;
     font-weight: 600;
 }
 
 .custom-select-option .check-icon {
-    color: #7fb885;
+    color: #619358;
     font-size: 0.8rem;
     opacity: 0;
     transition: opacity 0.15s ease;
@@ -505,7 +505,7 @@ main {
     right: 22px;
     font-size: 1.05rem;
     font-weight: 700;
-    color: #7fb885;
+    color: #619358;
     pointer-events: none;
 }
 
@@ -517,7 +517,7 @@ main {
     font-family: "Archivo", Arial, sans-serif;
     font-style: italic;
     font-weight: 700;
-    background-color: #7fb885;
+    background-color: #619358;
     color: #fff;
     border: none;
     border-radius: 50px;
@@ -527,9 +527,9 @@ main {
 }
 
 .publish-btn:hover {
-    background-color: #6aa070;
+    background-color: #4f7a49;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(127, 184, 133, 0.45);
+    box-shadow: 0 6px 20px rgba(97, 147, 88, 0.45);
 }
 
 .publish-btn:active {

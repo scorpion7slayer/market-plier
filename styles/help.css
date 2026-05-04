@@ -37,8 +37,8 @@
 }
 
 .aide-search-input:focus {
-    border-color: #7fb885;
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    border-color: #619358;
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
 }
 
 .aide-search-input::placeholder {
@@ -74,26 +74,26 @@
 
 .aide-category-btn i {
     font-size: 1.3rem;
-    color: #7fb885;
+    color: #619358;
     flex-shrink: 0;
 }
 
 .aide-category-btn:hover {
-    border-color: #7fb885;
-    background: rgba(127, 184, 133, 0.05);
+    border-color: #619358;
+    background: rgba(97, 147, 88, 0.05);
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(127, 184, 133, 0.15);
+    box-shadow: 0 6px 18px rgba(97, 147, 88, 0.15);
     color: var(--mp-text, #333);
 }
 
 .aide-category-btn.active {
-    border-color: #7fb885;
-    background: rgba(127, 184, 133, 0.08);
-    color: #7fb885;
+    border-color: #619358;
+    background: rgba(97, 147, 88, 0.08);
+    color: #619358;
 }
 
 .aide-category-btn.active i {
-    color: #7fb885;
+    color: #619358;
 }
 
 /* FAQ — Accordéon */
@@ -125,11 +125,11 @@
 }
 
 .aide-faq-question:hover {
-    color: #7fb885;
+    color: #619358;
 }
 
 .aide-faq-question.open {
-    color: #7fb885;
+    color: #619358;
 }
 
 .aide-faq-chevron {
@@ -143,7 +143,7 @@
 
 .aide-faq-question.open .aide-faq-chevron {
     transform: rotate(180deg);
-    color: #7fb885;
+    color: #619358;
 }
 
 .aide-faq-answer {
@@ -161,7 +161,7 @@
 }
 
 .aide-faq-answer a {
-    color: #7fb885;
+    color: #619358;
     font-weight: 600;
     text-decoration: none;
 }
@@ -219,7 +219,7 @@
 .aide-badge-success {
     background: #e8fde8;
     color: #27ae60;
-    border: 1.5px solid #7fb885;
+    border: 1.5px solid #619358;
 }
 
 /* Délais info */
@@ -265,8 +265,8 @@
     align-items: center;
     gap: 14px;
     padding: 16px 20px;
-    background: rgba(127, 184, 133, 0.07);
-    border: 1.5px solid rgba(127, 184, 133, 0.3);
+    background: rgba(97, 147, 88, 0.07);
+    border: 1.5px solid rgba(97, 147, 88, 0.3);
     border-radius: 14px;
     margin-bottom: 20px;
     font-size: 0.88rem;
@@ -276,7 +276,7 @@
 
 .aide-contact-intro i {
     font-size: 1.4rem;
-    color: #7fb885;
+    color: #619358;
     flex-shrink: 0;
 }
 
@@ -300,9 +300,9 @@
 }
 
 .aide-textarea:focus {
-    border-color: #7fb885;
+    border-color: #619358;
     background: var(--mp-bg-secondary, #fff);
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
 }
 
 .aide-textarea::placeholder {
