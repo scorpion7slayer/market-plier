@@ -55,7 +55,7 @@ body {
 }
 
 .settings-back-link:hover {
-    color: #7fb885;
+    color: #619358;
 }
 
 .settings-top-bar .theme-toggle {
@@ -95,7 +95,7 @@ body {
 .settings-alert-success {
     background: #e8fde8;
     color: #27ae60;
-    border: 1.5px solid #7fb885;
+    border: 1.5px solid #619358;
 }
 
 .settings-alert-error {
@@ -136,7 +136,7 @@ body {
 }
 
 .settings-section-title i {
-    color: #7fb885;
+    color: #619358;
     font-size: 1rem;
 }
 
@@ -184,9 +184,9 @@ body {
 }
 
 .settings-input:focus {
-    border-color: #7fb885;
+    border-color: #619358;
     background: var(--mp-bg-secondary, #fff);
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
 }
 
 .settings-input::placeholder {
@@ -221,7 +221,7 @@ body {
 }
 
 .settings-field .password-toggle:hover {
-    color: var(--mp-green, #7fb885);
+    color: var(--mp-green, #619358);
 }
 
 .settings-field .password-toggle .fa-eye-slash {
@@ -269,8 +269,8 @@ body {
 }
 
 .settings-select:focus {
-    border-color: #7fb885;
-    box-shadow: 0 0 0 3px rgba(127, 184, 133, 0.15);
+    border-color: #619358;
+    box-shadow: 0 0 0 3px rgba(97, 147, 88, 0.15);
 }
 
 /* Boutons */
@@ -291,26 +291,26 @@ body {
 }
 
 .settings-btn-primary {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
     margin-top: 8px;
 }
 
 .settings-btn-primary:hover {
-    background: #6aa070;
+    background: #4f7a49;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(127, 184, 133, 0.35);
+    box-shadow: 0 4px 14px rgba(97, 147, 88, 0.35);
 }
 
 .settings-btn-outline {
     background: transparent;
-    color: #7fb885;
-    border: 2.5px solid #7fb885;
+    color: #619358;
+    border: 2.5px solid #619358;
     cursor: pointer;
 }
 
 .settings-btn-outline:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -352,14 +352,14 @@ body {
 }
 
 .settings-dropzone:hover {
-    border-color: #7fb885;
-    background: rgba(127, 184, 133, 0.04);
+    border-color: #619358;
+    background: rgba(97, 147, 88, 0.04);
 }
 
 .settings-dropzone.dragover {
-    border-color: #7fb885;
-    background: rgba(127, 184, 133, 0.08);
-    box-shadow: 0 0 0 4px rgba(127, 184, 133, 0.12);
+    border-color: #619358;
+    background: rgba(97, 147, 88, 0.08);
+    box-shadow: 0 0 0 4px rgba(97, 147, 88, 0.12);
 }
 
 .settings-dropzone-text {
@@ -377,7 +377,7 @@ body {
 }
 
 .settings-dropzone-main i {
-    color: #7fb885;
+    color: #619358;
     margin-right: 6px;
 }
 
@@ -389,7 +389,7 @@ body {
 }
 
 .settings-dropzone-link {
-    color: #7fb885;
+    color: #619358;
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 2px;
@@ -407,7 +407,7 @@ body {
 .crop-modal-content {
     border-radius: 18px;
     overflow: hidden;
-    border: 2.5px solid #7fb885;
+    border: 2.5px solid #619358;
     background: var(--mp-card-bg, #fff);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
@@ -434,7 +434,7 @@ body {
 }
 
 .crop-modal-title i {
-    color: #7fb885;
+    color: #619358;
     font-size: 1rem;
 }
 
@@ -485,8 +485,8 @@ body {
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #7fb885;
-    box-shadow: 0 4px 14px rgba(127, 184, 133, 0.25);
+    border: 4px solid #619358;
+    box-shadow: 0 4px 14px rgba(97, 147, 88, 0.25);
     flex-shrink: 0;
     pointer-events: none;
 }
@@ -495,7 +495,7 @@ body {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7fb885 0%, #6aa070 100%);
+    background: linear-gradient(135deg, #619358 0%, #4f7a49 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -586,7 +586,7 @@ body {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background: #7fb885;
+    background: #619358;
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
@@ -625,17 +625,17 @@ body {
 }
 
 .theme-option:hover {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .theme-option.active {
-    border-color: #7fb885;
-    background: rgba(127, 184, 133, 0.08);
-    color: #7fb885;
+    border-color: #619358;
+    background: rgba(97, 147, 88, 0.08);
+    color: #619358;
 }
 
 .theme-option.active i {
-    color: #7fb885;
+    color: #619358;
 }
 
 /* Section admin */
@@ -871,7 +871,7 @@ body {
 .settings-mini-toast-success {
     background: #d4edda;
     color: #155724;
-    border: 1.5px solid #7fb885;
+    border: 1.5px solid #619358;
 }
 
 .settings-mini-toast-error {

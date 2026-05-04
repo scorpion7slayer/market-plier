@@ -222,7 +222,7 @@
 }
 
 .buy-tag-category {
-    background: rgba(127, 184, 133, 0.15);
+    background: rgba(97, 147, 88, 0.15);
     color: var(--mp-green);
 }
 
@@ -292,13 +292,13 @@
 .buy-btn-primary {
     background: var(--mp-green);
     color: #fff;
-    box-shadow: 0 3px 12px rgba(127, 184, 133, 0.35);
+    box-shadow: 0 3px 12px rgba(97, 147, 88, 0.35);
 }
 
 .buy-btn-primary:hover {
     background: var(--mp-green-hover);
     color: #fff;
-    box-shadow: 0 5px 16px rgba(127, 184, 133, 0.45);
+    box-shadow: 0 5px 16px rgba(97, 147, 88, 0.45);
 }
 
 .buy-btn-cart {
@@ -313,13 +313,13 @@
 }
 
 .buy-btn-cart-active {
-    background: rgba(127, 184, 133, 0.14);
+    background: rgba(97, 147, 88, 0.14);
     color: var(--mp-green);
-    border: 1px solid rgba(127, 184, 133, 0.35);
+    border: 1px solid rgba(97, 147, 88, 0.35);
 }
 
 .buy-btn-cart-active:hover {
-    background: rgba(127, 184, 133, 0.2);
+    background: rgba(97, 147, 88, 0.2);
     color: var(--mp-green);
 }
 
@@ -776,7 +776,7 @@
 }
 
 [data-bs-theme="dark"] .buy-tag-category {
-    background: rgba(127, 184, 133, 0.12);
+    background: rgba(97, 147, 88, 0.12);
 }
 
 /* Modal confirmation suppression */

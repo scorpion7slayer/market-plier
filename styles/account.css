@@ -27,7 +27,7 @@ body {
 
 /* HEADER (identique à index.css pour le header partagé) */
 header {
-    background-color: #7faa58;
+    background-color: #619358;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -181,7 +181,7 @@ header {
 
 .ac-item:hover,
 .ac-item.ac-active {
-    background: #7fb88518;
+    background: #61935818;
     text-decoration: none;
     color: var(--mp-text, #333);
 }
@@ -190,7 +190,7 @@ header {
     width: 20px;
     text-align: center;
     font-size: 14px;
-    color: #7fb885;
+    color: #619358;
     flex-shrink: 0;
 }
 
@@ -237,7 +237,7 @@ header {
 .ac-price {
     font-size: 12px;
     font-weight: 700;
-    color: #7fb885;
+    color: #619358;
 }
 
 .ac-arrow {
@@ -535,7 +535,7 @@ nav a:hover {
     position: absolute;
     top: 10px;
     left: 10px;
-    background: rgba(127, 184, 133, 0.95);
+    background: rgba(97, 147, 88, 0.95);
     color: #fff;
     padding: 5px 12px;
     border-radius: 20px;
@@ -565,7 +565,7 @@ nav a:hover {
 .article-price {
     font-size: 20px;
     font-weight: 700;
-    color: #7fb885;
+    color: #619358;
     margin-bottom: 8px;
 }
 
@@ -577,7 +577,7 @@ nav a:hover {
 }
 
 .article-location i {
-    color: #7fb885;
+    color: #619358;
     margin-right: 4px;
 }
 
@@ -593,9 +593,9 @@ nav a:hover {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 2px solid #7fb885;
+    border: 2px solid #619358;
     background: var(--mp-card-bg, #fff);
-    color: #7fb885;
+    color: #619358;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -604,7 +604,7 @@ nav a:hover {
 }
 
 .btn-edit:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -636,8 +636,8 @@ nav a:hover {
 }
 
 .btn-brand {
-    background-color: #7fb885;
-    border-color: #7fb885;
+    background-color: #619358;
+    border-color: #619358;
     color: white;
     font-weight: 600;
     font-style: italic;
@@ -646,7 +646,7 @@ nav a:hover {
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
-    border: 2px solid #7fb885;
+    border: 2px solid #619358;
 }
 
 .btn-brand.btn-sm {
@@ -656,16 +656,16 @@ nav a:hover {
 }
 
 .btn-brand:hover {
-    background-color: #6aa070;
-    border-color: #6aa070;
+    background-color: #4f7a49;
+    border-color: #4f7a49;
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(127, 184, 133, 0.4);
+    box-shadow: 0 4px 12px rgba(97, 147, 88, 0.4);
 }
 
 /* Description éditable */
 .description-edit-form textarea {
-    border: 2px solid #7fb885;
+    border: 2px solid #619358;
     border-radius: 12px;
     font-family: "Archivo", sans-serif;
     font-style: italic;
@@ -674,15 +674,15 @@ nav a:hover {
 }
 
 .description-edit-form textarea:focus {
-    border-color: #6aa070;
-    box-shadow: 0 0 0 0.2rem rgba(127, 184, 133, 0.25);
+    border-color: #4f7a49;
+    box-shadow: 0 0 0 0.2rem rgba(97, 147, 88, 0.25);
     outline: none;
 }
 
 .edit-description-btn {
     background: none;
     border: none;
-    color: #7fb885;
+    color: #619358;
     cursor: pointer;
     font-size: 16px;
     padding: 4px 8px;
@@ -690,7 +690,7 @@ nav a:hover {
 }
 
 .edit-description-btn:hover {
-    color: #6aa070;
+    color: #4f7a49;
 }
 
 /* CUSTOM MODAL */

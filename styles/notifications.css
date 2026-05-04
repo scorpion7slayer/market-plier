@@ -67,11 +67,11 @@
 }
 
 a.notif-item:hover {
-    background: rgba(127, 184, 133, 0.06);
+    background: rgba(97, 147, 88, 0.06);
 }
 
 .notif-new {
-    background: rgba(127, 184, 133, 0.04);
+    background: rgba(97, 147, 88, 0.04);
 }
 
 .notif-icon {

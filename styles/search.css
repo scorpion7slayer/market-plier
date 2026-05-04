@@ -36,21 +36,21 @@
 }
 
 .category-chip:hover {
-    background: #7fb88520;
-    border-color: #7fb885;
+    background: #61935820;
+    border-color: #619358;
     color: #5a9060;
     text-decoration: none;
 }
 
 .category-chip.active {
-    background: #7fb885;
-    border-color: #7fb885;
+    background: #619358;
+    border-color: #619358;
     color: #fff;
 }
 
 .category-chip.active:hover {
-    background: #6aa070;
-    border-color: #6aa070;
+    background: #4f7a49;
+    border-color: #4f7a49;
     color: #fff;
 }
 
@@ -165,7 +165,7 @@
 }
 
 .listing-card-category {
-    background: #7fb88518;
+    background: #61935818;
     color: #5a9060;
     padding: 2px 8px;
     border-radius: 12px;
@@ -215,16 +215,16 @@
     font-size: 14px;
     padding: 12px 32px;
     border-radius: 30px;
-    border: 1.5px solid #7fb885;
+    border: 1.5px solid #619358;
     background: transparent;
-    color: #7fb885;
+    color: #619358;
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
 }
 
 .load-more-btn:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -260,12 +260,12 @@
 }
 
 .category-dropdown-toggle:hover {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .category-dropdown-toggle.active {
-    background: #7fb885;
-    border-color: #7fb885;
+    background: #619358;
+    border-color: #619358;
     color: #fff;
 }
 
@@ -317,18 +317,18 @@
 }
 
 .category-dropdown-item:hover {
-    background: #7fb88515;
+    background: #61935815;
     text-decoration: none;
     color: var(--mp-text, #333);
 }
 
 .category-dropdown-item.active {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
 .category-dropdown-item.active:hover {
-    background: #6aa070;
+    background: #4f7a49;
     color: #fff;
 }
 
@@ -346,11 +346,11 @@
 }
 
 [data-bs-theme="dark"] .category-dropdown-toggle:hover {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 [data-bs-theme="dark"] .category-dropdown-toggle.active {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -366,12 +366,12 @@
 }
 
 [data-bs-theme="dark"] .category-dropdown-item:hover {
-    background: #7fb88520;
+    background: #61935820;
     color: var(--mp-text, #ddd);
 }
 
 [data-bs-theme="dark"] .category-dropdown-item.active {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -418,13 +418,13 @@
 }
 
 [data-bs-theme="dark"] .category-chip:hover {
-    background: #7fb88530;
-    border-color: #7fb885;
-    color: #7fb885;
+    background: #61935830;
+    border-color: #619358;
+    color: #619358;
 }
 
 [data-bs-theme="dark"] .category-chip.active {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -441,17 +441,17 @@
 }
 
 [data-bs-theme="dark"] .listing-card-category {
-    background: #7fb88525;
-    color: #7fb885;
+    background: #61935825;
+    color: #619358;
 }
 
 [data-bs-theme="dark"] .load-more-btn {
-    border-color: #7fb885;
-    color: #7fb885;
+    border-color: #619358;
+    color: #619358;
 }
 
 [data-bs-theme="dark"] .load-more-btn:hover {
-    background: #7fb885;
+    background: #619358;
     color: #fff;
 }
 
@@ -507,7 +507,7 @@
 }
 
 .filter-input:focus {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .filter-sep {
@@ -532,7 +532,7 @@
 }
 
 .filter-select:focus {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .filter-btn {
@@ -540,7 +540,7 @@
     padding: 0 18px;
     border: none;
     border-radius: 8px;
-    background: #7fb885;
+    background: #619358;
     color: #fff;
     font-family: "Archivo", sans-serif;
     font-style: italic;
@@ -552,7 +552,7 @@
 }
 
 .filter-btn:hover {
-    background: #6aa070;
+    background: #4f7a49;
 }
 
 /* Dark theme filters */
@@ -615,7 +615,7 @@
 }
 
 .search-inline-input:focus {
-    border-color: #7fb885;
+    border-color: #619358;
 }
 
 .search-inline-btn {
@@ -623,7 +623,7 @@
     height: 42px;
     border-radius: 50%;
     border: none;
-    background: #7fb885;
+    background: #619358;
     color: #fff;
     font-size: 15px;
     cursor: pointer;
@@ -635,7 +635,7 @@
 }
 
 .search-inline-btn:hover {
-    background: #6aa070;
+    background: #4f7a49;
 }
 
 @media (max-width: 768px) {

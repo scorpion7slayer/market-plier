@@ -196,7 +196,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    background: rgba(127, 184, 133, 0.92);
+    background: rgba(97, 147, 88, 0.92);
     color: #fff;
     padding: 4px 12px;
     border-radius: 20px;
@@ -243,7 +243,7 @@
 }
 
 .profile-listing-category {
-    background: rgba(127, 184, 133, 0.12);
+    background: rgba(97, 147, 88, 0.12);
     color: var(--mp-green);
     padding: 2px 10px;
     border-radius: 20px;
@@ -385,9 +385,9 @@
 
 /* MODE SOMBRE */
 [data-bs-theme="dark"] .profile-listing-condition {
-    background: rgba(127, 184, 133, 0.85);
+    background: rgba(97, 147, 88, 0.85);
 }
 
 [data-bs-theme="dark"] .profile-listing-category {
-    background: rgba(127, 184, 133, 0.1);
+    background: rgba(97, 147, 88, 0.1);
 }
