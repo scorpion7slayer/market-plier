@@ -26,7 +26,7 @@ if (!isset($_SESSION['csrf_token'])) {
   <?php include '../includes/theme_init.php'; ?>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="../styles/register.css">
+  <link rel="stylesheet" href="../styles/register.css?v=20260608-3">
   <link rel="stylesheet" href="../styles/theme.css">
   <link rel="icon" type="image/svg+xml" href="../assets/images/logo.svg" />
   <title>Market Plier - <?= htmlspecialchars(t('login_title'), ENT_QUOTES, 'UTF-8') ?></title>
@@ -35,7 +35,7 @@ if (!isset($_SESSION['csrf_token'])) {
 <body class="auth-page">
   <?php include '../includes/toast.php'; ?>
   <div class="logo">
-    <img src="../assets/images/logo.svg" alt="" class="auth-logo-img">
+    <img src="../assets/images/logo.svg?v=20260608-3" alt="" class="auth-logo-img" width="360" height="113">
     <p class="auth-link" style="margin-top: 8px;"><a href="../index.php">&larr; <?= htmlspecialchars(t('login_back'), ENT_QUOTES, 'UTF-8') ?></a></p>
   </div>
   <!-- Theme toggle flottant -->

@@ -62,11 +62,14 @@ body.auth-page .mp-footer {
     position: fixed;
     top: 20px;
     left: 40px;
+    width: 300px;
     z-index: 1000;
 }
 
 .logo .auth-logo-img {
-    width: 120%;
+    display: block;
+    width: 360px;
+    max-width: none;
     height: auto;
 }
 
@@ -379,12 +382,13 @@ body.auth-page .mp-footer {
         position: relative;
         top: auto;
         left: auto;
+        width: 100%;
         padding: 15px 15px 0;
     }
 
     .logo .auth-logo-img {
-        width: auto;
-        max-width: 200px;
+        width: 200px;
+        max-width: 100%;
         height: auto;
     }
 

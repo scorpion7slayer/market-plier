@@ -1,4 +1,5 @@
 .grepai/
+tasks/
 # Ignorer les fichiers uploadés, garder les dossiers
 uploads/profiles/*
 !uploads/profiles/.gitkeep
