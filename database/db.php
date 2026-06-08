@@ -18,8 +18,9 @@ $dbHost = $_ENV["DB_HOST"];
 $dbName = $_ENV["DB_NAME"];
 $dbUser = $_ENV["DB_USER"];
 $dbPass = $_ENV["DB_PASS"];
+$dbPort = $_ENV["DB_PORT"];
 
-$dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
+$dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
 
 $pdoOptions = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
