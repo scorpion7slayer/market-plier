@@ -84,7 +84,7 @@ if ($sessionId) {
 
                 if ($lstRow && $lstRow['status'] === 'sold') {
                     sendNotification($pdo, $sellerToken, [
-                        'type'    => 'stock',
+                        'type'    => 'system',
                         'title'   => 'Stock épuisé',
                         'content' => 'Votre annonce « ' . ($lstRow['title'] ?? 'Article') . ' » est maintenant épuisée et a été retirée de la vente.',
                         'link'    => 'inscription-connexion/account.php',

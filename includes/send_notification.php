@@ -23,19 +23,34 @@ function sendNotification(PDO $pdo, string $authToken, array $data): void
     $content = $data['content'] ?? '';
     $link = $data['link'] ?? null;
 
+    $allowedTypes = ['message', 'review', 'favorite', 'system', 'sale'];
+    if (!is_string($type) || !in_array($type, $allowedTypes, true)) {
+        error_log('Notification type invalide, remplacement par system');
+        $type = 'system';
+    }
+
     // 1. Insérer notification en base
-    $stmt = $pdo->prepare("
-        INSERT INTO notifications (auth_token, type, title, content, link, is_read, created_at)
-        VALUES (?, ?, ?, ?, ?, 0, NOW())
-    ");
-    $stmt->execute([$authToken, $type, $title, $content, $link]);
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO notifications (auth_token, type, title, content, link, is_read, created_at)
+            VALUES (?, ?, ?, ?, ?, 0, NOW())
+        ");
+        $stmt->execute([$authToken, $type, $title, $content, $link]);
+    } catch (\Throwable $e) {
+        error_log('Notification insert error: ' . $e->getMessage());
+        return;
+    }
 
     // 2. Envoyer Web Push à tous les appareils de l'utilisateur
-    sendWebPush($pdo, $authToken, [
-        'title' => $title,
-        'body'  => $content,
-        'link'  => $link ? ($_ENV['APP_URL'] ?? '/market-plier') . '/' . $link : ($_ENV['APP_URL'] ?? '/market-plier') . '/',
-    ]);
+    try {
+        sendWebPush($pdo, $authToken, [
+            'title' => $title,
+            'body'  => $content,
+            'link'  => $link ? ($_ENV['APP_URL'] ?? '/market-plier') . '/' . $link : ($_ENV['APP_URL'] ?? '/market-plier') . '/',
+        ]);
+    } catch (\Throwable $e) {
+        error_log('Web Push error: ' . $e->getMessage());
+    }
 }
 
 function sendWebPush(PDO $pdo, string $authToken, array $payload): void
