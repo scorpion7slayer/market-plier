@@ -122,7 +122,7 @@ function handleCheckoutCompleted($session, $pdo)
     // Notification supplémentaire si stock épuisé
     if ($listingNowSold) {
         sendNotification($pdo, $sellerToken, [
-            'type'    => 'stock',
+            'type'    => 'system',
             'title'   => 'Stock épuisé',
             'content' => 'Votre annonce « ' . $listingTitle . ' » est maintenant épuisée et a été retirée de la vente.',
             'link'    => 'inscription-connexion/account.php',
